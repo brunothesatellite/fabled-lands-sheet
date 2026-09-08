@@ -444,119 +444,106 @@ var bookData = {
         {n:"635",c:1,note:"Notes"},{n:"645",c:1},{n:"649",c:1},{n:"655",c:1},{n:"667",c:1}
     ],
     book2: [
-        {n:"2",d:"(Town House)"},{n:"36",d:"(Money Banked)"},{n:"48",d:"(Town House)"},
-        {n:"57"},{n:"71",d:"(Town House)"},{n:"39",d:"(Money Invested)"},{n:"160"},
-        {n:"217",d:"(Town House)"},{n:"253"},{n:"49",d:"(Money Invested)"},{n:"254"},
-        {n:"391"},{n:"416"},{n:"85",d:"(Money Invested)"},{n:"443"},{n:"465"},
-        {n:"542"},{n:"154",d:"(Money Invested)"},{n:"547"},{n:"567",d:"(Amulet)"},
-        {n:"567",d:"(Tresses)"},{n:"171",d:"(Items in Town House)"},{n:"567",d:"(Katana)"},
-        {n:"586"},{n:"648"},{n:"211",d:"(Items in Town House)"},{n:"679"},
-        {n:"710"},{n:"718"},{n:"278",d:"(Items in Town House)"},{n:"727"},
-        {n:"728"},{n:"754"},{n:"348",d:"(Items in Town House)"},{n:"757"},
-        {n:"760"},{n:"762"},{n:"661",d:"(Locker Box)"},{n:"777"}
+        {n:"2 (Town House)",c:1,note:"36 (Money Banked)"},
+        {n:"48 (Town House)",c:1},{n:"57",c:1},
+        {n:"71 (Town House)",c:1,note:"39 (Money Invested)"},{n:"160",c:1},{n:"217 (Town House)",c:1},
+        {n:"253",c:1,note:"49 (Money Invested)"},{n:"254",c:1},{n:"391",c:1},
+        {n:"416",c:1,note:"85 (Money Invested)"},{n:"443",c:1},{n:"465",c:1},
+        {n:"542",c:3,note:"154 (Money Invested)"},{n:"547",c:1},{n:"567 (Amulet)",c:1},
+        {n:"567 (Tresses)",c:1,note:"171 (Items in Town House)"},{n:"567 (Katana)",c:1},{n:"586",c:1},
+        {n:"648",c:1,note:"211 (Items in Town House)"},{n:"679",c:1},{n:"710",c:1},
+        {n:"718",c:1,note:"278 (Items in Town House)"},{n:"727",c:1},{n:"728",c:1},
+        {n:"754",c:1,note:"348 (Items in Town House)"},{n:"757",c:1},{n:"760",c:1},
+        {n:"762",c:1,note:"661 (Locker Box)"},{n:"777",c:1}
     ],
     book3: [
-        {n:"44",d:"(Shack)"},{n:"74",d:"(Items in Shack)"},{n:"49"},{n:"56"},
-        {n:"57"},{n:"68"},{n:"84"},{n:"105"},{n:"120"},{n:"143"},
-        {n:"335",d:"(Items in House)"},{n:"183"},{n:"216"},{n:"351"},
-        {n:"466"},{n:"470"},{n:"477"},{n:"494"},{n:"509"},
-        {n:"607",d:"(Items in College)"},{n:"515"},{n:"572",d:"(College)"},
-        {n:"576"},{n:"651"},{n:"659"},{n:"680"},{n:"692"},{n:"719"},
-        {n:"652",d:"(Money Invested)"}
+        {n:"44 (Shack)",c:1,note:"74 (Items in Shack)"},
+        {n:"49",c:1},{n:"56",c:1},{n:"57",c:1},{n:"68",c:1},{n:"84",c:1},{n:"105",c:1},{n:"120",c:1},
+        {n:"143",c:1,note:"335 (Items in House)"},
+        {n:"183",c:1},{n:"216",c:1},{n:"351",c:3},{n:"466",c:1},{n:"470",c:1},{n:"477",c:1},{n:"494",c:1},
+        {n:"509",c:1,note:"607 (Items in College)"},
+        {n:"515",c:1},{n:"572 (College)",c:1},{n:"576",c:1},{n:"651",c:1},{n:"659",c:1},{n:"680",c:1},{n:"692",c:1},
+        {n:"719",c:1,note:"652 (Money Invested)"}
     ],
     book4: [
-        {n:"10",d:"(Town House)"},{n:"450",d:"(Items Protected by Brotherhood)"},
-        {n:"40"},{n:"63"},{n:"127"},{n:"173"},{n:"181"},{n:"195"},
-        {n:"468",d:"(Items in Hordeth's Villa)"},{n:"210"},{n:"243"},{n:"259"},
-        {n:"265"},{n:"326"},{n:"360"},{n:"509",d:"(Items in Town House)"},{n:"376"},
-        {n:"395"},{n:"428"},{n:"429"},{n:"437"},{n:"440"},
-        {n:"526",d:"(Money Invested)"},{n:"467"},{n:"491"},{n:"500"},
-        {n:"513"},{n:"522"},{n:"545"},{n:"586",d:"(Items Left Behind)"},
-        {n:"583"},{n:"605"},{n:"704"},{n:"600",d:"(Money Banked)"}
+        {n:"10 (Town House)",c:1,note:"450 (Items Protected by Brotherhood)"},
+        {n:"40",c:1},{n:"63",c:1},{n:"127",c:1},{n:"173",c:1},{n:"181",c:1},
+        {n:"195",c:1,note:"468 (Items in Hordeth's Villa)"},
+        {n:"210",c:1},{n:"243",c:1},{n:"259",c:1},{n:"265",c:1},{n:"326",c:1},
+        {n:"360",c:1,note:"509 (Items in Town House)"},
+        {n:"376",c:1},{n:"395",c:1},{n:"428",c:1},{n:"429",c:1},{n:"437",c:1},
+        {n:"440",c:3,note:"526 (Money Invested)"},
+        {n:"467",c:3},{n:"491",c:1},{n:"500",c:1},{n:"513",c:1},{n:"522",c:1},
+        {n:"545",c:1,note:"586 (Items Left Behind)"},
+        {n:"583",c:1},{n:"605",c:1},{n:"704",c:1}
     ],
     book5: [
-        {n:"16"},{n:"115",d:"(Money Invested)"},{n:"44"},{n:"93"},{n:"113"},
-        {n:"120"},{n:"126"},{n:"245",d:"(Items in Castle)"},{n:"153"},{n:"165"},
-        {n:"195"},{n:"204"},{n:"216"},{n:"401",d:"(Status Points)"},{n:"227"},
-        {n:"239"},{n:"247"},{n:"269"},{n:"325"},{n:"560",d:"(Items in Cellar)"},
-        {n:"335"},{n:"467"},{n:"493"},{n:"498"},{n:"520"},
-        {n:"586",d:"(Items in Room)"},{n:"534"},{n:"584"},{n:"592"},
-        {n:"596"},{n:"602"},{n:"601",d:"(Money Banked)"},{n:"622"},
-        {n:"644"},{n:"648"},{n:"672"},{n:"697"},{n:"624",d:"(Palace Rooms)"},{n:"714"}
+        {n:"68",c:1,note:"175 (Money Invested)"},
+        {n:"79 (Town House)",c:1},{n:"92",c:1},{n:"106",c:1},
+        {n:"109",c:1,note:"238 (Items in Town House)"},
+        {n:"123",c:1},{n:"155 (Town House)",c:1},{n:"164",c:4},
+        {n:"174",c:1,note:"276 (Worldly Goods)"},
+        {n:"233",c:1},{n:"244",c:1},{n:"258",c:1},
+        {n:"263",c:1,note:"284 (Items in Town House)"},
+        {n:"328",c:1},{n:"345",c:1},{n:"517",c:1},
+        {n:"539",c:1,note:"414 (Items in Town House)"},
+        {n:"569",c:1},{n:"604",c:1},{n:"650",c:1},
+        {n:"668",c:1,note:"440 (Money Invested)"}
     ],
     book6: [
-        {n:"68"},{n:"175",d:"(Money Invested)"},{n:"79",d:"(Town House)"},
-        {n:"92"},{n:"106"},{n:"109"},{n:"238",d:"(Items in Town House)"},{n:"123"},
-        {n:"155",d:"(Town House)"},{n:"164"},{n:"174"},{n:"276",d:"(Worldly Goods)"},
-        {n:"233"},{n:"244"},{n:"258"},{n:"263"},{n:"284",d:"(Items in Town House)"},
-        {n:"328"},{n:"345"},{n:"517"},{n:"539"},{n:"414",d:"(Items in Town House)"},
-        {n:"569"},{n:"604"},{n:"650"},{n:"668"},{n:"440",d:"(Money Invested)"},
-        {n:"464",d:"(Private Apartments)"},{n:"512",d:"(Cabinet)"},
-        {n:"576",d:"(Apartments)"}
+        {n:"17",c:1,note:"129 (Items in Town House)"},
+        {n:"560 (Sword)",c:1},
+        {n:"23",c:4},
+        {n:"560 (Storm)",c:1},
+        {n:"34",c:1},
+        {n:"560 (Horse)",c:1},
+        {n:"40",c:1},
+        {n:"588 (2nd Trial)",c:1},
+        {n:"42 (Town House)",c:1,note:"150 (Items Stored in Quarters)"},
+        {n:"588 (3rd Trial)",c:1},
+        {n:"58",c:1},
+        {n:"588 (4th Trial)",c:1},
+        {n:"94",c:1},{n:"117",c:1},
+        {n:"120",c:1,note:"250 (Items Held in Storage)"},
+        {n:"124",c:1},{n:"132",c:1},{n:"135",c:1},
+        {n:"141",c:1,note:"250 (Duties Remaining)"},
+        {n:"146",c:1},{n:"161",c:1},{n:"178",c:1},
+        {n:"204",c:1,note:"263 (Items Held in Spire)"},
+        {n:"225 (Town House)",c:1},
+        {n:"233",c:1},{n:"266",c:1},
+        {n:"270",c:1,note:"307 (Items Held in Theatre)"},
+        {n:"292",c:1},{n:"299",c:1},{n:"305",c:1},
+        {n:"307",c:2,note:"405 (Items in Town House)"},
+        {n:"313",c:1},{n:"316",c:1},{n:"333 (Town House)",c:1},
+        {n:"354",c:1,note:"486 (Items in Town House)"},
+        {n:"356",c:1},{n:"407",c:1},{n:"412",c:1},
+        {n:"424",c:1,note:"Notes"},
+        {n:"426",c:1},{n:"486",c:1},{n:"506",c:1},{n:"557",c:1}
     ],
     book7a: [
-        {n:"17"},{n:"560",d:"(Sword)"},{n:"129",d:"(Items in Town House)"},
-        {n:"23"},{n:"560",d:"(Storm)"},{n:"34"},{n:"560",d:"(Horse)"},
-        {n:"40"},{n:"588",d:"(2nd Trial)"},{n:"42",d:"(Town House)"},
-        {n:"588",d:"(3rd Trial)"},{n:"150",d:"(Items Stored in Quarters)"},
-        {n:"58"},{n:"588",d:"(4th Trial)"},{n:"94"},{n:"117"},{n:"120"},
-        {n:"250",d:"(Items Held in Storage)"},{n:"124"},{n:"132"},{n:"135"},
-        {n:"141"},{n:"250",d:"(Duties Remaining)"},{n:"146"},{n:"161"},{n:"178"},
-        {n:"204"},{n:"263",d:"(Items Held in Spire)"},{n:"225",d:"(Town House)"},
-        {n:"233"},{n:"266"},{n:"270"},{n:"307",d:"(Items Held in Theatre)"},
-        {n:"292"},{n:"299"},{n:"305"},{n:"307"},{n:"405",d:"(Items in Town House)"},
-        {n:"313"},{n:"316"},{n:"333",d:"(Town House)"},{n:"354"},
-        {n:"486",d:"(Items in Town House)"},{n:"356"},{n:"407"},{n:"412"},
-        {n:"424"},{n:"426"},{n:"486"},{n:"506"},{n:"557"}
+        {n:"610",c:1,note:"599 (Items Left in Atotl's Home)"},
+        {n:"618",c:1},{n:"629",c:1},{n:"635",c:1},{n:"645",c:1},{n:"653",c:1},{n:"690",c:1},
+        {n:"694",c:1,note:"624 (Items Stored in Clifftop House)"},
+        {n:"729",c:1},{n:"777",c:3},{n:"793",c:1},{n:"847",c:1},{n:"865",c:1},{n:"880",c:1},
+        {n:"899",c:1,note:"788 (Flask of Oblivion)"},
+        {n:"911",c:1},{n:"912",c:1},{n:"927",c:1},{n:"946",c:1},{n:"947",c:1},{n:"962",c:1},{n:"963",c:1},
+        {n:"976",c:1,note:"974 (Stolen Items)"},
+        {n:"1043",c:1},{n:"1057",c:1},{n:"1061",c:2},{n:"1067",c:1},
+        {n:"1136",c:1},{n:"1145",c:1,note:"1150 (Items in Town House)"},
+        {n:"1184",c:1},{n:"1189",c:1},
+        {n:"1190",c:5,note:"Notes"}
     ],
-    book7b: [
-        {n:"610"},{n:"599",d:"(Items Left in Atotl's Home)"},{n:"618"},
-        {n:"629"},{n:"635"},{n:"645"},{n:"653"},{n:"690"},{n:"694"},
-        {n:"624",d:"(Items Stored in Clifftop House)"},{n:"729"},{n:"777"},
-        {n:"793"},{n:"847"},{n:"865"},{n:"880"},{n:"899"},
-        {n:"788",d:"(Flask of Oblivion)"},{n:"911"},{n:"912"},{n:"927"},
-        {n:"946"},{n:"947"},{n:"962"},{n:"963"},{n:"974",d:"(Stolen Items)"},
-        {n:"976"},{n:"1043"},{n:"1057"},{n:"1061"},{n:"1067"},
-        {n:"1136"},{n:"1145"},{n:"1150",d:"(Items in Town House)"},
-        {n:"1184"},{n:"1189"},{n:"1190"}
-    ]
+    book7b: []
 };
 
 function genererParagraphes(bookId, listId, prefix) {
-    var list = document.getElementById(listId);
-    if (!list) return;
     var paragraphs = bookData[bookId];
     if (!paragraphs) return;
-    if(bookId === 'book1'){
-        buildBook1Table(paragraphs, listId);
-        return;
-    }
-    paragraphs.forEach(function(para, i) {
-        var key = prefix + '-para-' + para.n + '-' + i;
-        ALL_KEYS.push(key);
-        var item = document.createElement('div');
-        item.className = 'paragraph-item';
-        var cb = document.createElement('input');
-        cb.type = 'checkbox';
-        cb.id = key;
-        cb.dataset.key = key;
-        cb.addEventListener('change', function() {
-            ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
-        });
-        var num = document.createElement('span');
-        num.className = 'para-number';
-        num.textContent = para.n;
-        var desc = document.createElement('span');
-        desc.className = 'para-desc';
-        desc.textContent = para.d || '';
-        item.appendChild(cb);
-        item.appendChild(num);
-        item.appendChild(desc);
-        list.appendChild(item);
-    });
+    if(paragraphs.length === 0) return;
+    buildBookTable(paragraphs, listId, bookId);
 }
 
-function buildBook1Table(paragraphs, tbodyId){
+function buildBookTable(paragraphs, tbodyId, bookId){
     var tbody = document.getElementById(tbodyId);
     if(!tbody) return;
     var groupSize = 4;
@@ -573,7 +560,7 @@ function buildBook1Table(paragraphs, tbodyId){
         var group = groups[gi];
         for(var g = 0; g < group.length; g++){
             var para = group[g];
-            var key = 'fl-book1-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
+            var key = 'fl-' + bookId + '-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
             var tr = document.createElement('tr');
             // Checkboxes cell
             var tdCheck = document.createElement('td');
@@ -603,7 +590,7 @@ function buildBook1Table(paragraphs, tbodyId){
             var inp = document.createElement('input');
             inp.type = 'text';
             inp.className = 'para-input';
-            var inpKey = 'fl-book1-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
+            var inpKey = 'fl-' + bookId + '-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
             inp.dataset.key = inpKey;
             inp.value = localStorage.getItem(inpKey) || '';
             inp.addEventListener('input', function(){
@@ -625,7 +612,7 @@ function buildBook1Table(paragraphs, tbodyId){
                     lbl.textContent = para.note;
                     tdNote.appendChild(lbl);
                 }
-                var noteKey = 'fl-book1-note-g' + gi;
+                var noteKey = 'fl-' + bookId + '-note-g' + gi;
                 var ta = document.createElement('textarea');
                 ta.className = 'note-textarea';
                 ta.rows = Math.max(group.length * 2, 4);
@@ -862,13 +849,13 @@ async function initialiser() {
     genererCodewords();
     genererShipTable();
     genererParagraphes('book1', 'book1TableBody', 'fl-book1');
-    genererParagraphes('book2', 'book2-list', 'fl-book2');
-    genererParagraphes('book3', 'book3-list', 'fl-book3');
-    genererParagraphes('book4', 'book4-list', 'fl-book4');
-    genererParagraphes('book5', 'book5-list', 'fl-book5');
-    genererParagraphes('book6', 'book6-list', 'fl-book6');
-    genererParagraphes('book7a', 'book7a-list', 'fl-book7');
-    genererParagraphes('book7b', 'book7b-list', 'fl-book7');
+    genererParagraphes('book2', 'book2TableBody', 'fl-book2');
+    genererParagraphes('book3', 'book3TableBody', 'fl-book3');
+    genererParagraphes('book4', 'book4TableBody', 'fl-book4');
+    genererParagraphes('book5', 'book5TableBody', 'fl-book5');
+    genererParagraphes('book6', 'book6TableBody', 'fl-book6');
+    genererParagraphes('book7a', 'book7aTableBody', 'fl-book7');
+    genererParagraphes('book7b', 'book7bTableBody', 'fl-book7');
 
     await detecterPhp();
     await chargerFormulaire();
