@@ -10,7 +10,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .utility-controls{ display:flex; align-items:flex-start; gap:.7rem; }
 
 /* Tabs */
-.tab-bar{ display:flex; overflow-x:auto; gap:0; border-bottom:2px solid var(--ink); background:var(--white); position:sticky; top:0; z-index:100; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+.tab-bar{ display:flex; gap:0; border-bottom:2px solid var(--ink); background:var(--white); position:sticky; top:0; z-index:100; }
 .tab-bar::-webkit-scrollbar{ display:none; }
 .tab{ flex:0 0 auto; padding:.6rem 1rem; font:700 .78rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; transition:background .15s,color .15s; }
 .tab:hover{ background:rgba(0,0,0,.06); }
