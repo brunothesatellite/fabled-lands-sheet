@@ -22,6 +22,7 @@ The top of the screen features a **tab bar** for quick navigation between sectio
 | **Ship's Manifest** | Track your fleet: ship type, name, crew quality, cargo, and docking location |
 | **Codewords** | A checklist of all codewords encountered across the 7 books |
 | **Books** (dropdown) | Per-book paragraph trackers with notes (Books 1–7) |
+| **Encounter** | Combat tracker for comparing your stats against a foe |
 | **Notes** | A free-form text area for general notes |
 | **Maps** (dropdown) | Interactive maps: world map and per-book maps |
 
@@ -56,6 +57,13 @@ All fields auto-save as you type.
 - Check the checkbox next to a paragraph when you visit it.
 - Some paragraphs have cross-references (e.g. "46 (Money Invested)") shown as note labels on the right panel.
 - Write your own notes in the text fields alongside each paragraph group.
+
+### Encounter
+
+A quick-reference combat tracker with two side-by-side boxes:
+
+- **Me** — Displays your Combat and Defence (read-only, synced from the Adventure Sheet) and your current Stamina (editable, synced back to the Adventure Sheet in real time).
+- **Foe** — Three editable fields (Combat, Defence, Stamina) initialized to 1. Use the **Reset** button to restore all Foe values to their defaults. Foe data is not persisted.
 
 ### Maps
 

@@ -311,6 +311,8 @@ function switchTab(tabId) {
     document.getElementById('booksMenu').hidden = true;
     document.getElementById('mapsMenu').hidden = true;
     window.scrollTo(0, 0);
+
+    if (tabId === 'encounter') actualiserFight();
 }
 
 document.querySelectorAll('.tab[data-tab]').forEach(function(btn) {
@@ -890,6 +892,33 @@ document.querySelectorAll('.map-image').forEach(function(img) {
             this.style.transform = '';
         }
     });
+});
+
+/* Encounter */
+function actualiserFight() {
+    var adventureCombat = document.querySelector('[data-key="fl-adventure-combat"]');
+    var adventureDefence = document.querySelector('[data-key="fl-adventure-defence"]');
+    var adventureStamina = document.querySelector('[data-key="fl-adventure-current-stamina"]');
+    var meCombat = document.getElementById('encounter-me-combat');
+    var meDefence = document.getElementById('encounter-me-defence');
+    var meStamina = document.getElementById('encounter-me-stamina');
+    if (adventureCombat) meCombat.value = adventureCombat.value;
+    if (adventureDefence) meDefence.value = adventureDefence.value;
+    if (adventureStamina) meStamina.value = adventureStamina.value;
+}
+
+document.getElementById('encounter-me-stamina').addEventListener('input', function() {
+    var adventureStamina = document.querySelector('[data-key="fl-adventure-current-stamina"]');
+    if (adventureStamina) {
+        adventureStamina.value = this.value;
+        adventureStamina.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+});
+
+document.getElementById('encounter-foe-reset').addEventListener('click', function() {
+    document.getElementById('encounter-foe-combat').value = 1;
+    document.getElementById('encounter-foe-defence').value = 1;
+    document.getElementById('encounter-foe-stamina').value = 1;
 });
 
 /* Init */

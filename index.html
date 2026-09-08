@@ -67,6 +67,7 @@
             <button class="tab-subitem" data-tab="book7-paragraphs" type="button">Book 7</button>
         </div>
     </div>
+    <button class="tab" data-tab="encounter" type="button">Encounter</button>
     <button class="tab" data-tab="notes" type="button">Notes</button>
     <div class="tab-dropdown" id="mapsDropdown">
         <button class="tab tab-dropdown-toggle" type="button">Maps <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
@@ -339,6 +340,50 @@
                 </div>
             </div>
             <div class="book-table-right" id="book7NotesBody"></div>
+        </div>
+    </section>
+
+    <!-- ENCOUNTER -->
+    <section class="tab-panel" id="panel-encounter">
+        <h2 class="panel-title">Encounter</h2>
+        <div class="encounter-container">
+            <div class="encounter-box">
+                <h3 class="encounter-box-title">Me</h3>
+                <div class="encounter-fields">
+                    <div class="encounter-field">
+                        <label class="form-label">Combat</label>
+                        <input type="number" class="form-input form-number" id="encounter-me-combat" readonly>
+                    </div>
+                    <div class="encounter-field">
+                        <label class="form-label">Defence</label>
+                        <input type="number" class="form-input form-number" id="encounter-me-defence" readonly>
+                    </div>
+                    <div class="encounter-field">
+                        <label class="form-label">Stamina</label>
+                        <input type="number" class="form-input form-number" id="encounter-me-stamina" min="0">
+                    </div>
+                </div>
+            </div>
+            <div class="encounter-box">
+                <div class="encounter-box-header">
+                    <h3 class="encounter-box-title">Foe</h3>
+                    <button class="encounter-reset-btn" id="encounter-foe-reset" type="button">Reset</button>
+                </div>
+                <div class="encounter-fields">
+                    <div class="encounter-field">
+                        <label class="form-label">Combat</label>
+                        <input type="number" class="form-input form-number" id="encounter-foe-combat" min="1" value="1">
+                    </div>
+                    <div class="encounter-field">
+                        <label class="form-label">Defence</label>
+                        <input type="number" class="form-input form-number" id="encounter-foe-defence" min="1" value="1">
+                    </div>
+                    <div class="encounter-field">
+                        <label class="form-label">Stamina</label>
+                        <input type="number" class="form-input form-number" id="encounter-foe-stamina" min="0" value="1">
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 

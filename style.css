@@ -118,6 +118,20 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .toast-message.toast-success{ background:#62b879; border-color:var(--ink); }
 .toast-message.toast-error{ background:var(--red); border-color:var(--ink); }
 
+/* Encounter */
+.encounter-container{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+.encounter-box{ border:2px solid var(--ink); background:var(--white); padding:1rem; }
+.encounter-box-title{ margin:0 0 .8rem; font:800 1.1rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--red); }
+.encounter-box-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.8rem; }
+.encounter-box-header .encounter-box-title{ margin-bottom:0; }
+.encounter-fields{ display:flex; flex-direction:column; gap:.5rem; }
+.encounter-field{ display:flex; flex-direction:column; gap:.2rem; }
+.encounter-field .form-number{ min-height:2.4rem; }
+.encounter-field input[readonly]{ background:var(--paper); color:var(--muted); cursor:default; -moz-appearance:textfield; }
+.encounter-field input[readonly]::-webkit-inner-spin-button,.encounter-field input[readonly]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+.encounter-reset-btn{ padding:.3rem .7rem; font:700 .7rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); background:var(--white); border:2px solid var(--ink); cursor:pointer; transition:transform .12s,box-shadow .12s; }
+.encounter-reset-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--yellow); }
+
 /* Mobile */
 @media (max-width:600px){
     .masthead{ padding:.6rem .8rem; }
@@ -130,6 +144,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     .ship-td textarea{ font-size:.72rem; min-height:2.5rem; }
     .book-tables-row{ flex-direction:column; }
     .book-table-right{ border-left:none; border-top:3px solid var(--ink); flex:none; width:100%; }
+    .encounter-container{ grid-template-columns:1fr; }
 }
 
 /* Book tables */
