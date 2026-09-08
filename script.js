@@ -714,19 +714,6 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
                 tr.appendChild(tdInput);
                 leftTbody.appendChild(tr);
             }
-        } else {
-            var trEmpty = document.createElement('tr');
-            trEmpty.className = 'book-tr-empty';
-            var tdE1 = document.createElement('td');
-            tdE1.className = 'book-td book-td-check';
-            trEmpty.appendChild(tdE1);
-            var tdE2 = document.createElement('td');
-            tdE2.className = 'book-td book-td-para';
-            trEmpty.appendChild(tdE2);
-            var tdE3 = document.createElement('td');
-            tdE3.className = 'book-td book-td-input';
-            trEmpty.appendChild(tdE3);
-            leftTbody.appendChild(trEmpty);
         }
         if(!rightDiv) continue;
         var noteGroup = document.createElement('div');
