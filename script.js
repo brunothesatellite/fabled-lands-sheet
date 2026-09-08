@@ -880,6 +880,9 @@ document.querySelectorAll('.map-image').forEach(function(img) {
     var lastMid = {x:0, y:0};
     var dragging = false;
     var dragStart = {x:0, y:0};
+    var touchStartTime = 0;
+    var touchStartX = 0;
+    var touchStartY = 0;
 
     img.addEventListener('touchstart', function(e){
         if(!this.classList.contains('fullscreen')) return;
@@ -892,11 +895,16 @@ document.querySelectorAll('.map-image').forEach(function(img) {
                 x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
                 y: (e.touches[0].clientY + e.touches[1].clientY) / 2
             };
-        } else if(e.touches.length === 1 && this._mapScale > 1){
+        } else if(e.touches.length === 1){
             e.preventDefault();
-            dragging = true;
-            dragStart.x = e.touches[0].clientX - this._mapX;
-            dragStart.y = e.touches[0].clientY - this._mapY;
+            touchStartTime = Date.now();
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+            if(this._mapScale > 1){
+                dragging = true;
+                dragStart.x = e.touches[0].clientX - this._mapX;
+                dragStart.y = e.touches[0].clientY - this._mapY;
+            }
         }
     }, {passive:false});
 
@@ -914,9 +922,9 @@ document.querySelectorAll('.map-image').forEach(function(img) {
             if(lastDist > 0){
                 var ratio = dist / lastDist;
                 var newScale = Math.min(Math.max(this._mapScale * ratio, 1), 5);
+                this._mapX = mid.x - (mid.x - this._mapX) * (newScale / this._mapScale);
+                this._mapY = mid.y - (mid.y - this._mapY) * (newScale / this._mapScale);
                 this._mapScale = newScale;
-                this._mapX += mid.x - lastMid.x;
-                this._mapY += mid.y - lastMid.y;
                 this.style.transform = 'translate('+this._mapX+'px,'+this._mapY+'px) scale('+this._mapScale+')';
                 this.style.transformOrigin = '0 0';
             }
@@ -934,7 +942,20 @@ document.querySelectorAll('.map-image').forEach(function(img) {
     img.addEventListener('touchend', function(e){
         if(!this.classList.contains('fullscreen')) return;
         if(e.touches.length < 2) lastDist = 0;
-        if(e.touches.length === 0) dragging = false;
+        if(e.touches.length === 0){
+            var dt = Date.now() - touchStartTime;
+            var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : 0) - touchStartX;
+            var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : 0) - touchStartY;
+            var moved = Math.sqrt(dx*dx + dy*dy);
+            if(dt < 300 && moved < 10){
+                this.classList.remove('fullscreen');
+                this.style.transform = '';
+                this._mapScale = 1;
+                this._mapX = 0;
+                this._mapY = 0;
+            }
+            dragging = false;
+        }
         if(this._mapScale <= 1){
             this._mapScale = 1;
             this._mapX = 0;
