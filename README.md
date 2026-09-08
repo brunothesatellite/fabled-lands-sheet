@@ -28,6 +28,8 @@ The top of the screen features a **tab bar** for quick navigation between sectio
 
 ### Adventure Sheet
 
+![Adventure Sheet](screenshots/adventurer.png)
+
 - Fill in your character's **Name**, **Profession**, **God**, **Rank**, and **Defence**.
 - Set your six **Ability Scores** (Charisma, Combat, Magic, Sanctity, Scouting, Thievery) from 1 to 12.
 - Track your **Current** and **Maximum Stamina**.
@@ -38,20 +40,26 @@ All fields auto-save as you type.
 
 ### Ship's Manifest
 
+![Ship's Manifest](screenshots/ship.png)
+
 - The table starts with 20 empty rows.
 - Each row has fields: Ship Type, Ship Name, Crew Quality, Cargo Capacity, Current Cargo, Where Docked.
 - Use the action buttons on each row:
   - **Strikethrough** — cross out a row (e.g. a lost ship).
   - **Trash** — delete the row permanently.
   - **Plus** — insert a new row below.
-- Use the **"Ajouter une ligne"** button at the bottom to append a new row.
+- Use the **"Add a row"** button at the bottom to append a new row.
 
 ### Codewords
+
+![Codewords](screenshots/codewords.png)
 
 - A grid of checkboxes for every codeword in the series.
 - Check a codeword when you learn it during your adventure.
 
 ### Book Paragraphs
+
+![Book Paragraphs](screenshots/book.png)
 
 - Each book (1–7) has its own tab with a table of **paragraph numbers** and associated **notes**.
 - Check the checkbox next to a paragraph when you visit it.
@@ -60,12 +68,16 @@ All fields auto-save as you type.
 
 ### Encounter
 
+![Encounter](screenshots/encounter.png)
+
 A quick-reference combat tracker with two side-by-side boxes:
 
 - **Me** — Displays your Combat and Defence (read-only, synced from the Adventure Sheet) and your current Stamina (editable, synced back to the Adventure Sheet in real time).
 - **Foe** — Three editable fields (Combat, Defence, Stamina) initialized to 1. Use the **Reset** button to restore all Foe values to their defaults. Foe data is not persisted.
 
 ### Maps
+
+![Maps](screenshots/map.png)
 
 - Tap a map to view it **fullscreen**.
 - Tap again to return to the fitted view.
@@ -117,6 +129,13 @@ fabled-lands-sheet/
 ├── maps/                    # Map images
 │   ├── world.png
 │   ├── book1.png … book7.png
+├── screenshots/             # Documentation screenshots
+│   ├── adventurer.png       # Adventure sheet example
+│   ├── book.png             # Book paragraph tracker
+│   ├── codewords.png        # Codewords checklist
+│   ├── encounter.png        # Combat encounter tracker
+│   ├── map.png              # Map fullscreen view
+│   └── ship.png             # Ship's manifest table
 ├── spec.txt                 # Original project specification
 ├── LICENSE                  # MIT License
 └── .gitignore
