@@ -206,9 +206,12 @@ anonClearBtn.addEventListener('click', function() {
 });
 anonLoginBtn.addEventListener('click', function() { fermerMenuAnonyme(); window.location.href = 'login.php'; });
 exportBtn.addEventListener('click', function() { fermerMenuUtilisateur(); exporterDonnees(); });
-clearDataBtn.addEventListener('click', function() {
+clearDataBtn.addEventListener('click', async function() {
     fermerMenuUtilisateur();
     if (!confirm('Delete all your Fabled Lands data? This action is irreversible.')) return;
+    if (phpDisponible && utilisateurLogue) {
+        await apiFetch('clear_preferences', { method: 'POST' });
+    }
     effacerDonnees();
     location.reload();
 });
