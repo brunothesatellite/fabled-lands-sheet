@@ -681,7 +681,85 @@ document.getElementById('shipAddTopBtn').addEventListener('click', function(){
 /* Map zoom */
 document.querySelectorAll('.map-image').forEach(function(img) {
     img.addEventListener('click', function() {
-        this.classList.toggle('fullscreen');
+        if(this.classList.contains('fullscreen')){
+            this.classList.remove('fullscreen');
+            this.style.transform = '';
+            this._mapScale = 1;
+            this._mapX = 0;
+            this._mapY = 0;
+        } else {
+            this.classList.add('fullscreen');
+            this._mapScale = 1;
+            this._mapX = 0;
+            this._mapY = 0;
+        }
+    });
+
+    var lastDist = 0;
+    var lastMid = {x:0, y:0};
+    var dragging = false;
+    var dragStart = {x:0, y:0};
+
+    img.addEventListener('touchstart', function(e){
+        if(!this.classList.contains('fullscreen')) return;
+        if(e.touches.length === 2){
+            e.preventDefault();
+            var dx = e.touches[0].clientX - e.touches[1].clientX;
+            var dy = e.touches[0].clientY - e.touches[1].clientY;
+            lastDist = Math.sqrt(dx*dx + dy*dy);
+            lastMid = {
+                x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+                y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+            };
+        } else if(e.touches.length === 1 && this._mapScale > 1){
+            e.preventDefault();
+            dragging = true;
+            dragStart.x = e.touches[0].clientX - this._mapX;
+            dragStart.y = e.touches[0].clientY - this._mapY;
+        }
+    }, {passive:false});
+
+    img.addEventListener('touchmove', function(e){
+        if(!this.classList.contains('fullscreen')) return;
+        if(e.touches.length === 2){
+            e.preventDefault();
+            var dx = e.touches[0].clientX - e.touches[1].clientX;
+            var dy = e.touches[0].clientY - e.touches[1].clientY;
+            var dist = Math.sqrt(dx*dx + dy*dy);
+            var mid = {
+                x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+                y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+            };
+            if(lastDist > 0){
+                var ratio = dist / lastDist;
+                var newScale = Math.min(Math.max(this._mapScale * ratio, 1), 5);
+                this._mapScale = newScale;
+                this._mapX += mid.x - lastMid.x;
+                this._mapY += mid.y - lastMid.y;
+                this.style.transform = 'translate('+this._mapX+'px,'+this._mapY+'px) scale('+this._mapScale+')';
+                this.style.transformOrigin = '0 0';
+            }
+            lastDist = dist;
+            lastMid = mid;
+        } else if(e.touches.length === 1 && dragging){
+            e.preventDefault();
+            this._mapX = e.touches[0].clientX - dragStart.x;
+            this._mapY = e.touches[0].clientY - dragStart.y;
+            this.style.transform = 'translate('+this._mapX+'px,'+this._mapY+'px) scale('+this._mapScale+')';
+            this.style.transformOrigin = '0 0';
+        }
+    }, {passive:false});
+
+    img.addEventListener('touchend', function(e){
+        if(!this.classList.contains('fullscreen')) return;
+        if(e.touches.length < 2) lastDist = 0;
+        if(e.touches.length === 0) dragging = false;
+        if(this._mapScale <= 1){
+            this._mapScale = 1;
+            this._mapX = 0;
+            this._mapY = 0;
+            this.style.transform = '';
+        }
     });
 });
 
