@@ -649,21 +649,19 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
             lbl.textContent = firstPara.note;
             noteGroup.appendChild(lbl);
         }
-        if(!isNoteOnly){
-            var noteKey = 'fl-' + bookId + '-note-g' + gi;
-            var ta = document.createElement('textarea');
-            ta.className = 'note-textarea';
-            ta.dataset.key = noteKey;
-            ta.value = localStorage.getItem(noteKey) || '';
-            ta.placeholder = 'Notes...';
-            ta.addEventListener('input', function(){
-                clearTimeout(this._saveTimeout);
-                var self = this;
-                this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
-            });
-            ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
-            noteGroup.appendChild(ta);
-        }
+        var noteKey = 'fl-' + bookId + '-note-g' + gi;
+        var ta = document.createElement('textarea');
+        ta.className = 'note-textarea';
+        ta.dataset.key = noteKey;
+        ta.value = localStorage.getItem(noteKey) || '';
+        ta.placeholder = 'Notes...';
+        ta.addEventListener('input', function(){
+            clearTimeout(this._saveTimeout);
+            var self = this;
+            this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
+        });
+        ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+        noteGroup.appendChild(ta);
         rightDiv.appendChild(noteGroup);
     }
 }
