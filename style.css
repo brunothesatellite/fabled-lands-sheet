@@ -133,16 +133,19 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 }
 
 /* Book tables */
-.book-tables-row{ display:flex; gap:0; align-items:flex-start; }
+.book-tables-row{ display:flex; gap:0; align-items:stretch; }
 .book-table-left{ flex:1; min-width:0; }
-.book-table-right{ flex:0 0 35%; min-width:0; border-left:3px solid var(--ink); }
+.book-table-right{ flex:0 0 35%; min-width:0; border-left:3px solid var(--ink); display:flex; flex-direction:column; }
+.book-table-right .note-group{ display:flex; flex-direction:column; background:var(--paper); border-bottom:2px solid var(--ink); padding:.3rem .5rem; }
+.book-table-right .note-group .note-label{ font:700 .75rem "Barlow Condensed",sans-serif; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; margin-bottom:.3rem; }
+.book-table-right .note-group .note-textarea{ width:100%; border:1px solid var(--line); background:var(--white); resize:vertical; font:.8rem "Space Grotesk",sans-serif; color:var(--ink); padding:.3rem .4rem; box-sizing:border-box; flex:1; min-height:2rem; }
+.book-table-right .note-group .note-textarea:focus{ outline:2px solid var(--red); }
 .book-table-wrapper{ overflow-x:auto; }
 .book-table{ width:100%; border-collapse:collapse; font-size:.85rem; }
 .book-th{ background:var(--ink); color:var(--white); padding:.4rem .5rem; text-align:left; font:700 .75rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; border:2px solid var(--ink); }
 .book-th-check{ width:70px; }
 .book-th-para{ width:1%; white-space:nowrap; }
 .book-th-note{ width:100%; }
-.book-th-notes{ width:100%; }
 .book-td-input{ padding:.2rem .3rem; }
 .book-td-input .para-input{ width:100%; border:1px solid var(--line); background:var(--white); font:.8rem "Space Grotesk",sans-serif; color:var(--ink); padding:.25rem .4rem; box-sizing:border-box; }
 .book-td-input .para-input:focus{ outline:2px solid var(--red); }
@@ -150,9 +153,5 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .book-td-para{ white-space:nowrap; }
 .book-td-check{ text-align:center; white-space:nowrap; }
 .book-td-check .para-check{ width:16px; height:16px; accent-color:var(--red); cursor:pointer; margin:0 2px; }
-.book-td-notes{ background:var(--paper); padding:.3rem .5rem; vertical-align:top; }
-.book-td-notes .note-label{ font:700 .75rem "Barlow Condensed",sans-serif; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; margin-bottom:.3rem; }
-.book-td-notes .note-textarea{ width:100%; border:1px solid var(--line); background:var(--white); resize:vertical; font:.8rem "Space Grotesk",sans-serif; color:var(--ink); padding:.3rem .4rem; box-sizing:border-box; min-height:3rem; }
-.book-td-notes .note-textarea:focus{ outline:2px solid var(--red); }
 .book-table tbody tr:nth-child(4n+1) .book-td{ border-top:3px solid var(--ink); }
 .book-table tbody tr:nth-child(4n) .book-td{ border-bottom:3px solid var(--ink); }

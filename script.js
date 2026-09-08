@@ -561,9 +561,9 @@ function genererParagraphes(bookId, listId, prefix) {
     buildBookTables(paragraphs, listId, notesBodyId, bookId);
 }
 
-function buildBookTables(paragraphs, leftTbodyId, rightTbodyId, bookId){
+function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
     var leftTbody = document.getElementById(leftTbodyId);
-    var rightTbody = document.getElementById(rightTbodyId);
+    var rightDiv = document.getElementById(rightDivId);
     if(!leftTbody) return;
     var groups = [];
     var extraLabels = [];
@@ -627,27 +627,25 @@ function buildBookTables(paragraphs, leftTbodyId, rightTbodyId, bookId){
             tr.appendChild(tdInput);
             leftTbody.appendChild(tr);
         }
-        if(!rightTbody) continue;
-        var trNote = document.createElement('tr');
-        var tdNote = document.createElement('td');
-        tdNote.className = 'book-td book-td-notes';
-        tdNote.rowSpan = items.length;
+        if(!rightDiv) continue;
+        var noteGroup = document.createElement('div');
+        noteGroup.className = 'note-group';
+        noteGroup.dataset.rows = items.length;
         if(items[0].note){
             var lbl = document.createElement('div');
             lbl.className = 'note-label';
             lbl.textContent = items[0].note;
-            tdNote.appendChild(lbl);
+            noteGroup.appendChild(lbl);
         }
         for(var el = 0; el < group.extraLabels.length; el++){
             var extraLbl = document.createElement('div');
             extraLbl.className = 'note-label';
             extraLbl.textContent = group.extraLabels[el];
-            tdNote.appendChild(extraLbl);
+            noteGroup.appendChild(extraLbl);
         }
         var noteKey = 'fl-' + bookId + '-note-g' + gi;
         var ta = document.createElement('textarea');
         ta.className = 'note-textarea';
-        ta.rows = Math.max(group.length * 2, 4);
         ta.dataset.key = noteKey;
         ta.value = localStorage.getItem(noteKey) || '';
         ta.placeholder = 'Notes...';
@@ -657,9 +655,8 @@ function buildBookTables(paragraphs, leftTbodyId, rightTbodyId, bookId){
             this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
         });
         ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
-        tdNote.appendChild(ta);
-        trNote.appendChild(tdNote);
-        rightTbody.appendChild(trNote);
+        noteGroup.appendChild(ta);
+        rightDiv.appendChild(noteGroup);
     }
 }
 
@@ -880,15 +877,20 @@ function syncBookHeights(){
     for(var i = 0; i < bookIds.length; i++){
         var id = bookIds[i];
         var leftTable = document.getElementById(id + 'Table');
-        var rightTable = document.getElementById(id + 'NotesTable');
-        if(!leftTable || !rightTable) continue;
-        rightTable.style.height = '';
-        var leftH = leftTable.offsetHeight;
-        var rightH = rightTable.offsetHeight;
-        if(leftH > rightH){
-            rightTable.style.height = leftH + 'px';
-        } else if(rightH > leftH){
-            leftTable.style.height = rightH + 'px';
+        var rightDiv = document.getElementById(id + 'NotesBody');
+        if(!leftTable || !rightDiv) continue;
+        var leftRows = leftTable.querySelectorAll('tbody tr');
+        var noteGroups = rightDiv.querySelectorAll('.note-group');
+        var rowIdx = 0;
+        for(var gi = 0; gi < noteGroups.length; gi++){
+            var group = noteGroups[gi];
+            var rowCount = parseInt(group.dataset.rows) || 1;
+            var groupHeight = 0;
+            for(var r = 0; r < rowCount && rowIdx < leftRows.length; r++){
+                groupHeight += leftRows[rowIdx].offsetHeight;
+                rowIdx++;
+            }
+            group.style.height = groupHeight + 'px';
         }
     }
 }
