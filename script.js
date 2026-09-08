@@ -594,7 +594,7 @@ function buildBook1Table(paragraphs, tbodyId){
             tr.appendChild(tdCheck);
             // Paragraph cell
             var tdPara = document.createElement('td');
-            tdPara.className = 'book-td';
+            tdPara.className = 'book-td book-td-para';
             tdPara.textContent = para.n;
             tr.appendChild(tdPara);
             // Note input cell
