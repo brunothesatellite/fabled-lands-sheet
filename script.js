@@ -344,7 +344,13 @@ async function chargerFormulaire() {
         var val = await lirePreference(cle);
         if (val !== null) {
             var el = document.querySelector('[data-key="' + cle + '"]');
-            if (el) el.value = val;
+            if (el) {
+                if (el.type === 'number' && (val === '' || val === null)) {
+                    el.value = el.getAttribute('value') || '0';
+                } else {
+                    el.value = val;
+                }
+            }
         }
     }
 }
