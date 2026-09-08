@@ -597,6 +597,23 @@ function buildBook1Table(paragraphs, tbodyId){
             tdPara.className = 'book-td';
             tdPara.textContent = para.n;
             tr.appendChild(tdPara);
+            // Note input cell
+            var tdInput = document.createElement('td');
+            tdInput.className = 'book-td book-td-input';
+            var inp = document.createElement('input');
+            inp.type = 'text';
+            inp.className = 'para-input';
+            var inpKey = 'fl-book1-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
+            inp.dataset.key = inpKey;
+            inp.value = localStorage.getItem(inpKey) || '';
+            inp.addEventListener('input', function(){
+                clearTimeout(this._saveTimeout);
+                var self = this;
+                this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
+            });
+            inp.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+            tdInput.appendChild(inp);
+            tr.appendChild(tdInput);
             // Notes cell (label + textarea with rowspan, only on first row of group)
             if(g === 0){
                 var tdNote = document.createElement('td');
