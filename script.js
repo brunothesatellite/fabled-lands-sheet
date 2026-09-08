@@ -121,12 +121,16 @@ async function ecrireToutesLesPreferences(prefs) {
 async function chargerToutesLesPreferences() {
     if (phpDisponible && utilisateurLogue) {
         const data = await apiFetch('get_preferences');
-        return data && data.preferences ? data.preferences : {};
+        var prefs = data && data.preferences ? data.preferences : {};
+        ALL_KEYS.forEach(function(cle) {
+            if (!(cle in prefs)) prefs[cle] = '';
+        });
+        return prefs;
     }
     var prefs = {};
     ALL_KEYS.forEach(function(cle) {
         var val = localStorage.getItem(cle);
-        if (val !== null) prefs[cle] = val;
+        prefs[cle] = val !== null ? val : '';
     });
     return prefs;
 }
@@ -226,6 +230,11 @@ importPrefsFile.addEventListener('change', async function() {
         var sauvegarde = JSON.parse(await fichier.text());
         if (!formatImportValide(sauvegarde)) throw new Error('Format invalide');
         if (!confirm('Importer ces données ?\n\nDate de l\'export : ' + new Date(sauvegarde.exportedAt).toLocaleString('fr-FR') + '\n\nToutes les données existantes seront écrasées.')) return;
+        if (phpDisponible && utilisateurLogue) {
+            await apiFetch('clear_preferences', { method: 'POST' });
+        } else {
+            effacerDonnees();
+        }
         await ecrireToutesLesPreferences(sauvegarde.data);
         afficherToast('Données importées avec succès !', 'success');
         setTimeout(function() { location.reload(); }, 1000);
@@ -242,6 +251,11 @@ importFile.addEventListener('change', async function() {
         var sauvegarde = JSON.parse(await fichier.text());
         if (!formatImportValide(sauvegarde)) throw new Error('Format invalide');
         if (!confirm('Importer ces données ?\n\nDate de l\'export : ' + new Date(sauvegarde.exportedAt).toLocaleString('fr-FR') + '\n\nToutes les données existantes seront écrasées.')) return;
+        if (phpDisponible && utilisateurLogue) {
+            await apiFetch('clear_preferences', { method: 'POST' });
+        } else {
+            effacerDonnees();
+        }
         await ecrireToutesLesPreferences(sauvegarde.data);
         afficherToast('Données importées avec succès !', 'success');
         setTimeout(function() { location.reload(); }, 1000);
@@ -344,7 +358,7 @@ async function chargerFormulaire() {
         var val = await lirePreference(cle);
         if (val !== null) {
             var el = document.querySelector('[data-key="' + cle + '"]');
-            if (el) {
+            if (el && el.type !== 'checkbox') {
                 if (el.type === 'number' && (val === '' || val === null)) {
                     el.value = el.getAttribute('value') || '0';
                 } else {
@@ -789,6 +803,7 @@ document.getElementById('shipAddTopBtn').addEventListener('click', function(){
     var newIdx = Date.now();
     var newRow = creerLigneShip(newIdx);
     tbody.appendChild(newRow);
+    chargerLigneShip(newRow);
     newRow.scrollIntoView({behavior:'smooth', block:'center'});
 });
 

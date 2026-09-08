@@ -190,6 +190,7 @@ A single entry point using query parameter routing (`?action=<action>`). All res
 | `set_preferences` | POST | Yes | Upserts a single key-value preference |
 | `set_all_preferences` | POST | Yes | Bulk upsert (used by import) |
 | `delete_preference` | POST | Yes | Deletes a single preference key |
+| `clear_preferences` | POST | Yes | Deletes all preferences for the logged-in user (used before import) |
 
 **Anti-abstraction on register:** Honeypot field (`website`) + minimum form time (3 seconds).
 
@@ -280,3 +281,70 @@ The database file `api/preferences.db` is gitignored and created automatically o
 4. **CSS-only tab switching** — No router. The `active` class toggles panel visibility. Browser back button is not used.
 5. **Debounced auto-save** — Text inputs save after 400–500ms of inactivity to avoid excessive API calls while keeping data safe.
 6. **Server-agnostic** — The frontend works without PHP (anonymous mode). The backend is optional and detected at startup.
+
+---
+
+## Troubleshooting
+
+### Synology NAS (DSM 7) — SQLite database error
+
+**Symptom:**
+```
+Fatal error: Uncaught Exception: Unable to open database: unable to open database file
+in /volume1/web/fabled-lands-sheet/api/db.php on line 9
+```
+
+**Cause:** The web server process (`http` user) cannot create or write to `preferences.db` in the `api/` directory.
+
+**Fix:** Connect via SSH and run:
+
+```bash
+# Give the web server ownership of the api/ directory
+chown -R http:http /volume1/web/fabled-lands-sheet/api/
+
+# Ensure the directory is traversable
+chmod 755 /volume1/web/fabled-lands-sheet/api/
+
+# If the database file already exists, ensure it is writable
+chmod 664 /volume1/web/fabled-lands-sheet/api/preferences.db 2>/dev/null
+```
+
+**Verify:**
+```bash
+ls -la /volume1/web/fabled-lands-sheet/api/
+```
+
+Expected output — the `api/` directory and `preferences.db` should be owned by `http:http`:
+
+```
+drwxr-xr-x 3 http http  4096 Sep  8 18:00 .
+drwxr-xr-x 6 http http  4096 Sep  8 17:00 ..
+-rw-r--r-- 1 http http  8192 Sep  8 18:00 preferences.db
+-rw-r--r-- 1 http http 12288 Sep  8 18:00 preferences.db-wal
+-rw-r--r-- 1 http http  8192 Sep  8 18:00 preferences.db-shm
+```
+
+If the `http` user does not exist on your system, find the correct web server user:
+```bash
+grep -E '^(www-data|apache|nginx|http)' /etc/passwd
+```
+
+### PHP sqlite3 extension not loaded
+
+**Symptom:** `Class 'SQLite3' not found` error.
+
+**Fix (Synology DSM 7):**
+1. Go to **Control Panel → Advanced → PHP Settings** (or via Web Station)
+2. Enable the `sqlite3` extension
+3. Restart the web server (Web Station → stop/start)
+
+### Session issues / not staying logged in
+
+**Symptom:** Login succeeds but the user is immediately shown as anonymous.
+
+**Fix:** Ensure the `session/` directory is writable:
+```bash
+chmod 777 /tmp  # or check PHP session.save_path
+```
+
+On Synology, sessions are typically managed automatically. If issues persist, check `php.ini` for `session.save_path`.

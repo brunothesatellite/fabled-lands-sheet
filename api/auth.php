@@ -154,6 +154,13 @@ switch ($action) {
         $stmt->execute();
         jsonResponse(['ok' => true]);
 
+    case 'clear_preferences':
+        $user = requireLogin($db);
+        $stmt = $db->prepare('DELETE FROM preferences WHERE user_id = :uid');
+        $stmt->bindValue(':uid', $user['id'], SQLITE3_INTEGER);
+        $stmt->execute();
+        jsonResponse(['ok' => true]);
+
     case 'set_preferences':
         $user = requireLogin($db);
         $input = json_decode(file_get_contents('php://input'), true);
