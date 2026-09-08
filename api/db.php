@@ -3,12 +3,12 @@ define('DB_PATH', __DIR__ . '/preferences.db');
 
 function getDB() {
     if (!class_exists('SQLite3')) {
-        jsonError('Extension SQLite3 non disponible sur ce serveur.', 500);
+        jsonError('SQLite3 extension not available on this server.', 500);
     }
 
     $db = @new SQLite3(DB_PATH);
     if (!$db) {
-        jsonError('Impossible d\'ouvrir la base de données. Vérifiez les permissions d\'écriture sur le dossier api/.', 500);
+        jsonError('Cannot open the database. Check write permissions on the api/ folder.', 500);
     }
 
     $db->enableExceptions(true);
@@ -33,7 +33,7 @@ function getDB() {
     )');
 
     if (!$usersCreated || !$prefsCreated) {
-        jsonError('Impossible de créer les tables. Vérifiez les permissions d\'écriture sur preferences.db.', 500);
+        jsonError('Cannot create tables. Check write permissions on preferences.db.', 500);
     }
 
     $colsResult = $db->query('PRAGMA table_info(users)');
@@ -71,7 +71,7 @@ function getUserFromSession($db) {
 
 function requireLogin($db) {
     $user = getUserFromSession($db);
-    if (!$user) jsonError('Non authentifié', 401);
+    if (!$user) jsonError('Not authenticated', 401);
     touchLastActivity($db, $user['id']);
     return $user;
 }

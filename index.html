@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,29 +20,29 @@
     <div class="masthead-side">
         <div class="utility-controls">
             <div class="user-avatar-container" id="anonAvatarContainer" hidden>
-                <button class="user-avatar anon-avatar" id="anonAvatarBtn" type="button" aria-label="Menu données" aria-expanded="false" title="Menu utilisateur">
+                <button class="user-avatar anon-avatar" id="anonAvatarBtn" type="button" aria-label="Data menu" aria-expanded="false" title="User menu">
                     <i class="fa-solid fa-user-secret" aria-hidden="true"></i>
                 </button>
                 <div class="user-menu" id="anonMenu" hidden>
-                    <div class="menu-welcome" id="anonWelcome">Bienvenue Anonyme</div>
-                    <button id="anonExportBtn" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i> Exporter mes données</button>
-                    <button id="anonImportBtn" type="button"><i class="fa-solid fa-upload" aria-hidden="true"></i> Importer mes données</button>
-                    <button id="anonClearBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-trash" aria-hidden="true"></i> Effacer mes données</button>
+                    <div class="menu-welcome" id="anonWelcome">Welcome Anonymous</div>
+                    <button id="anonExportBtn" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i> Export my data</button>
+                    <button id="anonImportBtn" type="button"><i class="fa-solid fa-upload" aria-hidden="true"></i> Import my data</button>
+                    <button id="anonClearBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-trash" aria-hidden="true"></i> Clear my data</button>
                     <button id="anonLoginBtn" type="button" hidden><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Login</button>
                 </div>
             </div>
             <div class="user-avatar-container" id="userAvatarContainer" hidden>
-                <button class="user-avatar" id="userAvatarBtn" type="button" aria-label="Menu utilisateur" aria-expanded="false" title="Menu utilisateur">
+                <button class="user-avatar" id="userAvatarBtn" type="button" aria-label="User menu" aria-expanded="false" title="User menu">
                     <span id="userAvatarLetter">M</span>
                 </button>
                 <div class="user-menu" id="userMenu" hidden>
-                    <div class="menu-welcome" id="userWelcome">Bienvenue</div>
-                    <button id="exportBtn" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i> Exporter mes données</button>
-                    <button id="importPrefsBtn" type="button"><i class="fa-solid fa-file-import" aria-hidden="true"></i> Importer mes données</button>
-                    <button id="clearDataBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-trash" aria-hidden="true"></i> Effacer mes données</button>
-                    <button id="changePasswordBtn" type="button"><i class="fa-solid fa-key" aria-hidden="true"></i> Modifier le mot de passe</button>
-                    <button id="logoutBtn" type="button"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Se déconnecter</button>
-                    <button id="deleteAccountBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-user-xmark" aria-hidden="true"></i> Supprimer mon compte</button>
+                    <div class="menu-welcome" id="userWelcome">Welcome</div>
+                    <button id="exportBtn" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i> Export my data</button>
+                    <button id="importPrefsBtn" type="button"><i class="fa-solid fa-file-import" aria-hidden="true"></i> Import my data</button>
+                    <button id="clearDataBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-trash" aria-hidden="true"></i> Clear my data</button>
+                    <button id="changePasswordBtn" type="button"><i class="fa-solid fa-key" aria-hidden="true"></i> Change password</button>
+                    <button id="logoutBtn" type="button"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Log out</button>
+                    <button id="deleteAccountBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-user-xmark" aria-hidden="true"></i> Delete my account</button>
                 </div>
             </div>
             <input id="importFile" type="file" accept="application/json,.json" hidden>
@@ -384,7 +384,7 @@
                 <tbody id="shipTableBody"></tbody>
             </table>
         </div>
-        <button class="ship-add-btn" id="shipAddTopBtn" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter une ligne</button>
+        <button class="ship-add-btn" id="shipAddTopBtn" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Add a row</button>
     </section>
 
     <!-- ENCOUNTER -->

@@ -8,11 +8,11 @@ $user = getUserFromSession($db);
 if ($user) { header('Location: index.html'); exit; }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion – Fabled Lands Companion</title>
+    <title>Login – Fabled Lands Companion</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,19 +22,19 @@ if ($user) { header('Location: index.html'); exit; }
 </head>
 <body>
     <div class="auth-wrapper">
-        <div class="back-link"><a href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a></div>
+        <div class="back-link"><a href="index.html"><i class="fa-solid fa-arrow-left"></i> Back to site</a></div>
         <div class="auth-card">
-        <h1><i class="fa-solid fa-scroll" style="color:var(--red);transform:rotate(-12deg);margin-right:.4rem"></i> Connexion</h1>
+        <h1><i class="fa-solid fa-scroll" style="color:var(--red);transform:rotate(-12deg);margin-right:.4rem"></i> Login</h1>
         <p class="subtitle">Fabled Lands Companion</p>
         <div class="error" id="errorMsg"></div>
         <form id="loginForm">
-            <label for="pseudo">Pseudo</label>
+            <label for="pseudo">Username</label>
             <input type="text" id="pseudo" name="pseudo" autocomplete="username" required minlength="3" maxlength="20">
-            <label for="password">Mot de passe</label>
+            <label for="password">Password</label>
             <input type="password" id="password" name="password" autocomplete="current-password" required minlength="6">
-            <button type="submit" class="btn">Se connecter</button>
+            <button type="submit" class="btn">Log in</button>
         </form>
-        <p class="link">Pas encore de compte ? <a href="register.php">Créer un compte</a></p>
+        <p class="link">Don't have an account? <a href="register.php">Create an account</a></p>
     </div>
     </div>
     <script>
@@ -58,7 +58,7 @@ if ($user) { header('Location: index.html'); exit; }
             }
             window.location.href = 'index.html';
         } catch (err) {
-            errorMsg.textContent = 'Erreur de connexion au serveur.';
+            errorMsg.textContent = 'Server connection error.';
             errorMsg.classList.add('visible');
         }
     });

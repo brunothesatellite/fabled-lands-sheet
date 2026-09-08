@@ -90,6 +90,7 @@ Click the avatar icon in the top-right corner to open the user menu:
 - **Anonymous mode**: Data is stored in the browser's `localStorage`.
 - **Logged-in mode**: Data is synced to the server database (SQLite3) via the PHP API.
 - Export/import works in both modes and uses a versioned JSON format (`fl-local-storage` v1).
+- **Export filename**: When logged in, the JSON file is prefixed with your username (e.g. `Roland-20260908-143022.json`). Special characters are sanitized for valid filenames.
 
 ---
 
@@ -140,14 +141,16 @@ The JavaScript is organized into functional modules within a single file:
 | **Preference I/O** | `lirePreference()`, `ecrirePreference()`, `chargerToutesLesPreferences()`, `ecrireToutesLesPreferences()` — abstracted read/write that routes to localStorage or PHP API |
 | **User UI** | `mettreAJourUIUtilisateur()`, menu open/close handlers — manages avatar display and dropdown menus |
 | **Form Auto-Save** | Binds `input`/`change` events on all `[data-key]` elements with debounced writes (400–500ms) |
+| **Element Map** | `elementMap` — `Map<key, Element>` built at startup for O(1) element lookup during restoration |
+| **Batch Restore** | `restoreAll(prefs)` — applies all preferences to elements in one pass (used in authenticated mode) |
 | **Codewords** | Dynamically generates 408 codeword checkboxes from a hardcoded array |
 | **Book Paragraphs** | `genererParagraphes()` builds paragraph tables + note panels from `bookData` object; paragraphs are grouped by note boundaries |
-| **Ship Table** | `genererShipTable()`, `creerLigneShip()` — dynamic row creation with strike/delete/add actions |
+| **Ship Table** | `genererShipTable()`, `creerLigneShip()` — dynamic row creation with strike/delete/add actions; restored in parallel via `Promise.all()` |
 | **Map Interaction** | Touch-aware pinch-to-zoom and drag panning for fullscreen maps |
-| **Import/Export** | `exporterDonnees()` creates a timestamped JSON blob; import validates format before overwriting |
+| **Import/Export** | `exporterDonnees()` creates a timestamped JSON blob (prefixed with username when logged in); import validates format before overwriting |
 | **PHP Detection** | `detecterPhp()` probes `api/auth.php?action=check` on load to determine backend availability |
 
-**Data key convention:** All stored values use the `fl-` prefix (e.g. `fl-adventure-name`, `fl-codeword-42`, `fl-book1-10-c0`). Keys are collected in the `ALL_KEYS` array at page load for bulk operations.
+**Data key convention:** All stored values use the `fl-` prefix (e.g. `fl-adventure-name`, `fl-codeword-42`, `fl-book1-10-c0`). Keys are collected in the `ALL_KEYS` array at page load for bulk operations. Elements are registered in `elementMap` for O(1) lookup.
 
 #### Styling
 
@@ -249,9 +252,15 @@ The database file `api/preferences.db` is gitignored and created automatically o
 │                          │  NO   →  localStorage│ │
 │                          └─────────┬──────────┘  │
 │                                    │             │
-│  on load ◄── chargerFormulaire()  │             │
-│          ◄── chargerCheckboxes()   │             │
-│          ◄── chargerShipTable()    │             │
+│  on load:                          │             │
+│   ┌─ if logged in:                 │             │
+│   │  1 HTTP: chargerToutesLes()    │             │
+│   │  restoreAll(prefs)             │             │
+│   │  Promise.all(ship rows)        │             │
+│   └─ if anonymous:                 │             │
+│      chargerFormulaire()           │             │
+│      chargerCheckboxes()           │             │
+│      chargerShipTable()            │             │
 └─────────────────────────────────────────────────┘
                           │
                     POST/GET fetch()
@@ -289,6 +298,8 @@ The database file `api/preferences.db` is gitignored and created automatically o
 4. **CSS-only tab switching** — No router. The `active` class toggles panel visibility. Browser back button is not used.
 5. **Debounced auto-save** — Text inputs save after 400–500ms of inactivity to avoid excessive API calls while keeping data safe.
 6. **Server-agnostic** — The frontend works without PHP (anonymous mode). The backend is optional and detected at startup.
+7. **Authenticated mode optimization** — Uses a single batch API call (`chargerToutesLesPreferences()`) + `elementMap` for O(1) element lookup + `restoreAll()` to restore ~1,020 preferences in one pass (vs. ~2,180 sequential HTTP requests before). Ship table rows are restored in parallel via `Promise.all()`.
+8. **Anonymous mode stability** — Keeps the original sequential read pattern (`chargerFormulaire()` + `chargerCheckboxes()`) which is fast enough for synchronous localStorage operations.
 
 ---
 

@@ -6,11 +6,11 @@ $user = getUserFromSession($db);
 if (!$user) { header('Location: login.php'); exit; }
 ?>
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modifier le mot de passe – Fabled Lands Companion</title>
+    <title>Change Password – Fabled Lands Companion</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,19 +20,19 @@ if (!$user) { header('Location: login.php'); exit; }
 </head>
 <body>
     <div class="auth-card">
-        <h1><i class="fa-solid fa-scroll" style="color:var(--red);transform:rotate(-12deg);margin-right:.4rem"></i> Modifier le mot de passe</h1>
-        <p class="subtitle">Connecté en tant que <strong><?= htmlspecialchars($user['pseudo']) ?></strong></p>
+        <h1><i class="fa-solid fa-scroll" style="color:var(--red);transform:rotate(-12deg);margin-right:.4rem"></i> Change Password</h1>
+        <p class="subtitle">Logged in as <strong><?= htmlspecialchars($user['pseudo']) ?></strong></p>
         <div class="error" id="errorMsg"></div>
         <div class="success" id="successMsg"></div>
         <form id="changeForm">
-            <label for="oldPassword">Mot de passe actuel</label>
+            <label for="oldPassword">Current password</label>
             <input type="password" id="oldPassword" name="oldPassword" autocomplete="current-password" required>
-            <label for="newPassword">Nouveau mot de passe</label>
-            <input type="password" id="newPassword" name="newPassword" autocomplete="new-password" required minlength="6" placeholder="Au moins 6 caractères">
-            <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+            <label for="newPassword">New password</label>
+            <input type="password" id="newPassword" name="newPassword" autocomplete="new-password" required minlength="6" placeholder="At least 6 characters">
+            <label for="confirmPassword">Confirm new password</label>
             <input type="password" id="confirmPassword" name="confirmPassword" autocomplete="new-password" required>
-            <button type="submit" class="btn">Modifier</button>
-            <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'" style="margin-top:.5rem">Annuler</button>
+            <button type="submit" class="btn">Change</button>
+            <button type="button" class="btn btn-secondary" onclick="window.location.href='index.html'" style="margin-top:.5rem">Cancel</button>
         </form>
     </div>
     <script>
@@ -46,7 +46,7 @@ if (!$user) { header('Location: login.php'); exit; }
         const new_password = document.getElementById('newPassword').value;
         const confirm = document.getElementById('confirmPassword').value;
         if (new_password !== confirm) {
-            errorMsg.textContent = 'Les mots de passe ne correspondent pas.';
+            errorMsg.textContent = 'The passwords do not match.';
             errorMsg.classList.add('visible');
             return;
         }
@@ -62,11 +62,11 @@ if (!$user) { header('Location: login.php'); exit; }
                 errorMsg.classList.add('visible');
                 return;
             }
-            successMsg.textContent = 'Mot de passe modifié avec succès ! Redirection...';
+            successMsg.textContent = 'Password changed successfully! Redirecting...';
             successMsg.classList.add('visible');
             setTimeout(() => window.location.href = 'index.html', 1500);
         } catch (err) {
-            errorMsg.textContent = 'Erreur de connexion au serveur.';
+            errorMsg.textContent = 'Server connection error.';
             errorMsg.classList.add('visible');
         }
     });

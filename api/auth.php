@@ -9,12 +9,12 @@ header('X-Content-Type-Options: nosniff');
 header('Content-Type: application/json; charset=utf-8');
 
 $action = $_GET['action'] ?? $_POST['action'] ?? null;
-if (!$action) jsonError('Action manquante');
+if (!$action) jsonError('Missing action');
 
 try {
     $db = getDB();
 } catch (Throwable $e) {
-    jsonError('Erreur de connexion à la base de données : ' . $e->getMessage(), 500);
+    jsonError('Database connection error: ' . $e->getMessage(), 500);
 }
 
 switch ($action) {
@@ -32,14 +32,14 @@ switch ($action) {
         $pseudo = trim($input['pseudo'] ?? '');
         $password = $input['password'] ?? '';
 
-        if (!empty($input['website'])) jsonError('Erreur de connexion au serveur.');
+        if (!empty($input['website'])) jsonError('Server connection error.');
         $formTs = intval($input['form_ts'] ?? 0);
-        if (!$formTs || time() - $formTs < 3) jsonError('Erreur de connexion au serveur.');
+        if (!$formTs || time() - $formTs < 3) jsonError('Server connection error.');
 
         $stmt = $db->prepare('SELECT id FROM users WHERE pseudo = :pseudo');
         $stmt->bindValue(':pseudo', $pseudo, SQLITE3_TEXT);
         $result = $stmt->execute();
-        if ($result->fetchArray()) jsonError('Ce pseudo est déjà utilisé.');
+        if ($result->fetchArray()) jsonError('This username is already taken.');
 
         $hash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
         $stmt = $db->prepare('INSERT INTO users (pseudo, password_hash) VALUES (:pseudo, :hash)');
@@ -55,7 +55,7 @@ switch ($action) {
         $pseudo = trim($input['pseudo'] ?? '');
         $password = $input['password'] ?? '';
 
-        if (!$pseudo || !$password) jsonError('Pseudo et mot de passe requis.');
+        if (!$pseudo || !$password) jsonError('Username and password required.');
 
         $stmt = $db->prepare('SELECT id, password_hash FROM users WHERE pseudo = :pseudo');
         $stmt->bindValue(':pseudo', $pseudo, SQLITE3_TEXT);
@@ -63,7 +63,7 @@ switch ($action) {
         $user = $result->fetchArray(SQLITE3_ASSOC);
 
         if (!$user || !password_verify($password, $user['password_hash']))
-            jsonError('Pseudo ou mot de passe incorrect.');
+            jsonError('Incorrect username or password.');
 
         $_SESSION['user_id'] = $user['id'];
         jsonResponse(['ok' => true, 'pseudo' => $pseudo]);
@@ -79,7 +79,7 @@ switch ($action) {
         $newPassword = $input['new_password'] ?? '';
 
         if (strlen($newPassword) < 6)
-            jsonError('Le nouveau mot de passe doit contenir au moins 6 caractères.');
+            jsonError('The new password must contain at least 6 characters.');
 
         $stmt = $db->prepare('SELECT password_hash FROM users WHERE id = :id');
         $stmt->bindValue(':id', $user['id'], SQLITE3_INTEGER);
@@ -87,7 +87,7 @@ switch ($action) {
         $row = $result->fetchArray(SQLITE3_ASSOC);
 
         if (!password_verify($oldPassword, $row['password_hash']))
-            jsonError('Le mot de passe actuel est incorrect.');
+            jsonError('The current password is incorrect.');
 
         $hash = password_hash($newPassword, PASSWORD_BCRYPT, ['cost' => 12]);
         $stmt = $db->prepare('UPDATE users SET password_hash = :hash WHERE id = :id');
@@ -108,7 +108,7 @@ switch ($action) {
         $row = $result->fetchArray(SQLITE3_ASSOC);
 
         if (!password_verify($password, $row['password_hash']))
-            jsonError('Mot de passe incorrect.');
+            jsonError('Incorrect password.');
 
         $stmt = $db->prepare('DELETE FROM preferences WHERE user_id = :id');
         $stmt->bindValue(':id', $user['id'], SQLITE3_INTEGER);
@@ -147,7 +147,7 @@ switch ($action) {
         $user = requireLogin($db);
         $input = json_decode(file_get_contents('php://input'), true);
         $key = $input['key'] ?? null;
-        if (!$key) jsonError('Clé requise.');
+        if (!$key) jsonError('Key required.');
         $stmt = $db->prepare('DELETE FROM preferences WHERE user_id = :uid AND key = :key');
         $stmt->bindValue(':uid', $user['id'], SQLITE3_INTEGER);
         $stmt->bindValue(':key', $key, SQLITE3_TEXT);
@@ -167,7 +167,7 @@ switch ($action) {
         $key = $input['key'] ?? null;
         $value = $input['value'] ?? null;
 
-        if (!$key || $value === null) jsonError('Clé et valeur requises.');
+        if (!$key || $value === null) jsonError('Key and value required.');
 
         $stmt = $db->prepare('INSERT INTO preferences (user_id, key, value) VALUES (:uid, :key, :value) ON CONFLICT(user_id, key) DO UPDATE SET value = :value2');
         $stmt->bindValue(':uid', $user['id'], SQLITE3_INTEGER);
@@ -183,7 +183,7 @@ switch ($action) {
         $input = json_decode(file_get_contents('php://input'), true);
         $prefs = $input['preferences'] ?? null;
 
-        if (!$prefs || !is_array($prefs)) jsonError('Préférences requises.');
+        if (!$prefs || !is_array($prefs)) jsonError('Preferences required.');
 
         $db->exec('BEGIN');
         $stmt = $db->prepare('INSERT INTO preferences (user_id, key, value) VALUES (:uid, :key, :value) ON CONFLICT(user_id, key) DO UPDATE SET value = :value2');
@@ -199,5 +199,5 @@ switch ($action) {
         jsonResponse(['ok' => true]);
 
     default:
-        jsonError('Action inconnue.');
+        jsonError('Unknown action.');
 }

@@ -1,5 +1,6 @@
 const STORAGE_PREFIX = 'fl-';
 const ALL_KEYS = [];
+const elementMap = new Map();
 
 let phpDisponible = false;
 let utilisateurLogue = null;
@@ -72,7 +73,7 @@ function mettreAJourUIUtilisateur() {
         anonAvatarContainer.hidden = true;
         userAvatarContainer.hidden = false;
         userAvatarLetter.textContent = utilisateurLogue.pseudo.charAt(0).toUpperCase();
-        userWelcome.textContent = 'Bienvenue ' + utilisateurLogue.pseudo;
+        userWelcome.textContent = 'Welcome ' + utilisateurLogue.pseudo;
     } else if (phpDisponible) {
         anonAvatarContainer.hidden = false;
         userAvatarContainer.hidden = true;
@@ -199,7 +200,7 @@ anonExportBtn.addEventListener('click', function() { fermerMenuAnonyme(); export
 anonImportBtn.addEventListener('click', function() { fermerMenuAnonyme(); importFile.click(); });
 anonClearBtn.addEventListener('click', function() {
     fermerMenuAnonyme();
-    if (!confirm('Effacer toutes vos données Fabled Lands ? Cette action est irréversible.')) return;
+    if (!confirm('Delete all your Fabled Lands data? This action is irreversible.')) return;
     effacerDonnees();
     location.reload();
 });
@@ -207,7 +208,7 @@ anonLoginBtn.addEventListener('click', function() { fermerMenuAnonyme(); window.
 exportBtn.addEventListener('click', function() { fermerMenuUtilisateur(); exporterDonnees(); });
 clearDataBtn.addEventListener('click', function() {
     fermerMenuUtilisateur();
-    if (!confirm('Effacer toutes vos données Fabled Lands ? Cette action est irréversible.')) return;
+    if (!confirm('Delete all your Fabled Lands data? This action is irreversible.')) return;
     effacerDonnees();
     location.reload();
 });
@@ -217,14 +218,14 @@ logoutBtn.addEventListener('click', async function() {
     await apiFetch('logout', { method: 'POST' });
     utilisateurLogue = null;
     mettreAJourUIUtilisateur();
-    afficherToast('Déconnecté.', 'success');
+    afficherToast('Logged out.', 'success');
     location.reload();
 });
 deleteAccountBtn.addEventListener('click', async function() {
     fermerMenuUtilisateur();
-    var motDePasse = prompt('Pour supprimer votre compte, entrez votre mot de passe :');
+    var motDePasse = prompt('To delete your account, enter your password:');
     if (!motDePasse) return;
-    if (!confirm('Êtes-vous sûr ? Cette action est irréversible.')) return;
+    if (!confirm('Are you sure? This action is irreversible.')) return;
     var data = await apiFetch('delete_account', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -232,10 +233,10 @@ deleteAccountBtn.addEventListener('click', async function() {
     });
     if (data && data.ok) {
         utilisateurLogue = null;
-        afficherToast('Compte supprimé.', 'success');
+        afficherToast('Account deleted.', 'success');
         location.reload();
     } else {
-        afficherToast(data ? data.error : 'Erreur lors de la suppression.', 'error');
+        afficherToast(data ? data.error : 'Error during deletion.', 'error');
     }
 });
 importPrefsBtn.addEventListener('click', function() { fermerMenuUtilisateur(); importPrefsFile.click(); });
@@ -246,18 +247,18 @@ importPrefsFile.addEventListener('change', async function() {
     if (!fichier) return;
     try {
         var sauvegarde = JSON.parse(await fichier.text());
-        if (!formatImportValide(sauvegarde)) throw new Error('Format invalide');
-        if (!confirm('Importer ces données ?\n\nDate de l\'export : ' + new Date(sauvegarde.exportedAt).toLocaleString('fr-FR') + '\n\nToutes les données existantes seront écrasées.')) return;
+        if (!formatImportValide(sauvegarde)) throw new Error('Invalid format');
+        if (!confirm('Import this data?\n\nExport date: ' + new Date(sauvegarde.exportedAt).toLocaleString('en-US') + '\n\nAll existing data will be overwritten.')) return;
         if (phpDisponible && utilisateurLogue) {
             await apiFetch('clear_preferences', { method: 'POST' });
         } else {
             effacerDonnees();
         }
         await ecrireToutesLesPreferences(sauvegarde.data);
-        afficherToast('Données importées avec succès !', 'success');
+        afficherToast('Data imported successfully!', 'success');
         setTimeout(function() { location.reload(); }, 1000);
     } catch (error) {
-        afficherToast('Ce fichier ne contient pas des données valides.', 'error');
+        afficherToast('This file does not contain valid data.', 'error');
     }
 });
 
@@ -267,18 +268,18 @@ importFile.addEventListener('change', async function() {
     if (!fichier) return;
     try {
         var sauvegarde = JSON.parse(await fichier.text());
-        if (!formatImportValide(sauvegarde)) throw new Error('Format invalide');
-        if (!confirm('Importer ces données ?\n\nDate de l\'export : ' + new Date(sauvegarde.exportedAt).toLocaleString('fr-FR') + '\n\nToutes les données existantes seront écrasées.')) return;
+        if (!formatImportValide(sauvegarde)) throw new Error('Invalid format');
+        if (!confirm('Import this data?\n\nExport date: ' + new Date(sauvegarde.exportedAt).toLocaleString('en-US') + '\n\nAll existing data will be overwritten.')) return;
         if (phpDisponible && utilisateurLogue) {
             await apiFetch('clear_preferences', { method: 'POST' });
         } else {
             effacerDonnees();
         }
         await ecrireToutesLesPreferences(sauvegarde.data);
-        afficherToast('Données importées avec succès !', 'success');
+        afficherToast('Data imported successfully!', 'success');
         setTimeout(function() { location.reload(); }, 1000);
     } catch (error) {
-        afficherToast('Ce fichier ne contient pas des données valides.', 'error');
+        afficherToast('This file does not contain valid data.', 'error');
     }
 });
 
@@ -293,7 +294,11 @@ function exporterDonnees() {
         var blob = new Blob([JSON.stringify(sauvegarde, null, 2)], { type: 'application/json' });
         var lien = document.createElement('a');
         lien.href = URL.createObjectURL(blob);
-        lien.download = 'fabled-lands-' + obtenirHorodatage(new Date()) + '.json';
+        var prefix = 'fabled-lands';
+        if (utilisateurLogue && utilisateurLogue.pseudo) {
+            prefix = utilisateurLogue.pseudo.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 30);
+        }
+        lien.download = prefix + '-' + obtenirHorodatage(new Date()) + '.json';
         lien.click();
         URL.revokeObjectURL(lien.href);
     });
@@ -390,6 +395,7 @@ document.getElementById('mapsDropdown').querySelector('.tab-dropdown-toggle').ad
 /* Auto-save form fields */
 document.querySelectorAll('[data-key]').forEach(function(el) {
     if (!ALL_KEYS.includes(el.dataset.key)) ALL_KEYS.push(el.dataset.key);
+    elementMap.set(el.dataset.key, el);
     el.addEventListener('change', function() {
         ecrirePreference(this.dataset.key, this.value);
     });
@@ -403,6 +409,20 @@ document.querySelectorAll('[data-key]').forEach(function(el) {
         });
     }
 });
+
+function restoreAll(prefs) {
+    for (var [cle, el] of elementMap) {
+        var val = prefs[cle];
+        if (val === undefined || val === '' || val === null) continue;
+        if (el.type === 'checkbox') {
+            el.checked = val === '1';
+        } else if (el.type === 'number' && val === '') {
+            el.value = el.getAttribute('value') || '0';
+        } else {
+            el.value = val;
+        }
+    }
+}
 
 async function chargerFormulaire() {
     for (var i = 0; i < ALL_KEYS.length; i++) {
@@ -424,6 +444,7 @@ async function chargerFormulaire() {
 /* Checkboxes auto-save */
 document.querySelectorAll('input[type="checkbox"][data-key]').forEach(function(cb) {
     ALL_KEYS.push(cb.dataset.key);
+    elementMap.set(cb.dataset.key, cb);
     cb.addEventListener('change', function() {
         ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
     });
@@ -484,6 +505,7 @@ function genererCodewords() {
         cb.type = 'checkbox';
         cb.id = key;
         cb.dataset.key = key;
+        elementMap.set(key, cb);
         cb.addEventListener('change', function() {
             ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
         });
@@ -659,6 +681,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
                     var cbKey = key + '-c' + c;
                     cb.dataset.key = cbKey;
                     if(!ALL_KEYS.includes(cbKey)) ALL_KEYS.push(cbKey);
+                    elementMap.set(cbKey, cb);
                     cb.addEventListener('change', function(){
                         ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
                     });
@@ -677,6 +700,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
                 var inpKey = 'fl-' + bookId + '-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
                 inp.dataset.key = inpKey;
                 if(!ALL_KEYS.includes(inpKey)) ALL_KEYS.push(inpKey);
+                elementMap.set(inpKey, inp);
                 inp.addEventListener('input', function(){
                     clearTimeout(this._saveTimeout);
                     var self = this;
@@ -718,6 +742,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
         ta.className = 'note-textarea';
         ta.dataset.key = noteKey;
         if(!ALL_KEYS.includes(noteKey)) ALL_KEYS.push(noteKey);
+        elementMap.set(noteKey, ta);
         ta.placeholder = 'Notes...';
         ta.addEventListener('input', function(){
             clearTimeout(this._saveTimeout);
@@ -747,19 +772,19 @@ function creerLigneShip(idx){
     var btnStrike = document.createElement('button');
     btnStrike.type = 'button';
     btnStrike.className = 'ship-action-btn';
-    btnStrike.title = 'Barrer / Débarrer';
+    btnStrike.title = 'Strike / Unstrike';
     btnStrike.innerHTML = '<i class="fa-solid fa-strikethrough"></i>';
     btnStrike.addEventListener('click', function(){ basculerStrike(tr); });
     var btnDel = document.createElement('button');
     btnDel.type = 'button';
     btnDel.className = 'ship-action-btn danger';
-    btnDel.title = 'Supprimer la ligne';
+    btnDel.title = 'Delete row';
     btnDel.innerHTML = '<i class="fa-solid fa-trash"></i>';
     btnDel.addEventListener('click', function(){ supprimerLigne(tr); });
     var btnAdd = document.createElement('button');
     btnAdd.type = 'button';
     btnAdd.className = 'ship-action-btn';
-    btnAdd.title = 'Ajouter une ligne en dessous';
+    btnAdd.title = 'Add row below';
     btnAdd.innerHTML = '<i class="fa-solid fa-plus"></i>';
     btnAdd.addEventListener('click', function(){ ajouterLigneApres(tr); });
     tdAct.appendChild(btnStrike);
@@ -796,7 +821,7 @@ function basculerStrike(tr){
 }
 
 function supprimerLigne(tr){
-    if(!confirm('Supprimer cette ligne ?')) return;
+    if(!confirm('Delete this row?')) return;
     var idx = tr.dataset.row;
     for(var c = 0; c < SHIP_COLS.length; c++){
         var k = shipKey(idx, c);
@@ -845,9 +870,11 @@ async function chargerLigneShip(tr){
 
 async function chargerShipTable(){
     var rows = document.getElementById('shipTableBody').querySelectorAll('tr');
+    var promises = [];
     for(var r = 0; r < rows.length; r++){
-        await chargerLigneShip(rows[r]);
+        promises.push(chargerLigneShip(rows[r]));
     }
+    await Promise.all(promises);
 }
 
 document.getElementById('shipAddTopBtn').addEventListener('click', function(){
@@ -1021,8 +1048,15 @@ async function initialiser() {
     genererParagraphes('book7', 'book7TableBody', 'fl-book7');
 
     await detecterPhp();
-    await chargerFormulaire();
-    await chargerCheckboxes();
+
+    if (phpDisponible && utilisateurLogue) {
+        var prefs = await chargerToutesLesPreferences();
+        restoreAll(prefs);
+    } else {
+        await chargerFormulaire();
+        await chargerCheckboxes();
+    }
+
     await chargerShipTable();
 }
 
