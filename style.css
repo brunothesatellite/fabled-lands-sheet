@@ -128,16 +128,21 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     .tab{ padding:.5rem .7rem; font-size:.72rem; }
     .ship-table{ min-width:600px; }
     .ship-td textarea{ font-size:.72rem; min-height:2.5rem; }
+    .book-tables-row{ flex-direction:column; }
+    .book-table-right{ border-left:none; border-top:3px solid var(--ink); flex:none; width:100%; }
 }
 
-/* Book 1 table */
+/* Book tables */
+.book-tables-row{ display:flex; gap:0; align-items:flex-start; }
+.book-table-left{ flex:1; min-width:0; }
+.book-table-right{ flex:0 0 35%; min-width:0; border-left:3px solid var(--ink); }
 .book-table-wrapper{ overflow-x:auto; }
 .book-table{ width:100%; border-collapse:collapse; font-size:.85rem; }
 .book-th{ background:var(--ink); color:var(--white); padding:.4rem .5rem; text-align:left; font:700 .75rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; border:2px solid var(--ink); }
 .book-th-check{ width:70px; }
 .book-th-para{ width:1%; white-space:nowrap; }
-.book-th-note{ width:40%; }
-.book-th-notes{ width:40%; }
+.book-th-note{ width:100%; }
+.book-th-notes{ width:100%; }
 .book-td-input{ padding:.2rem .3rem; }
 .book-td-input .para-input{ width:100%; border:1px solid var(--line); background:var(--white); font:.8rem "Space Grotesk",sans-serif; color:var(--ink); padding:.25rem .4rem; box-sizing:border-box; }
 .book-td-input .para-input:focus{ outline:2px solid var(--red); }

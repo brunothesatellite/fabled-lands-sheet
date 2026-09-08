@@ -557,29 +557,38 @@ function genererParagraphes(bookId, listId, prefix) {
     var paragraphs = bookData[bookId];
     if (!paragraphs) return;
     if(paragraphs.length === 0) return;
-    buildBookTable(paragraphs, listId, bookId);
+    var notesBodyId = listId.replace('TableBody', 'NotesBody');
+    buildBookTables(paragraphs, listId, notesBodyId, bookId);
 }
 
-function buildBookTable(paragraphs, tbodyId, bookId){
-    var tbody = document.getElementById(tbodyId);
-    if(!tbody) return;
+function buildBookTables(paragraphs, leftTbodyId, rightTbodyId, bookId){
+    var leftTbody = document.getElementById(leftTbodyId);
+    var rightTbody = document.getElementById(rightTbodyId);
+    if(!leftTbody) return;
     var groups = [];
+    var extraLabels = [];
     var currentGroup = [];
     for(var i = 0; i < paragraphs.length; i++){
-        if(paragraphs[i].note && currentGroup.length > 0){
-            groups.push(currentGroup);
-            currentGroup = [];
+        var para = paragraphs[i];
+        if(para.n === ""){
+            extraLabels.push(para.note);
+            continue;
         }
-        currentGroup.push(paragraphs[i]);
+        if(para.note && currentGroup.length > 0){
+            groups.push({items: currentGroup, extraLabels: extraLabels});
+            currentGroup = [];
+            extraLabels = [];
+        }
+        currentGroup.push(para);
     }
-    if(currentGroup.length > 0) groups.push(currentGroup);
+    if(currentGroup.length > 0) groups.push({items: currentGroup, extraLabels: extraLabels});
     for(var gi = 0; gi < groups.length; gi++){
         var group = groups[gi];
-        for(var g = 0; g < group.length; g++){
-            var para = group[g];
+        var items = group.items;
+        for(var g = 0; g < items.length; g++){
+            var para = items[g];
             var key = 'fl-' + bookId + '-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
             var tr = document.createElement('tr');
-            // Checkboxes cell
             var tdCheck = document.createElement('td');
             tdCheck.className = 'book-td book-td-check';
             var cbCount = para.c || 1;
@@ -596,12 +605,10 @@ function buildBookTable(paragraphs, tbodyId, bookId){
                 tdCheck.appendChild(cb);
             }
             tr.appendChild(tdCheck);
-            // Paragraph cell
             var tdPara = document.createElement('td');
             tdPara.className = 'book-td book-td-para';
             tdPara.textContent = para.n;
             tr.appendChild(tdPara);
-            // Note input cell
             var tdInput = document.createElement('td');
             tdInput.className = 'book-td book-td-input';
             var inp = document.createElement('input');
@@ -618,35 +625,41 @@ function buildBookTable(paragraphs, tbodyId, bookId){
             inp.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
             tdInput.appendChild(inp);
             tr.appendChild(tdInput);
-            // Notes cell (label + textarea with rowspan, only on first row of group)
-            if(g === 0){
-                var tdNote = document.createElement('td');
-                tdNote.className = 'book-td book-td-notes';
-                tdNote.rowSpan = group.length;
-                if(para.note){
-                    var lbl = document.createElement('div');
-                    lbl.className = 'note-label';
-                    lbl.textContent = para.note;
-                    tdNote.appendChild(lbl);
-                }
-                var noteKey = 'fl-' + bookId + '-note-g' + gi;
-                var ta = document.createElement('textarea');
-                ta.className = 'note-textarea';
-                ta.rows = Math.max(group.length * 2, 4);
-                ta.dataset.key = noteKey;
-                ta.value = localStorage.getItem(noteKey) || '';
-                ta.placeholder = 'Notes...';
-                ta.addEventListener('input', function(){
-                    clearTimeout(this._saveTimeout);
-                    var self = this;
-                    this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
-                });
-                ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
-                tdNote.appendChild(ta);
-                tr.appendChild(tdNote);
-            }
-            tbody.appendChild(tr);
+            leftTbody.appendChild(tr);
         }
+        if(!rightTbody) continue;
+        var trNote = document.createElement('tr');
+        var tdNote = document.createElement('td');
+        tdNote.className = 'book-td book-td-notes';
+        tdNote.rowSpan = items.length;
+        if(items[0].note){
+            var lbl = document.createElement('div');
+            lbl.className = 'note-label';
+            lbl.textContent = items[0].note;
+            tdNote.appendChild(lbl);
+        }
+        for(var el = 0; el < group.extraLabels.length; el++){
+            var extraLbl = document.createElement('div');
+            extraLbl.className = 'note-label';
+            extraLbl.textContent = group.extraLabels[el];
+            tdNote.appendChild(extraLbl);
+        }
+        var noteKey = 'fl-' + bookId + '-note-g' + gi;
+        var ta = document.createElement('textarea');
+        ta.className = 'note-textarea';
+        ta.rows = Math.max(group.length * 2, 4);
+        ta.dataset.key = noteKey;
+        ta.value = localStorage.getItem(noteKey) || '';
+        ta.placeholder = 'Notes...';
+        ta.addEventListener('input', function(){
+            clearTimeout(this._saveTimeout);
+            var self = this;
+            this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
+        });
+        ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+        tdNote.appendChild(ta);
+        trNote.appendChild(tdNote);
+        rightTbody.appendChild(trNote);
     }
 }
 
@@ -861,6 +874,25 @@ document.querySelectorAll('.map-image').forEach(function(img) {
     });
 });
 
+/* Sync table heights */
+function syncBookHeights(){
+    var bookIds = ['book1','book2','book3','book4','book5','book6','book7a','book7b'];
+    for(var i = 0; i < bookIds.length; i++){
+        var id = bookIds[i];
+        var leftTable = document.getElementById(id + 'Table');
+        var rightTable = document.getElementById(id + 'NotesTable');
+        if(!leftTable || !rightTable) continue;
+        rightTable.style.height = '';
+        var leftH = leftTable.offsetHeight;
+        var rightH = rightTable.offsetHeight;
+        if(leftH > rightH){
+            rightTable.style.height = leftH + 'px';
+        } else if(rightH > leftH){
+            leftTable.style.height = rightH + 'px';
+        }
+    }
+}
+
 /* Init */
 async function initialiser() {
     genererCodewords();
@@ -873,11 +905,17 @@ async function initialiser() {
     genererParagraphes('book6', 'book6TableBody', 'fl-book6');
     genererParagraphes('book7a', 'book7aTableBody', 'fl-book7');
     genererParagraphes('book7b', 'book7bTableBody', 'fl-book7');
+    syncBookHeights();
 
     await detecterPhp();
     await chargerFormulaire();
     await chargerCheckboxes();
     await chargerShipTable();
 }
+
+window.addEventListener('resize', function(){
+    clearTimeout(this._resizeTimeout);
+    this._resizeTimeout = setTimeout(syncBookHeights, 200);
+});
 
 initialiser();
