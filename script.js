@@ -592,7 +592,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
                     cb.className = 'para-check';
                     var cbKey = key + '-c' + c;
                     cb.dataset.key = cbKey;
-                    cb.checked = lirePreference(cbKey) === '1';
+                    cb.checked = localStorage.getItem(cbKey) === '1';
                     cb.addEventListener('change', function(){
                         ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
                     });
