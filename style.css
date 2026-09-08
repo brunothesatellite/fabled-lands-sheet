@@ -131,6 +131,15 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .encounter-field input[readonly]::-webkit-inner-spin-button,.encounter-field input[readonly]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
 .encounter-reset-btn{ padding:.3rem .7rem; font:700 .7rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); background:var(--white); border:2px solid var(--ink); cursor:pointer; transition:transform .12s,box-shadow .12s; }
 .encounter-reset-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--yellow); }
+.encounter-stepper{ display:flex; align-items:stretch; border:2px solid var(--ink); background:var(--white); }
+.encounter-stepper-input{ flex:1; min-width:0; border:none; border-radius:0; text-align:center; min-height:2.4rem; }
+.encounter-stepper-input::-webkit-inner-spin-button,.encounter-stepper-input::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+.encounter-stepper-input{ -moz-appearance:textfield; }
+.encounter-stepper-btn{ flex:0 0 2.4rem; font:700 1.2rem/1 "Space Grotesk",sans-serif; color:var(--ink); background:var(--paper); border:none; border-left:1px solid var(--line); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .1s; -webkit-tap-highlight-color:transparent; }
+.encounter-stepper-btn:first-child{ border-left:none; border-right:1px solid var(--line); }
+.encounter-stepper-btn:hover{ background:var(--yellow); }
+.encounter-stepper-btn:active{ background:var(--ink); color:var(--white); }
+.form-field .encounter-stepper{ width:100%; }
 
 /* Mobile */
 @media (max-width:600px){

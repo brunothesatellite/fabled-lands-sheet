@@ -53,7 +53,6 @@
 
 <nav class="tab-bar" id="tabBar">
     <button class="tab active" data-tab="adventure-sheet" type="button">Adventure Sheet</button>
-    <button class="tab" data-tab="ships-manifest" type="button">Ship's Manifest</button>
     <button class="tab" data-tab="codewords" type="button">Codewords</button>
     <div class="tab-dropdown" id="booksDropdown">
         <button class="tab tab-dropdown-toggle" type="button">Books <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
@@ -67,6 +66,7 @@
             <button class="tab-subitem" data-tab="book7-paragraphs" type="button">Book 7</button>
         </div>
     </div>
+    <button class="tab" data-tab="ships-manifest" type="button">Ship's Manifest</button>
     <button class="tab" data-tab="encounter" type="button">Encounter</button>
     <button class="tab" data-tab="notes" type="button">Notes</button>
     <div class="tab-dropdown" id="mapsDropdown">
@@ -105,11 +105,19 @@
                 </div>
                 <div class="form-field">
                     <label class="form-label">Rank</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-rank" value="1" min="1">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-rank" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-rank" data-key="fl-adventure-rank" value="1" min="1">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-rank" data-dir="1">+</button>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label class="form-label">Defence</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-defence" value="0" min="0">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-defence" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-defence" data-key="fl-adventure-defence" value="0" min="0">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-defence" data-dir="1">+</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -119,39 +127,71 @@
             <div class="form-row triple">
                 <div class="form-field">
                     <label class="form-label">Charisma</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-charisma" value="1" min="1" max="12">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-charisma" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-charisma" data-key="fl-adventure-charisma" value="1" min="1" max="12">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-charisma" data-dir="1">+</button>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label class="form-label">Combat</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-combat" value="1" min="1" max="12">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-combat" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-combat" data-key="fl-adventure-combat" value="1" min="1" max="12">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-combat" data-dir="1">+</button>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label class="form-label">Magic</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-magic" value="1" min="1" max="12">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-magic" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-magic" data-key="fl-adventure-magic" value="1" min="1" max="12">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-magic" data-dir="1">+</button>
+                    </div>
                 </div>
             </div>
             <div class="form-row triple">
                 <div class="form-field">
                     <label class="form-label">Sanctity</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-sanctity" value="1" min="1" max="12">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-sanctity" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-sanctity" data-key="fl-adventure-sanctity" value="1" min="1" max="12">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-sanctity" data-dir="1">+</button>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label class="form-label">Scouting</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-scouting" value="1" min="1" max="12">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-scouting" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-scouting" data-key="fl-adventure-scouting" value="1" min="1" max="12">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-scouting" data-dir="1">+</button>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label class="form-label">Thievery</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-thievery" value="1" min="1" max="12">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-thievery" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-thievery" data-key="fl-adventure-thievery" value="1" min="1" max="12">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-thievery" data-dir="1">+</button>
+                    </div>
                 </div>
             </div>
             <div class="form-row double">
                 <div class="form-field">
                     <label class="form-label">Current Stamina</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-current-stamina" value="9" min="0">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-current-stamina" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-current-stamina" data-key="fl-adventure-current-stamina" value="9" min="0">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-current-stamina" data-dir="1">+</button>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label class="form-label">Maximum Stamina</label>
-                    <input type="number" class="form-input form-number" data-key="fl-adventure-max-stamina" value="9" min="0">
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-max-stamina" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-max-stamina" data-key="fl-adventure-max-stamina" value="9" min="0">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-max-stamina" data-dir="1">+</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -177,7 +217,11 @@
 
         <div class="form-row">
             <label class="form-label">Money</label>
-            <input type="number" class="form-input form-number" data-key="fl-adventure-money" value="0" min="0">
+            <div class="encounter-stepper">
+                <button class="encounter-stepper-btn" type="button" data-target="adventure-money" data-dir="-1">−</button>
+                <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-money" data-key="fl-adventure-money" value="0" min="0">
+                <button class="encounter-stepper-btn" type="button" data-target="adventure-money" data-dir="1">+</button>
+            </div>
         </div>
 
         <h3 class="section-title">Titles & Honours</h3>
@@ -185,28 +229,6 @@
 
         <h3 class="section-title">Blessings</h3>
         <textarea class="form-textarea" data-key="fl-adventure-blessings" rows="4"></textarea>
-    </section>
-
-    <!-- SHIP'S MANIFEST -->
-    <section class="tab-panel" id="panel-ships-manifest">
-        <h2 class="panel-title">Ship's Manifest</h2>
-        <div class="ship-table-wrapper">
-            <table class="ship-table" id="shipTable">
-                <thead>
-                    <tr>
-                        <th class="ship-th-actions"></th>
-                        <th class="ship-th">Ship Type</th>
-                        <th class="ship-th">Ship Name</th>
-                        <th class="ship-th">Crew Quality</th>
-                        <th class="ship-th">Cargo Capacity</th>
-                        <th class="ship-th">Current Cargo</th>
-                        <th class="ship-th">Where Docked</th>
-                    </tr>
-                </thead>
-                <tbody id="shipTableBody"></tbody>
-            </table>
-        </div>
-        <button class="ship-add-btn" id="shipAddTopBtn" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter une ligne</button>
     </section>
 
     <!-- CODEWORDS -->
@@ -343,6 +365,28 @@
         </div>
     </section>
 
+    <!-- SHIP'S MANIFEST -->
+    <section class="tab-panel" id="panel-ships-manifest">
+        <h2 class="panel-title">Ship's Manifest</h2>
+        <div class="ship-table-wrapper">
+            <table class="ship-table" id="shipTable">
+                <thead>
+                    <tr>
+                        <th class="ship-th-actions"></th>
+                        <th class="ship-th">Ship Type</th>
+                        <th class="ship-th">Ship Name</th>
+                        <th class="ship-th">Crew Quality</th>
+                        <th class="ship-th">Cargo Capacity</th>
+                        <th class="ship-th">Current Cargo</th>
+                        <th class="ship-th">Where Docked</th>
+                    </tr>
+                </thead>
+                <tbody id="shipTableBody"></tbody>
+            </table>
+        </div>
+        <button class="ship-add-btn" id="shipAddTopBtn" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter une ligne</button>
+    </section>
+
     <!-- ENCOUNTER -->
     <section class="tab-panel" id="panel-encounter">
         <h2 class="panel-title">Encounter</h2>
@@ -360,7 +404,11 @@
                     </div>
                     <div class="encounter-field">
                         <label class="form-label">Stamina</label>
-                        <input type="number" class="form-input form-number" id="encounter-me-stamina" min="0">
+                        <div class="encounter-stepper">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-me-stamina" data-dir="-1">−</button>
+                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-me-stamina" min="0">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-me-stamina" data-dir="1">+</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -372,15 +420,27 @@
                 <div class="encounter-fields">
                     <div class="encounter-field">
                         <label class="form-label">Combat</label>
-                        <input type="number" class="form-input form-number" id="encounter-foe-combat" min="1" value="1">
+                        <div class="encounter-stepper">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-combat" data-dir="-1">−</button>
+                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-foe-combat" min="1" value="1">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-combat" data-dir="1">+</button>
+                        </div>
                     </div>
                     <div class="encounter-field">
                         <label class="form-label">Defence</label>
-                        <input type="number" class="form-input form-number" id="encounter-foe-defence" min="1" value="1">
+                        <div class="encounter-stepper">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-defence" data-dir="-1">−</button>
+                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-foe-defence" min="1" value="1">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-defence" data-dir="1">+</button>
+                        </div>
                     </div>
                     <div class="encounter-field">
                         <label class="form-label">Stamina</label>
-                        <input type="number" class="form-input form-number" id="encounter-foe-stamina" min="0" value="1">
+                        <div class="encounter-stepper">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-stamina" data-dir="-1">−</button>
+                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-foe-stamina" min="0" value="1">
+                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-stamina" data-dir="1">+</button>
+                        </div>
                     </div>
                 </div>
             </div>

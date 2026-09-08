@@ -957,6 +957,22 @@ function actualiserFight() {
     if (adventureStamina) meStamina.value = adventureStamina.value;
 }
 
+document.querySelectorAll('.encounter-stepper-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var target = document.getElementById(this.dataset.target);
+        if (!target) return;
+        var step = parseInt(this.dataset.dir);
+        var min = parseInt(target.min);
+        var max = parseInt(target.max);
+        var val = parseInt(target.value) || 0;
+        val = val + step;
+        if (!isNaN(min)) val = Math.max(min, val);
+        if (!isNaN(max)) val = Math.min(max, val);
+        target.value = val;
+        target.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+});
+
 document.getElementById('encounter-me-stamina').addEventListener('input', function() {
     var adventureStamina = document.querySelector('[data-key="fl-adventure-current-stamina"]');
     if (adventureStamina) {
