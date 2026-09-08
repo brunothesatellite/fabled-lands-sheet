@@ -546,16 +546,16 @@ function genererParagraphes(bookId, listId, prefix) {
 function buildBookTable(paragraphs, tbodyId, bookId){
     var tbody = document.getElementById(tbodyId);
     if(!tbody) return;
-    var groupSize = 4;
     var groups = [];
-    for(var i = 0; i < paragraphs.length; i += groupSize){
-        var end = Math.min(i + groupSize, paragraphs.length);
-        if(end < paragraphs.length && paragraphs.length - end < groupSize){
-            end = paragraphs.length;
+    var currentGroup = [];
+    for(var i = 0; i < paragraphs.length; i++){
+        if(paragraphs[i].note && currentGroup.length > 0){
+            groups.push(currentGroup);
+            currentGroup = [];
         }
-        groups.push(paragraphs.slice(i, end));
-        if(end === paragraphs.length) break;
+        currentGroup.push(paragraphs[i]);
     }
+    if(currentGroup.length > 0) groups.push(currentGroup);
     for(var gi = 0; gi < groups.length; gi++){
         var group = groups[gi];
         for(var g = 0; g < group.length; g++){
