@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fabled Lands Companion</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="masthead">
+    <div>
+        <div class="brand-mark" aria-hidden="true"><i class="fa-solid fa-scroll"></i></div>
+        <h1>Fabled Lands Companion</h1>
+    </div>
+    <div class="masthead-side">
+        <div class="utility-controls">
+            <div class="user-avatar-container" id="anonAvatarContainer" hidden>
+                <button class="user-avatar anon-avatar" id="anonAvatarBtn" type="button" aria-label="Menu données" aria-expanded="false" title="Menu utilisateur">
+                    <i class="fa-solid fa-user-secret" aria-hidden="true"></i>
+                </button>
+                <div class="user-menu" id="anonMenu" hidden>
+                    <div class="menu-welcome" id="anonWelcome">Bienvenue Anonyme</div>
+                    <button id="anonExportBtn" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i> Exporter mes données</button>
+                    <button id="anonImportBtn" type="button"><i class="fa-solid fa-upload" aria-hidden="true"></i> Importer mes données</button>
+                    <button id="anonClearBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-trash" aria-hidden="true"></i> Effacer mes données</button>
+                    <button id="anonLoginBtn" type="button" hidden><i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i> Login</button>
+                </div>
+            </div>
+            <div class="user-avatar-container" id="userAvatarContainer" hidden>
+                <button class="user-avatar" id="userAvatarBtn" type="button" aria-label="Menu utilisateur" aria-expanded="false" title="Menu utilisateur">
+                    <span id="userAvatarLetter">M</span>
+                </button>
+                <div class="user-menu" id="userMenu" hidden>
+                    <div class="menu-welcome" id="userWelcome">Bienvenue</div>
+                    <button id="exportBtn" type="button"><i class="fa-solid fa-download" aria-hidden="true"></i> Exporter mes données</button>
+                    <button id="importPrefsBtn" type="button"><i class="fa-solid fa-file-import" aria-hidden="true"></i> Importer mes données</button>
+                    <button id="clearDataBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-trash" aria-hidden="true"></i> Effacer mes données</button>
+                    <button id="changePasswordBtn" type="button"><i class="fa-solid fa-key" aria-hidden="true"></i> Modifier le mot de passe</button>
+                    <button id="logoutBtn" type="button"><i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i> Se déconnecter</button>
+                    <button id="deleteAccountBtn" type="button" class="danger-menu-item"><i class="fa-solid fa-user-xmark" aria-hidden="true"></i> Supprimer mon compte</button>
+                </div>
+            </div>
+            <input id="importFile" type="file" accept="application/json,.json" hidden>
+            <input id="importPrefsFile" type="file" accept="application/json,.json" hidden>
+        </div>
+    </div>
+</header>
+
+<nav class="tab-bar" id="tabBar">
+    <button class="tab active" data-tab="adventure-sheet" type="button">Adventure Sheet</button>
+    <button class="tab" data-tab="ships-manifest" type="button">Ship's Manifest</button>
+    <button class="tab" data-tab="codewords" type="button">Codewords</button>
+    <div class="tab-dropdown" id="booksDropdown">
+        <button class="tab tab-dropdown-toggle" type="button">Books <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
+        <div class="tab-dropdown-menu" id="booksMenu" hidden>
+            <button class="tab-subitem" data-tab="book1-paragraphs" type="button">Book 1</button>
+            <button class="tab-subitem" data-tab="book2-paragraphs" type="button">Book 2</button>
+            <button class="tab-subitem" data-tab="book3-paragraphs" type="button">Book 3</button>
+            <button class="tab-subitem" data-tab="book4-paragraphs" type="button">Book 4</button>
+            <button class="tab-subitem" data-tab="book5-paragraphs" type="button">Book 5</button>
+            <button class="tab-subitem" data-tab="book6-paragraphs" type="button">Book 6</button>
+            <button class="tab-subitem" data-tab="book7-paragraphs" type="button">Book 7</button>
+        </div>
+    </div>
+    <div class="tab-dropdown" id="mapsDropdown">
+        <button class="tab tab-dropdown-toggle" type="button">Maps <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
+        <div class="tab-dropdown-menu" id="mapsMenu" hidden>
+            <button class="tab-subitem" data-tab="map-world" type="button">World</button>
+            <button class="tab-subitem" data-tab="map-book1" type="button">Book 1</button>
+            <button class="tab-subitem" data-tab="map-book2" type="button">Book 2</button>
+            <button class="tab-subitem" data-tab="map-book3" type="button">Book 3</button>
+            <button class="tab-subitem" data-tab="map-book4" type="button">Book 4</button>
+            <button class="tab-subitem" data-tab="map-book5" type="button">Book 5</button>
+            <button class="tab-subitem" data-tab="map-book6" type="button">Book 6</button>
+            <button class="tab-subitem" data-tab="map-book7" type="button">Book 7</button>
+        </div>
+    </div>
+</nav>
+
+<main class="content" id="content">
+
+    <!-- ADVENTURE SHEET -->
+    <section class="tab-panel active" id="panel-adventure-sheet">
+        <h2 class="panel-title">Adventure Sheet</h2>
+        <div class="form-grid">
+            <div class="form-row">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-input" data-key="fl-adventure-name">
+            </div>
+            <div class="form-row">
+                <label class="form-label">Profession</label>
+                <input type="text" class="form-input" data-key="fl-adventure-profession">
+            </div>
+            <div class="form-row triple">
+                <div class="form-field">
+                    <label class="form-label">God</label>
+                    <input type="text" class="form-input" data-key="fl-adventure-god">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Rank</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-rank" value="0" min="0">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Defence</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-defence" value="0" min="0">
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Abilities, Scores & Stamina</h3>
+        <div class="form-grid">
+            <div class="form-row triple">
+                <div class="form-field">
+                    <label class="form-label">Charisma</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-charisma" value="0" min="0">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Combat</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-combat" value="0" min="0">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Magic</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-magic" value="0" min="0">
+                </div>
+            </div>
+            <div class="form-row triple">
+                <div class="form-field">
+                    <label class="form-label">Sanctity</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-sanctity" value="0" min="0">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Scouting</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-scouting" value="0" min="0">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Thievery</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-thievery" value="0" min="0">
+                </div>
+            </div>
+            <div class="form-row double">
+                <div class="form-field">
+                    <label class="form-label">Current Stamina</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-current-stamina" value="0" min="0">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Maximum Stamina</label>
+                    <input type="number" class="form-input form-number" data-key="fl-adventure-max-stamina" value="0" min="0">
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Possessions</h3>
+        <div class="possessions-grid">
+            <div class="possession-row"><span class="possession-num">1</span><input type="text" class="form-input" data-key="fl-adventure-pos1"></div>
+            <div class="possession-row"><span class="possession-num">2</span><input type="text" class="form-input" data-key="fl-adventure-pos2"></div>
+            <div class="possession-row"><span class="possession-num">3</span><input type="text" class="form-input" data-key="fl-adventure-pos3"></div>
+            <div class="possession-row"><span class="possession-num">4</span><input type="text" class="form-input" data-key="fl-adventure-pos4"></div>
+            <div class="possession-row"><span class="possession-num">5</span><input type="text" class="form-input" data-key="fl-adventure-pos5"></div>
+            <div class="possession-row"><span class="possession-num">6</span><input type="text" class="form-input" data-key="fl-adventure-pos6"></div>
+            <div class="possession-row"><span class="possession-num">7</span><input type="text" class="form-input" data-key="fl-adventure-pos7"></div>
+            <div class="possession-row"><span class="possession-num">8</span><input type="text" class="form-input" data-key="fl-adventure-pos8"></div>
+            <div class="possession-row"><span class="possession-num">9</span><input type="text" class="form-input" data-key="fl-adventure-pos9"></div>
+            <div class="possession-row"><span class="possession-num">10</span><input type="text" class="form-input" data-key="fl-adventure-pos10"></div>
+            <div class="possession-row"><span class="possession-num">11</span><input type="text" class="form-input" data-key="fl-adventure-pos11"></div>
+            <div class="possession-row"><span class="possession-num">12</span><input type="text" class="form-input" data-key="fl-adventure-pos12"></div>
+        </div>
+
+        <h3 class="section-title">Resurrection Arrangements</h3>
+        <textarea class="form-textarea" data-key="fl-adventure-resurrection" rows="3"></textarea>
+
+        <div class="form-row">
+            <label class="form-label">Money</label>
+            <input type="number" class="form-input form-number" data-key="fl-adventure-money" value="0" min="0">
+        </div>
+
+        <h3 class="section-title">Titles & Honours</h3>
+        <textarea class="form-textarea" data-key="fl-adventure-titles" rows="4"></textarea>
+
+        <h3 class="section-title">Blessings</h3>
+        <textarea class="form-textarea" data-key="fl-adventure-blessings" rows="4"></textarea>
+    </section>
+
+    <!-- SHIP'S MANIFEST -->
+    <section class="tab-panel" id="panel-ships-manifest">
+        <h2 class="panel-title">Ship's Manifest</h2>
+        <div class="form-grid">
+            <div class="form-row double">
+                <div class="form-field">
+                    <label class="form-label">Ship Type</label>
+                    <input type="text" class="form-input" data-key="fl-ship-type">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Ship Name</label>
+                    <input type="text" class="form-input" data-key="fl-ship-name">
+                </div>
+            </div>
+            <div class="form-row triple">
+                <div class="form-field">
+                    <label class="form-label">Crew Quality</label>
+                    <input type="text" class="form-input" data-key="fl-ship-crew-quality">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Cargo Capacity</label>
+                    <input type="text" class="form-input" data-key="fl-ship-cargo-capacity">
+                </div>
+                <div class="form-field">
+                    <label class="form-label">Current Cargo</label>
+                    <input type="text" class="form-input" data-key="fl-ship-current-cargo">
+                </div>
+            </div>
+            <div class="form-row">
+                <label class="form-label">Where Docked</label>
+                <input type="text" class="form-input" data-key="fl-ship-where-docked">
+            </div>
+        </div>
+        <h3 class="section-title">Cargo Details</h3>
+        <textarea class="form-textarea" data-key="fl-ship-cargo-details" rows="10"></textarea>
+    </section>
+
+    <!-- CODEWORDS -->
+    <section class="tab-panel" id="panel-codewords">
+        <h2 class="panel-title">Codewords</h2>
+        <div class="codewords-grid" id="codewordsGrid"></div>
+    </section>
+
+    <!-- BOOK PARAGRAPHS -->
+    <section class="tab-panel" id="panel-book1-paragraphs">
+        <h2 class="panel-title">Book 1 - Paragraphs & Notes</h2>
+        <div class="paragraphs-list" id="book1-list"></div>
+        <h3 class="section-title">Notes</h3>
+        <textarea class="form-textarea" data-key="fl-book1-notes" rows="6"></textarea>
+    </section>
+    <section class="tab-panel" id="panel-book2-paragraphs">
+        <h2 class="panel-title">Book 2 - Paragraphs & Notes</h2>
+        <div class="paragraphs-list" id="book2-list"></div>
+        <h3 class="section-title">Notes</h3>
+        <textarea class="form-textarea" data-key="fl-book2-notes" rows="6"></textarea>
+    </section>
+    <section class="tab-panel" id="panel-book3-paragraphs">
+        <h2 class="panel-title">Book 3 - Paragraphs & Notes</h2>
+        <div class="paragraphs-list" id="book3-list"></div>
+        <h3 class="section-title">Notes</h3>
+        <textarea class="form-textarea" data-key="fl-book3-notes" rows="6"></textarea>
+    </section>
+    <section class="tab-panel" id="panel-book4-paragraphs">
+        <h2 class="panel-title">Book 4 - Paragraphs & Notes</h2>
+        <div class="paragraphs-list" id="book4-list"></div>
+        <h3 class="section-title">Notes</h3>
+        <textarea class="form-textarea" data-key="fl-book4-notes" rows="6"></textarea>
+    </section>
+    <section class="tab-panel" id="panel-book5-paragraphs">
+        <h2 class="panel-title">Book 5 - Paragraphs & Notes</h2>
+        <div class="paragraphs-list" id="book5-list"></div>
+        <h3 class="section-title">Notes</h3>
+        <textarea class="form-textarea" data-key="fl-book5-notes" rows="6"></textarea>
+    </section>
+    <section class="tab-panel" id="panel-book6-paragraphs">
+        <h2 class="panel-title">Book 6 - Paragraphs & Notes</h2>
+        <div class="paragraphs-list" id="book6-list"></div>
+        <h3 class="section-title">Notes</h3>
+        <textarea class="form-textarea" data-key="fl-book6-notes" rows="6"></textarea>
+    </section>
+    <section class="tab-panel" id="panel-book7-paragraphs">
+        <h2 class="panel-title">Book 7 - Paragraphs & Notes (1-590)</h2>
+        <div class="paragraphs-list" id="book7a-list"></div>
+        <h2 class="panel-title">Book 7 - Paragraphs & Notes (591-1200)</h2>
+        <div class="paragraphs-list" id="book7b-list"></div>
+        <h3 class="section-title">Notes</h3>
+        <textarea class="form-textarea" data-key="fl-book7-notes" rows="6"></textarea>
+    </section>
+
+    <!-- MAPS -->
+    <section class="tab-panel" id="panel-map-world">
+        <h2 class="panel-title">World Map</h2>
+        <div class="map-container">
+            <img src="maps/world.png" alt="World Map" class="map-image" id="map-world-img">
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-map-book1">
+        <h2 class="panel-title">Book 1 Map</h2>
+        <div class="map-container">
+            <img src="maps/book1.png" alt="Book 1 Map" class="map-image" id="map-book1-img">
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-map-book2">
+        <h2 class="panel-title">Book 2 Map</h2>
+        <div class="map-container">
+            <img src="maps/book2.png" alt="Book 2 Map" class="map-image" id="map-book2-img">
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-map-book3">
+        <h2 class="panel-title">Book 3 Map</h2>
+        <div class="map-container">
+            <img src="maps/book3.png" alt="Book 3 Map" class="map-image" id="map-book3-img">
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-map-book4">
+        <h2 class="panel-title">Book 4 Map</h2>
+        <div class="map-container">
+            <img src="maps/book4.png" alt="Book 4 Map" class="map-image" id="map-book4-img">
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-map-book5">
+        <h2 class="panel-title">Book 5 Map</h2>
+        <div class="map-container">
+            <img src="maps/book5.png" alt="Book 5 Map" class="map-image" id="map-book5-img">
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-map-book6">
+        <h2 class="panel-title">Book 6 Map</h2>
+        <div class="map-container">
+            <img src="maps/book6.png" alt="Book 6 Map" class="map-image" id="map-book6-img">
+        </div>
+    </section>
+    <section class="tab-panel" id="panel-map-book7">
+        <h2 class="panel-title">Book 7 Map</h2>
+        <div class="map-container">
+            <img src="maps/book7.png" alt="Book 7 Map" class="map-image" id="map-book7-img">
+        </div>
+    </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

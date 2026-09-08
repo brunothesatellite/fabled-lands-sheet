@@ -1,0 +1,39 @@
+Travaille dans "D:\VS Code\fabled-lands-sheet"
+Je veux que tu transforme Fabled-Lands-Play-Sheets-Ultimate.pdf en un site web, adapté aux smartphone, en particulier à la résolution d'un Google Pixel 7a
+Le site web tournera sur un serveur apache / nginx avec php 8.2 activé et les modules curl & sqlite3 activés.
+Pour transformer ce PDF en site web je voudrais que le haut du site soit un bandeau d'onglets permettant de changer d'onglet rapidement. Au dessus de ce bandeau d'onglets, il y aura un bandeau utilitaire décrit plus loin.
+Voici les onglets :
+"Adventure sheet" : cela correspond à la page 1 du pdf
+"Ship's manifest" : page 2 du pdf
+"Codewords" : page 3 et 4 du PDF
+"Books paragraphs" avec les sous-onglets suivants :
+ "Book 1 - paragraphs"  : page 5 du pdf
+ "Book 2 - paragraphs"  : page 6 du pdf
+ "Book 3 - paragraphs"  : page 7 du pdf
+ "Book 4 - paragraphs"  : page 8 du pdf
+ "Book 5 - paragraphs"  : page 9 du pdf
+ "Book 6 - paragraphs"  : page 10 du pdf
+ "Book 7 - paragraphs"  : page 11 et 12 du pdf
+"Maps" avec les sous onglets suivants :
+ "World" : page 15 du PDF
+ "Book 1" : page 16 du pdf
+ "Book 2" : page 17 du pdf
+ "Book 3" : page 18 du pdf
+ "Book 4" : page 19 du pdf
+ "Book 5" : page 20 du pdf
+ "Book 6" : page 21 du pdf
+ "Book 7" : page 22 du pdf
+Ignore les pages 13 et 14 du pdf
+
+Pour les "World" et "Book x", récupère simplement l'image de la page PDF associée, affiche la en plein écran selon la résolution du la page et autorise un clic sur l'image pour l'afficher en pleine résolution (un nouveau clic la remet en résolution adaptée à l'écran). Pour "Book 7", il faudra que tu affiches l'image du PDF tournée de 90° dans le sens horaire
+
+Pour les pages "Adventure sheet", "Ship's manifest", "Codewords" et "Book x - paragraphs", reproduit la mise en page des tableaux PDF avec les zones texte, les cases à cocher en éléments HTML identiques : une zone texte que je peux modifier, une case que je peux cocher. Pour les zones texte multilignes, elles doivent aussi être multilignes dans le site web.
+Pour les pages html qui sont créées à partir de plusieurs pages PDF, met le contenu des pages PDF à la suite dans la page HTML
+
+Toutes les valeurs des champs texte et les cases à cocher doivent être persistées : soit dans le localstorage, soit en base sqlite3
+Dans le bandeau utilitaire, on trouver une icone pour l'utilisateur ouvrant un menu déroulant.
+Dans ce menu on trouvera des boutons "export json" et "import json" permettant d'exporter et d'importer la totalité des valeurs des champs texte et case à cocher des pages du site web. L'export créera un fichier horodaté et le téléchargera automatiquement. L'import demandera confirmation et écrasera les données (vérifie le format du fichier json avant)
+Utilise le même mécanisme de gestion soit d'une session anonyme, soit d'un utilisateur connecté que dans le projet  
+D:\VS Code\sgw-german-schauss
+Je veux que tu crées les même pages de création de compte, de login, les même entrées de menu lorsqu'on clique sur l'icone anonyme ou de l'utilisateur connecté.
+Fait un plan et demande des précisions si besoin.
