@@ -137,9 +137,9 @@ switch ($action) {
         $stmt = $db->prepare('SELECT key, value FROM preferences WHERE user_id = :uid');
         $stmt->bindValue(':uid', $user['id'], SQLITE3_INTEGER);
         $result = $stmt->execute();
-        $prefs = [];
+        $prefs = new \stdClass();
         while ($row = $result->fetchArray(SQLITE3_ASSOC)) {
-            $prefs[$row['key']] = $row['value'];
+            $prefs->{$row['key']} = $row['value'];
         }
         jsonResponse(['preferences' => $prefs]);
 

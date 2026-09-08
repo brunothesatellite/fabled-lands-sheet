@@ -121,7 +121,7 @@ async function ecrireToutesLesPreferences(prefs) {
 async function chargerToutesLesPreferences() {
     if (phpDisponible && utilisateurLogue) {
         const data = await apiFetch('get_preferences');
-        var prefs = data && data.preferences ? data.preferences : {};
+        var prefs = data && data.preferences && !Array.isArray(data.preferences) ? data.preferences : {};
         ALL_KEYS.forEach(function(cle) {
             if (!(cle in prefs)) prefs[cle] = '';
         });
