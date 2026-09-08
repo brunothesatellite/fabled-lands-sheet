@@ -477,6 +477,7 @@ var bookData = {
         {n:"467",c:3},{n:"491",c:1},{n:"500",c:1},{n:"513",c:1},{n:"522",c:1},
         {n:"545",c:1,note:"586 (Items Left Behind)"},
         {n:"583",c:1},{n:"605",c:1},{n:"704",c:1},
+        {n:"",c:0,note:"600 (Money Banked)"},
         {n:"",c:0,note:"Notes"}
     ],
     book5: [
