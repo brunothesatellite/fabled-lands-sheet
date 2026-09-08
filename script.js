@@ -592,7 +592,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
                     cb.className = 'para-check';
                     var cbKey = key + '-c' + c;
                     cb.dataset.key = cbKey;
-                    cb.checked = localStorage.getItem(cbKey) === '1';
+                    if(!ALL_KEYS.includes(cbKey)) ALL_KEYS.push(cbKey);
                     cb.addEventListener('change', function(){
                         ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
                     });
@@ -610,7 +610,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
                 inp.className = 'para-input';
                 var inpKey = 'fl-' + bookId + '-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
                 inp.dataset.key = inpKey;
-                inp.value = localStorage.getItem(inpKey) || '';
+                if(!ALL_KEYS.includes(inpKey)) ALL_KEYS.push(inpKey);
                 inp.addEventListener('input', function(){
                     clearTimeout(this._saveTimeout);
                     var self = this;
@@ -651,7 +651,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
         var ta = document.createElement('textarea');
         ta.className = 'note-textarea';
         ta.dataset.key = noteKey;
-        ta.value = localStorage.getItem(noteKey) || '';
+        if(!ALL_KEYS.includes(noteKey)) ALL_KEYS.push(noteKey);
         ta.placeholder = 'Notes...';
         ta.addEventListener('input', function(){
             clearTimeout(this._saveTimeout);
@@ -735,11 +735,13 @@ function supprimerLigne(tr){
     for(var c = 0; c < SHIP_COLS.length; c++){
         var k = shipKey(idx, c);
         localStorage.removeItem(k);
+        if(phpDisponible && utilisateurLogue) apiFetch('delete_preference',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});
         var ki = ALL_KEYS.indexOf(k);
         if(ki !== -1) ALL_KEYS.splice(ki, 1);
     }
     var sk = shipStrikeKey(idx);
     localStorage.removeItem(sk);
+    if(phpDisponible && utilisateurLogue) apiFetch('delete_preference',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:sk})});
     var ski = ALL_KEYS.indexOf(sk);
     if(ski !== -1) ALL_KEYS.splice(ski, 1);
     tr.remove();

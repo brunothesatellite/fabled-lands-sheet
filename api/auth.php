@@ -143,6 +143,17 @@ switch ($action) {
         }
         jsonResponse(['preferences' => $prefs]);
 
+    case 'delete_preference':
+        $user = requireLogin($db);
+        $input = json_decode(file_get_contents('php://input'), true);
+        $key = $input['key'] ?? null;
+        if (!$key) jsonError('Clé requise.');
+        $stmt = $db->prepare('DELETE FROM preferences WHERE user_id = :uid AND key = :key');
+        $stmt->bindValue(':uid', $user['id'], SQLITE3_INTEGER);
+        $stmt->bindValue(':key', $key, SQLITE3_TEXT);
+        $stmt->execute();
+        jsonResponse(['ok' => true]);
+
     case 'set_preferences':
         $user = requireLogin($db);
         $input = json_decode(file_get_contents('php://input'), true);
