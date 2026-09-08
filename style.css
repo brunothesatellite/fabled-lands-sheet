@@ -1,6 +1,6 @@
 :root{ --ink:#171717; --paper:#f1eee8; --muted:#706d68; --line:#d7d1c8; --red:#e23b2e; --yellow:#f2bd3d; --white:#fffdf8; }
 *{ box-sizing:border-box; }
-body{ font-family:"Space Grotesk",sans-serif; background:var(--paper); color:var(--ink); margin:0; padding:0; min-height:100vh; background-image:linear-gradient(135deg,rgba(23,23,23,.035) 25%,transparent 25%),linear-gradient(315deg,rgba(23,23,23,.025) 25%,transparent 25%); background-size:24px 24px; }
+body{ font-family:"Space Grotesk",sans-serif; background:var(--paper); color:var(--ink); margin:0; padding:0; min-height:100vh; overflow-x:hidden; background-image:linear-gradient(135deg,rgba(23,23,23,.035) 25%,transparent 25%),linear-gradient(315deg,rgba(23,23,23,.025) 25%,transparent 25%); background-size:24px 24px; }
 body:before{ content:""; position:fixed; inset:0 0 auto; height:7px; background:var(--red); z-index:10; }
 .masthead{ max-width:1400px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:1rem; padding:.8rem 1.2rem; border-bottom:2px solid var(--ink); position:relative; z-index:150; }
 .brand-mark{ display:flex; align-items:center; gap:.6rem; color:var(--red); font-size:1.2rem; }
@@ -10,7 +10,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .utility-controls{ display:flex; align-items:flex-start; gap:.7rem; }
 
 /* Tabs */
-.tab-bar{ display:flex; gap:0; border-bottom:2px solid var(--ink); background:var(--white); position:sticky; top:0; z-index:100; }
+.tab-bar{ display:flex; gap:0; border-bottom:2px solid var(--ink); background:var(--white); position:sticky; top:0; z-index:100; overflow-x:auto; -webkit-overflow-scrolling:touch; }
 .tab-bar::-webkit-scrollbar{ display:none; }
 .tab{ flex:0 0 auto; padding:.6rem 1rem; font:700 .78rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; transition:background .15s,color .15s; }
 .tab:hover{ background:rgba(0,0,0,.06); }

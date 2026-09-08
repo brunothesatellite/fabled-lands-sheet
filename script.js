@@ -148,8 +148,16 @@ function fermerMenuUtilisateur() {
 function fermerTousLesMenus() {
     fermerMenuAnonyme();
     fermerMenuUtilisateur();
-    document.getElementById('booksMenu').hidden = true;
-    document.getElementById('mapsMenu').hidden = true;
+    var booksMenu = document.getElementById('booksMenu');
+    var mapsMenu = document.getElementById('mapsMenu');
+    booksMenu.hidden = true;
+    mapsMenu.hidden = true;
+    booksMenu.style.position = '';
+    booksMenu.style.left = '';
+    booksMenu.style.top = '';
+    mapsMenu.style.position = '';
+    mapsMenu.style.left = '';
+    mapsMenu.style.top = '';
 }
 
 anonAvatarBtn.addEventListener('click', function() {
@@ -173,8 +181,18 @@ userAvatarBtn.addEventListener('click', function() {
 document.addEventListener('click', function(e) {
     if (!anonAvatarContainer.contains(e.target)) fermerMenuAnonyme();
     if (!userAvatarContainer.contains(e.target)) fermerMenuUtilisateur();
-    if (!document.getElementById('booksDropdown').contains(e.target)) document.getElementById('booksMenu').hidden = true;
-    if (!document.getElementById('mapsDropdown').contains(e.target)) document.getElementById('mapsMenu').hidden = true;
+    if (!document.getElementById('booksDropdown').contains(e.target)) {
+        document.getElementById('booksMenu').hidden = true;
+        document.getElementById('booksMenu').style.position = '';
+        document.getElementById('booksMenu').style.left = '';
+        document.getElementById('booksMenu').style.top = '';
+    }
+    if (!document.getElementById('mapsDropdown').contains(e.target)) {
+        document.getElementById('mapsMenu').hidden = true;
+        document.getElementById('mapsMenu').style.position = '';
+        document.getElementById('mapsMenu').style.left = '';
+        document.getElementById('mapsMenu').style.top = '';
+    }
 });
 
 anonExportBtn.addEventListener('click', function() { fermerMenuAnonyme(); exporterDonnees(); });
@@ -310,6 +328,12 @@ function switchTab(tabId) {
 
     document.getElementById('booksMenu').hidden = true;
     document.getElementById('mapsMenu').hidden = true;
+    document.getElementById('booksMenu').style.position = '';
+    document.getElementById('booksMenu').style.left = '';
+    document.getElementById('booksMenu').style.top = '';
+    document.getElementById('mapsMenu').style.position = '';
+    document.getElementById('mapsMenu').style.left = '';
+    document.getElementById('mapsMenu').style.top = '';
     window.scrollTo(0, 0);
 
     if (tabId === 'encounter') actualiserFight();
@@ -327,14 +351,40 @@ document.getElementById('booksDropdown').querySelector('.tab-dropdown-toggle').a
     e.stopPropagation();
     var menu = document.getElementById('booksMenu');
     document.getElementById('mapsMenu').hidden = true;
+    document.getElementById('mapsMenu').style.position = '';
+    document.getElementById('mapsMenu').style.left = '';
+    document.getElementById('mapsMenu').style.top = '';
     menu.hidden = !menu.hidden;
+    if (!menu.hidden) {
+        var rect = this.getBoundingClientRect();
+        menu.style.position = 'fixed';
+        menu.style.left = rect.left + 'px';
+        menu.style.top = rect.bottom + 'px';
+    } else {
+        menu.style.position = '';
+        menu.style.left = '';
+        menu.style.top = '';
+    }
 });
 
 document.getElementById('mapsDropdown').querySelector('.tab-dropdown-toggle').addEventListener('click', function(e) {
     e.stopPropagation();
     var menu = document.getElementById('mapsMenu');
     document.getElementById('booksMenu').hidden = true;
+    document.getElementById('booksMenu').style.position = '';
+    document.getElementById('booksMenu').style.left = '';
+    document.getElementById('booksMenu').style.top = '';
     menu.hidden = !menu.hidden;
+    if (!menu.hidden) {
+        var rect = this.getBoundingClientRect();
+        menu.style.position = 'fixed';
+        menu.style.left = rect.left + 'px';
+        menu.style.top = rect.bottom + 'px';
+    } else {
+        menu.style.position = '';
+        menu.style.left = '';
+        menu.style.top = '';
+    }
 });
 
 /* Auto-save form fields */
