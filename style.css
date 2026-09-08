@@ -140,6 +140,8 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .book-table-right .note-group .note-label{ font:700 .75rem "Barlow Condensed",sans-serif; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; margin-bottom:.3rem; }
 .book-table-right .note-group .note-textarea{ width:100%; border:1px solid var(--line); background:var(--white); resize:vertical; font:.8rem "Space Grotesk",sans-serif; color:var(--ink); padding:.3rem .4rem; box-sizing:border-box; min-height:4rem; flex:1; }
 .book-table-right .note-group .note-textarea:focus{ outline:2px solid var(--red); }
+.book-table-right .note-group.note-group-label{ background:var(--white); justify-content:center; min-height:auto; padding:.2rem .5rem; }
+.book-table-right .note-group.note-group-label .note-label{ margin-bottom:0; }
 .book-table-wrapper{ overflow-x:auto; }
 .book-table{ width:100%; border-collapse:collapse; font-size:.85rem; }
 .book-th{ background:var(--ink); color:var(--white); padding:.4rem .5rem; text-align:left; font:700 .75rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; border:2px solid var(--ink); }
@@ -155,3 +157,4 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .book-td-check .para-check{ width:16px; height:16px; accent-color:var(--red); cursor:pointer; margin:0 2px; }
 .book-table tbody tr:nth-child(4n+1) .book-td{ border-top:3px solid var(--ink); }
 .book-table tbody tr:nth-child(4n) .book-td{ border-bottom:3px solid var(--ink); }
+.book-table tbody tr.book-tr-empty .book-td{ border-color:var(--line); }

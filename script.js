@@ -566,96 +566,104 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
     var rightDiv = document.getElementById(rightDivId);
     if(!leftTbody) return;
     var groups = [];
-    var extraLabels = [];
     var currentGroup = [];
     for(var i = 0; i < paragraphs.length; i++){
         var para = paragraphs[i];
-        if(para.n === ""){
-            extraLabels.push(para.note);
-            continue;
-        }
         if(para.note && currentGroup.length > 0){
-            groups.push({items: currentGroup, extraLabels: extraLabels});
+            groups.push(currentGroup);
             currentGroup = [];
-            extraLabels = [];
         }
         currentGroup.push(para);
     }
-    if(currentGroup.length > 0) groups.push({items: currentGroup, extraLabels: extraLabels});
+    if(currentGroup.length > 0) groups.push(currentGroup);
     for(var gi = 0; gi < groups.length; gi++){
         var group = groups[gi];
-        var items = group.items;
-        for(var g = 0; g < items.length; g++){
-            var para = items[g];
-            var key = 'fl-' + bookId + '-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
-            var tr = document.createElement('tr');
-            var tdCheck = document.createElement('td');
-            tdCheck.className = 'book-td book-td-check';
-            var cbCount = para.c || 1;
-            for(var c = 0; c < cbCount; c++){
-                var cb = document.createElement('input');
-                cb.type = 'checkbox';
-                cb.className = 'para-check';
-                var cbKey = key + '-c' + c;
-                cb.dataset.key = cbKey;
-                cb.checked = lirePreference(cbKey) === '1';
-                cb.addEventListener('change', function(){
-                    ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
+        var firstPara = group[0];
+        var isNoteOnly = (firstPara.n === "" && group.length === 1);
+        if(!isNoteOnly){
+            for(var g = 0; g < group.length; g++){
+                var para = group[g];
+                var key = 'fl-' + bookId + '-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
+                var tr = document.createElement('tr');
+                var tdCheck = document.createElement('td');
+                tdCheck.className = 'book-td book-td-check';
+                var cbCount = para.c || 1;
+                for(var c = 0; c < cbCount; c++){
+                    var cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.className = 'para-check';
+                    var cbKey = key + '-c' + c;
+                    cb.dataset.key = cbKey;
+                    cb.checked = lirePreference(cbKey) === '1';
+                    cb.addEventListener('change', function(){
+                        ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
+                    });
+                    tdCheck.appendChild(cb);
+                }
+                tr.appendChild(tdCheck);
+                var tdPara = document.createElement('td');
+                tdPara.className = 'book-td book-td-para';
+                tdPara.textContent = para.n;
+                tr.appendChild(tdPara);
+                var tdInput = document.createElement('td');
+                tdInput.className = 'book-td book-td-input';
+                var inp = document.createElement('input');
+                inp.type = 'text';
+                inp.className = 'para-input';
+                var inpKey = 'fl-' + bookId + '-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
+                inp.dataset.key = inpKey;
+                inp.value = localStorage.getItem(inpKey) || '';
+                inp.addEventListener('input', function(){
+                    clearTimeout(this._saveTimeout);
+                    var self = this;
+                    this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
                 });
-                tdCheck.appendChild(cb);
+                inp.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+                tdInput.appendChild(inp);
+                tr.appendChild(tdInput);
+                leftTbody.appendChild(tr);
             }
-            tr.appendChild(tdCheck);
-            var tdPara = document.createElement('td');
-            tdPara.className = 'book-td book-td-para';
-            tdPara.textContent = para.n;
-            tr.appendChild(tdPara);
-            var tdInput = document.createElement('td');
-            tdInput.className = 'book-td book-td-input';
-            var inp = document.createElement('input');
-            inp.type = 'text';
-            inp.className = 'para-input';
-            var inpKey = 'fl-' + bookId + '-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
-            inp.dataset.key = inpKey;
-            inp.value = localStorage.getItem(inpKey) || '';
-            inp.addEventListener('input', function(){
-                clearTimeout(this._saveTimeout);
-                var self = this;
-                this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
-            });
-            inp.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
-            tdInput.appendChild(inp);
-            tr.appendChild(tdInput);
-            leftTbody.appendChild(tr);
+        } else {
+            var trEmpty = document.createElement('tr');
+            trEmpty.className = 'book-tr-empty';
+            var tdE1 = document.createElement('td');
+            tdE1.className = 'book-td book-td-check';
+            trEmpty.appendChild(tdE1);
+            var tdE2 = document.createElement('td');
+            tdE2.className = 'book-td book-td-para';
+            trEmpty.appendChild(tdE2);
+            var tdE3 = document.createElement('td');
+            tdE3.className = 'book-td book-td-input';
+            trEmpty.appendChild(tdE3);
+            leftTbody.appendChild(trEmpty);
         }
         if(!rightDiv) continue;
         var noteGroup = document.createElement('div');
         noteGroup.className = 'note-group';
-        noteGroup.dataset.rows = items.length;
-        if(items[0].note){
+        if(isNoteOnly){
+            noteGroup.classList.add('note-group-label');
+        }
+        if(firstPara.note){
             var lbl = document.createElement('div');
             lbl.className = 'note-label';
-            lbl.textContent = items[0].note;
+            lbl.textContent = firstPara.note;
             noteGroup.appendChild(lbl);
         }
-        for(var el = 0; el < group.extraLabels.length; el++){
-            var extraLbl = document.createElement('div');
-            extraLbl.className = 'note-label';
-            extraLbl.textContent = group.extraLabels[el];
-            noteGroup.appendChild(extraLbl);
+        if(!isNoteOnly){
+            var noteKey = 'fl-' + bookId + '-note-g' + gi;
+            var ta = document.createElement('textarea');
+            ta.className = 'note-textarea';
+            ta.dataset.key = noteKey;
+            ta.value = localStorage.getItem(noteKey) || '';
+            ta.placeholder = 'Notes...';
+            ta.addEventListener('input', function(){
+                clearTimeout(this._saveTimeout);
+                var self = this;
+                this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
+            });
+            ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+            noteGroup.appendChild(ta);
         }
-        var noteKey = 'fl-' + bookId + '-note-g' + gi;
-        var ta = document.createElement('textarea');
-        ta.className = 'note-textarea';
-        ta.dataset.key = noteKey;
-        ta.value = localStorage.getItem(noteKey) || '';
-        ta.placeholder = 'Notes...';
-        ta.addEventListener('input', function(){
-            clearTimeout(this._saveTimeout);
-            var self = this;
-            this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
-        });
-        ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
-        noteGroup.appendChild(ta);
         rightDiv.appendChild(noteGroup);
     }
 }
