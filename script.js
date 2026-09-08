@@ -433,7 +433,7 @@ function genererCodewords() {
 /* Book paragraphs */
 var bookData = {
     book1: [
-        {n:"10",c:4},{n:"10 (Town House)",c:1},{n:"16",c:1},{n:"19",c:3},
+        {n:"10",c:4,note:"46 (Money Invested)"},{n:"10 (Town House)",c:1},{n:"16",c:1},{n:"19",c:3},
         {n:"91",c:1,note:"104 (Money Invested)"},{n:"100 (Town House)",c:1},{n:"116",c:1},{n:"160",c:1},
         {n:"169",c:1,note:"177 (Items in Town House)"},{n:"175",c:1},{n:"199",c:1},{n:"207",c:1},
         {n:"232",c:1,note:"300 (Items in Town House)"},{n:"233",c:1},{n:"264",c:1},{n:"305",c:1},
@@ -560,18 +560,20 @@ function buildBook1Table(paragraphs, tbodyId){
     var tbody = document.getElementById(tbodyId);
     if(!tbody) return;
     var groupSize = 4;
+    var groups = [];
     for(var i = 0; i < paragraphs.length; i += groupSize){
-        var group = paragraphs.slice(i, i + groupSize);
-        var noteText = '';
-        for(var g = 0; g < group.length; g++){
-            if(group[g].note){
-                noteText = group[g].note;
-                break;
-            }
+        var end = Math.min(i + groupSize, paragraphs.length);
+        if(end < paragraphs.length && paragraphs.length - end < groupSize){
+            end = paragraphs.length;
         }
+        groups.push(paragraphs.slice(i, end));
+        if(end === paragraphs.length) break;
+    }
+    for(var gi = 0; gi < groups.length; gi++){
+        var group = groups[gi];
         for(var g = 0; g < group.length; g++){
             var para = group[g];
-            var key = 'fl-book1-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + i;
+            var key = 'fl-book1-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
             var tr = document.createElement('tr');
             // Checkboxes cell
             var tdCheck = document.createElement('td');
@@ -595,12 +597,25 @@ function buildBook1Table(paragraphs, tbodyId){
             tdPara.className = 'book-td';
             tdPara.textContent = para.n;
             tr.appendChild(tdPara);
-            // Notes cell (only on first row of group, with rowspan)
-            if(g === 0 && noteText){
+            // Notes cell (textarea with rowspan, only on first row of group)
+            if(g === 0){
                 var tdNote = document.createElement('td');
                 tdNote.className = 'book-td book-td-notes';
                 tdNote.rowSpan = group.length;
-                tdNote.textContent = noteText;
+                var noteKey = 'fl-book1-note-g' + gi;
+                var ta = document.createElement('textarea');
+                ta.className = 'note-textarea';
+                ta.rows = Math.max(group.length * 2, 4);
+                ta.dataset.key = noteKey;
+                ta.value = lirePreference(noteKey) || para.note || '';
+                ta.placeholder = 'Notes...';
+                ta.addEventListener('input', function(){
+                    clearTimeout(this._saveTimeout);
+                    var self = this;
+                    this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
+                });
+                ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+                tdNote.appendChild(ta);
                 tr.appendChild(tdNote);
             }
             tbody.appendChild(tr);
