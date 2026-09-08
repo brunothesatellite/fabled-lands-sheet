@@ -67,6 +67,7 @@
             <button class="tab-subitem" data-tab="book7-paragraphs" type="button">Book 7</button>
         </div>
     </div>
+    <button class="tab" data-tab="notes" type="button">Notes</button>
     <div class="tab-dropdown" id="mapsDropdown">
         <button class="tab tab-dropdown-toggle" type="button">Maps <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
         <div class="tab-dropdown-menu" id="mapsMenu" hidden>
@@ -188,38 +189,23 @@
     <!-- SHIP'S MANIFEST -->
     <section class="tab-panel" id="panel-ships-manifest">
         <h2 class="panel-title">Ship's Manifest</h2>
-        <div class="form-grid">
-            <div class="form-row double">
-                <div class="form-field">
-                    <label class="form-label">Ship Type</label>
-                    <input type="text" class="form-input" data-key="fl-ship-type">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Ship Name</label>
-                    <input type="text" class="form-input" data-key="fl-ship-name">
-                </div>
-            </div>
-            <div class="form-row triple">
-                <div class="form-field">
-                    <label class="form-label">Crew Quality</label>
-                    <input type="text" class="form-input" data-key="fl-ship-crew-quality">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Cargo Capacity</label>
-                    <input type="text" class="form-input" data-key="fl-ship-cargo-capacity">
-                </div>
-                <div class="form-field">
-                    <label class="form-label">Current Cargo</label>
-                    <input type="text" class="form-input" data-key="fl-ship-current-cargo">
-                </div>
-            </div>
-            <div class="form-row">
-                <label class="form-label">Where Docked</label>
-                <input type="text" class="form-input" data-key="fl-ship-where-docked">
-            </div>
+        <div class="ship-table-wrapper">
+            <table class="ship-table" id="shipTable">
+                <thead>
+                    <tr>
+                        <th class="ship-th-actions"></th>
+                        <th class="ship-th">Ship Type</th>
+                        <th class="ship-th">Ship Name</th>
+                        <th class="ship-th">Crew Quality</th>
+                        <th class="ship-th">Cargo Capacity</th>
+                        <th class="ship-th">Current Cargo</th>
+                        <th class="ship-th">Where Docked</th>
+                    </tr>
+                </thead>
+                <tbody id="shipTableBody"></tbody>
+            </table>
         </div>
-        <h3 class="section-title">Cargo Details</h3>
-        <textarea class="form-textarea" data-key="fl-ship-cargo-details" rows="10"></textarea>
+        <button class="ship-add-btn" id="shipAddTopBtn" type="button"><i class="fa-solid fa-plus" aria-hidden="true"></i> Ajouter une ligne</button>
     </section>
 
     <!-- CODEWORDS -->
@@ -272,6 +258,12 @@
         <div class="paragraphs-list" id="book7b-list"></div>
         <h3 class="section-title">Notes</h3>
         <textarea class="form-textarea" data-key="fl-book7-notes" rows="6"></textarea>
+    </section>
+
+    <!-- NOTES -->
+    <section class="tab-panel" id="panel-notes">
+        <h2 class="panel-title">Notes</h2>
+        <textarea class="form-textarea notes-textarea" data-key="fl-notes" rows="20"></textarea>
     </section>
 
     <!-- MAPS -->

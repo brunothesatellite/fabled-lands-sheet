@@ -2,7 +2,7 @@
 *{ box-sizing:border-box; }
 body{ font-family:"Space Grotesk",sans-serif; background:var(--paper); color:var(--ink); margin:0; padding:0; min-height:100vh; background-image:linear-gradient(135deg,rgba(23,23,23,.035) 25%,transparent 25%),linear-gradient(315deg,rgba(23,23,23,.025) 25%,transparent 25%); background-size:24px 24px; }
 body:before{ content:""; position:fixed; inset:0 0 auto; height:7px; background:var(--red); z-index:10; }
-.masthead{ max-width:1400px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:1rem; padding:.8rem 1.2rem; border-bottom:2px solid var(--ink); }
+.masthead{ max-width:1400px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:1rem; padding:.8rem 1.2rem; border-bottom:2px solid var(--ink); position:relative; z-index:150; }
 .brand-mark{ display:flex; align-items:center; gap:.6rem; color:var(--red); font-size:1.2rem; }
 .brand-mark i{ font-size:1.4rem; transform:rotate(-12deg); }
 h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-serif; text-transform:uppercase; white-space:nowrap; }
@@ -69,6 +69,27 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .paragraph-item .para-desc{ flex:1; font-size:.8rem; color:var(--muted); }
 .paragraph-item .para-note{ flex:2; }
 
+/* Ship table */
+.ship-table-wrapper{ overflow-x:auto; border:2px solid var(--ink); background:var(--white); }
+.ship-table{ width:100%; border-collapse:collapse; min-width:700px; }
+.ship-th{ padding:.4rem .5rem; font:700 .7rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--white); background:var(--ink); text-align:left; white-space:nowrap; }
+.ship-th-actions{ width:4.5rem; }
+.ship-td{ border:1px solid var(--line); vertical-align:top; padding:0; }
+.ship-td textarea{ width:100%; border:none; background:transparent; padding:.35rem .4rem; font:500 .78rem "Space Grotesk",sans-serif; color:var(--ink); resize:vertical; min-height:3rem; }
+.ship-td textarea:focus{ outline:2px solid var(--yellow); outline-offset:-2px; }
+.ship-actions{ display:flex; gap:.15rem; padding:.3rem .2rem; justify-content:center; align-items:flex-start; background:rgba(0,0,0,.02); }
+.ship-action-btn{ width:1.5rem; height:1.5rem; padding:0; border:1px solid var(--line); background:var(--white); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:.6rem; color:var(--muted); transition:background .1s,color .1s; }
+.ship-action-btn:hover{ background:var(--ink); color:var(--white); border-color:var(--ink); }
+.ship-action-btn.danger:hover{ background:var(--red); border-color:var(--red); }
+.ship-action-btn.active{ background:var(--yellow); color:var(--ink); border-color:var(--ink); }
+.ship-row-struck textarea{ text-decoration:line-through; opacity:.45; }
+.ship-add-btn{ margin-top:.6rem; padding:.4rem .8rem; font:700 .75rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); background:var(--white); border:2px solid var(--ink); cursor:pointer; transition:transform .12s,box-shadow .12s; }
+.ship-add-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--yellow); }
+.ship-add-btn i{ margin-right:.3rem; }
+
+/* Notes */
+.notes-textarea{ min-height:60vh; font-size:.9rem; line-height:1.5; }
+
 /* Maps */
 .map-container{ width:100%; overflow:hidden; border:2px solid var(--ink); background:var(--ink); }
 .map-image{ width:100%; height:auto; display:block; cursor:zoom-in; transition:transform .2s; }
@@ -80,7 +101,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .user-avatar:hover,.user-avatar:focus-visible{ transform:translate(-3px,-3px); box-shadow:4px 4px 0 var(--yellow); }
 .user-avatar[aria-expanded="true"]{ transform:translate(-3px,-3px); box-shadow:4px 4px 0 var(--yellow); }
 .anon-avatar i{ font-size:1rem; }
-.user-menu{ position:absolute; top:calc(100% + 6px); right:0; min-width:220px; background:var(--white); border:2px solid var(--ink); box-shadow:7px 7px 0 var(--yellow); z-index:100; }
+.user-menu{ position:absolute; top:calc(100% + 6px); right:0; min-width:220px; background:var(--white); border:2px solid var(--ink); box-shadow:7px 7px 0 var(--yellow); z-index:200; }
 .user-menu button{ display:flex; align-items:center; gap:.6rem; width:100%; padding:.7rem 1rem; font:600 .85rem "Space Grotesk",sans-serif; color:var(--ink); background:transparent; border:none; border-bottom:1px solid var(--line); cursor:pointer; text-align:left; white-space:nowrap; }
 .user-menu button:last-child{ border-bottom:none; }
 .user-menu button:hover{ background:#f8f5ef; }
@@ -105,4 +126,6 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     .codewords-grid{ grid-template-columns:repeat(2,1fr); }
     .user-menu{ right:auto; left:0; }
     .tab{ padding:.5rem .7rem; font-size:.72rem; }
+    .ship-table{ min-width:600px; }
+    .ship-td textarea{ font-size:.72rem; min-height:2.5rem; }
 }
