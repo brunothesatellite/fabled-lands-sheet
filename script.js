@@ -515,7 +515,7 @@ var bookData = {
         {n:"",c:0,note:"Notes"}
     ],
     book7: [
-        {n:"17",c:2,note:"129 (Items in Town House)"},
+        {n:"17",c:1,note:"129 (Items in Town House)"},
         {n:"23",c:4},
         {n:"34",c:1},
         {n:"40",c:1},
