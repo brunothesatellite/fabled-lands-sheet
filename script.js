@@ -534,7 +534,9 @@ var bookData = {
         {n:"354",c:1,note:"486 (Items in Town House)"},
         {n:"356",c:1},{n:"407",c:1},{n:"412",c:1},
         {n:"424",c:1,note:"Notes"},
-        {n:"426",c:1},{n:"486",c:1},{n:"506",c:1},{n:"557",c:1}
+        {n:"426",c:1},{n:"486",c:1},{n:"506",c:1},{n:"557",c:1},
+        {n:"560 (Sword)",c:0},{n:"560 (Storm)",c:0},{n:"560 (Horse)",c:0},
+        {n:"588 (2nd Trial)",c:0},{n:"588 (3rd Trial)",c:0},{n:"588 (4th Trial)",c:0}
     ],
     book7b: [
         {n:"610",c:1,note:"599 (Items Left in Atotl's Home)"},
