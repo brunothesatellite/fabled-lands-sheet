@@ -514,7 +514,7 @@ var bookData = {
         {n:"",c:0,note:"576 (Apartments)"},
         {n:"",c:0,note:"Notes"}
     ],
-    book7a: [
+    book7: [
         {n:"17",c:2,note:"129 (Items in Town House)"},
         {n:"23",c:4},
         {n:"34",c:1},
@@ -533,12 +533,10 @@ var bookData = {
         {n:"313",c:1},{n:"316",c:1},{n:"333 (Town House)",c:1},
         {n:"354",c:1,note:"486 (Items in Town House)"},
         {n:"356",c:1},{n:"407",c:1},{n:"412",c:1},
-        {n:"424",c:1,note:"Notes"},
+        {n:"424",c:1},
         {n:"426",c:1},{n:"486",c:1},{n:"506",c:1},{n:"557",c:1},
         {n:"560 (Sword)",c:0},{n:"560 (Storm)",c:0},{n:"560 (Horse)",c:0},
-        {n:"588 (2nd Trial)",c:0},{n:"588 (3rd Trial)",c:0},{n:"588 (4th Trial)",c:0}
-    ],
-    book7b: [
+        {n:"588 (2nd Trial)",c:0},{n:"588 (3rd Trial)",c:0},{n:"588 (4th Trial)",c:0},
         {n:"610",c:1,note:"599 (Items Left in Atotl's Home)"},
         {n:"618",c:1},{n:"629",c:1},{n:"635",c:1},{n:"645",c:1},{n:"653",c:1},{n:"690",c:1},
         {n:"694",c:1,note:"624 (Items Stored in Clifftop House)"},
@@ -887,8 +885,7 @@ async function initialiser() {
     genererParagraphes('book4', 'book4TableBody', 'fl-book4');
     genererParagraphes('book5', 'book5TableBody', 'fl-book5');
     genererParagraphes('book6', 'book6TableBody', 'fl-book6');
-    genererParagraphes('book7a', 'book7aTableBody', 'fl-book7');
-    genererParagraphes('book7b', 'book7bTableBody', 'fl-book7');
+    genererParagraphes('book7', 'book7TableBody', 'fl-book7');
 
     await detecterPhp();
     await chargerFormulaire();
