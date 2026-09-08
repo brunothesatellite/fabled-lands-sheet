@@ -325,16 +325,14 @@ document.getElementById('mapsDropdown').querySelector('.tab-dropdown-toggle').ad
 document.querySelectorAll('[data-key]').forEach(function(el) {
     if (!ALL_KEYS.includes(el.dataset.key)) ALL_KEYS.push(el.dataset.key);
     el.addEventListener('change', function() {
-        var val = this.type === 'number' ? (this.value || '0') : this.value;
-        ecrirePreference(this.dataset.key, val);
+        ecrirePreference(this.dataset.key, this.value);
     });
     if (el.type === 'text' || el.tagName === 'TEXTAREA' || el.type === 'number') {
         el.addEventListener('input', function() {
             clearTimeout(this._saveTimeout);
             var self = this;
             this._saveTimeout = setTimeout(function() {
-                var val = self.type === 'number' ? (self.value || '0') : self.value;
-                ecrirePreference(self.dataset.key, val);
+                ecrirePreference(self.dataset.key, self.value);
             }, 500);
         });
     }
@@ -346,13 +344,7 @@ async function chargerFormulaire() {
         var val = await lirePreference(cle);
         if (val !== null) {
             var el = document.querySelector('[data-key="' + cle + '"]');
-            if (el) {
-                if (el.type === 'number') {
-                    el.value = val || '0';
-                } else {
-                    el.value = val;
-                }
-            }
+            if (el) el.value = val;
         }
     }
 }
