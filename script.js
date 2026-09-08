@@ -597,12 +597,31 @@ function buildBook1Table(paragraphs, tbodyId){
             tdPara.className = 'book-td';
             tdPara.textContent = para.n;
             tr.appendChild(tdPara);
-            // Notes cell (label with rowspan, only on first row of group)
-            if(g === 0 && para.note){
+            // Notes cell (label + textarea with rowspan, only on first row of group)
+            if(g === 0){
                 var tdNote = document.createElement('td');
                 tdNote.className = 'book-td book-td-notes';
                 tdNote.rowSpan = group.length;
-                tdNote.textContent = para.note;
+                if(para.note){
+                    var lbl = document.createElement('div');
+                    lbl.className = 'note-label';
+                    lbl.textContent = para.note;
+                    tdNote.appendChild(lbl);
+                }
+                var noteKey = 'fl-book1-note-g' + gi;
+                var ta = document.createElement('textarea');
+                ta.className = 'note-textarea';
+                ta.rows = Math.max(group.length * 2, 4);
+                ta.dataset.key = noteKey;
+                ta.value = localStorage.getItem(noteKey) || '';
+                ta.placeholder = 'Notes...';
+                ta.addEventListener('input', function(){
+                    clearTimeout(this._saveTimeout);
+                    var self = this;
+                    this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
+                });
+                ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+                tdNote.appendChild(ta);
                 tr.appendChild(tdNote);
             }
             tbody.appendChild(tr);
