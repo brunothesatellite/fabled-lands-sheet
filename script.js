@@ -481,6 +481,23 @@ var bookData = {
         {n:"",c:0,note:"Notes"}
     ],
     book5: [
+        {n:"16",c:1,note:"115 (Money Invested)"},
+        {n:"44",c:1},{n:"93",c:1},{n:"113",c:1},{n:"120",c:1},
+        {n:"126",c:1,note:"245 (Items in Castle)"},
+        {n:"153",c:1},{n:"165",c:1},{n:"195",c:1},{n:"204",c:1},
+        {n:"216",c:1,note:"401 (Status Points)"},
+        {n:"227",c:1},{n:"239",c:1},{n:"247",c:1},{n:"269",c:1},
+        {n:"325",c:1,note:"560 (Items in Cellar)"},
+        {n:"335",c:1},{n:"467",c:1},{n:"493",c:1},{n:"498",c:1},
+        {n:"520",c:1,note:"586 (Items in Room)"},
+        {n:"534",c:1},{n:"584",c:1},{n:"592",c:1},{n:"596",c:1},
+        {n:"602",c:1,note:"601 (Money Banked)"},
+        {n:"622",c:1},{n:"644",c:1},{n:"648",c:1},{n:"672",c:1},
+        {n:"697",c:1,note:"624 (Palace Rooms)"},
+        {n:"714",c:1},
+        {n:"",c:0,note:"Notes"}
+    ],
+    book6: [
         {n:"68",c:1,note:"175 (Money Invested)"},
         {n:"79 (Town House)",c:1},{n:"92",c:1},{n:"106",c:1},
         {n:"109",c:1,note:"238 (Items in Town House)"},
@@ -492,29 +509,24 @@ var bookData = {
         {n:"539",c:1,note:"414 (Items in Town House)"},
         {n:"569",c:1},{n:"604",c:1},{n:"650",c:1},
         {n:"668",c:1,note:"440 (Money Invested)"},
+        {n:"",c:0,note:"464 (Private Apartments)"},
+        {n:"",c:0,note:"512 (Cabinet)"},
+        {n:"",c:0,note:"576 (Apartments)"},
         {n:"",c:0,note:"Notes"}
     ],
-    book6: [
-        {n:"17",c:1,note:"129 (Items in Town House)"},
-        {n:"560 (Sword)",c:1},
+    book7a: [
+        {n:"17",c:2,note:"129 (Items in Town House)"},
         {n:"23",c:4},
-        {n:"560 (Storm)",c:1},
         {n:"34",c:1},
-        {n:"560 (Horse)",c:1},
         {n:"40",c:1},
-        {n:"588 (2nd Trial)",c:1},
         {n:"42 (Town House)",c:1,note:"150 (Items Stored in Quarters)"},
-        {n:"588 (3rd Trial)",c:1},
-        {n:"58",c:1},
-        {n:"588 (4th Trial)",c:1},
-        {n:"94",c:1},{n:"117",c:1},
+        {n:"58",c:1},{n:"94",c:1},{n:"117",c:1},
         {n:"120",c:1,note:"250 (Items Held in Storage)"},
         {n:"124",c:1},{n:"132",c:1},{n:"135",c:1},
         {n:"141",c:1,note:"250 (Duties Remaining)"},
         {n:"146",c:1},{n:"161",c:1},{n:"178",c:1},
         {n:"204",c:1,note:"263 (Items Held in Spire)"},
-        {n:"225 (Town House)",c:1},
-        {n:"233",c:1},{n:"266",c:1},
+        {n:"225 (Town House)",c:1},{n:"233",c:1},{n:"266",c:1},
         {n:"270",c:1,note:"307 (Items Held in Theatre)"},
         {n:"292",c:1},{n:"299",c:1},{n:"305",c:1},
         {n:"307",c:2,note:"405 (Items in Town House)"},
@@ -524,7 +536,7 @@ var bookData = {
         {n:"424",c:1,note:"Notes"},
         {n:"426",c:1},{n:"486",c:1},{n:"506",c:1},{n:"557",c:1}
     ],
-    book7a: [
+    book7b: [
         {n:"610",c:1,note:"599 (Items Left in Atotl's Home)"},
         {n:"618",c:1},{n:"629",c:1},{n:"635",c:1},{n:"645",c:1},{n:"653",c:1},{n:"690",c:1},
         {n:"694",c:1,note:"624 (Items Stored in Clifftop House)"},
@@ -536,8 +548,7 @@ var bookData = {
         {n:"1136",c:1},{n:"1145",c:1,note:"1150 (Items in Town House)"},
         {n:"1184",c:1},{n:"1189",c:1},
         {n:"1190",c:5,note:"Notes"}
-    ],
-    book7b: []
+    ]
 };
 
 function genererParagraphes(bookId, listId, prefix) {
