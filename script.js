@@ -454,7 +454,7 @@ var bookData = {
         {n:"648",c:1,note:"211 (Items in Town House)"},{n:"679",c:1},{n:"710",c:1},
         {n:"718",c:1,note:"278 (Items in Town House)"},{n:"727",c:1},{n:"728",c:1},
         {n:"754",c:1,note:"348 (Items in Town House)"},{n:"757",c:1},{n:"760",c:1},
-        {n:"762",c:1,note:"661 (Locker Box)"},{n:"777",c:1}
+        {n:"762",c:1,note:"661 (Locker Box)"},{n:"777",c:1,note:"Notes"}
     ],
     book3: [
         {n:"44 (Shack)",c:1,note:"74 (Items in Shack)"},
@@ -463,7 +463,8 @@ var bookData = {
         {n:"183",c:1},{n:"216",c:1},{n:"351",c:3},{n:"466",c:1},{n:"470",c:1},{n:"477",c:1},{n:"494",c:1},
         {n:"509",c:1,note:"607 (Items in College)"},
         {n:"515",c:1},{n:"572 (College)",c:1},{n:"576",c:1},{n:"651",c:1},{n:"659",c:1},{n:"680",c:1},{n:"692",c:1},
-        {n:"719",c:1,note:"652 (Money Invested)"}
+        {n:"719",c:1,note:"652 (Money Invested)"},
+        {n:"",c:0,note:"Notes"}
     ],
     book4: [
         {n:"10 (Town House)",c:1,note:"450 (Items Protected by Brotherhood)"},
@@ -475,7 +476,8 @@ var bookData = {
         {n:"440",c:3,note:"526 (Money Invested)"},
         {n:"467",c:3},{n:"491",c:1},{n:"500",c:1},{n:"513",c:1},{n:"522",c:1},
         {n:"545",c:1,note:"586 (Items Left Behind)"},
-        {n:"583",c:1},{n:"605",c:1},{n:"704",c:1}
+        {n:"583",c:1},{n:"605",c:1},{n:"704",c:1},
+        {n:"",c:0,note:"Notes"}
     ],
     book5: [
         {n:"68",c:1,note:"175 (Money Invested)"},
@@ -488,7 +490,8 @@ var bookData = {
         {n:"328",c:1},{n:"345",c:1},{n:"517",c:1},
         {n:"539",c:1,note:"414 (Items in Town House)"},
         {n:"569",c:1},{n:"604",c:1},{n:"650",c:1},
-        {n:"668",c:1,note:"440 (Money Invested)"}
+        {n:"668",c:1,note:"440 (Money Invested)"},
+        {n:"",c:0,note:"Notes"}
     ],
     book6: [
         {n:"17",c:1,note:"129 (Items in Town House)"},
