@@ -433,15 +433,15 @@ function genererCodewords() {
 /* Book paragraphs */
 var bookData = {
     book1: [
-        {n:"10",d:"(Money Invested)"},{n:"10",d:"(Town House)"},{n:"16"},
-        {n:"19"},{n:"91"},{n:"104",d:"(Money Invested)"},{n:"100",d:"(Town House)"},
-        {n:"116"},{n:"160"},{n:"169"},{n:"177",d:"(Items in Town House)"},{n:"175"},
-        {n:"199"},{n:"207"},{n:"232"},{n:"300",d:"(Items in Town House)"},{n:"233"},
-        {n:"264"},{n:"305"},{n:"310"},{n:"327",d:"(Items in Cache)"},{n:"331"},
-        {n:"337"},{n:"361"},{n:"398"},{n:"400",d:"(Items in Town House)"},{n:"403"},
-        {n:"409"},{n:"446"},{n:"454"},{n:"434",d:"(Items in Town House)"},{n:"473"},
-        {n:"496"},{n:"504"},{n:"542"},{n:"605",d:"(Money Banked)"},{n:"610"},
-        {n:"612"},{n:"619"},{n:"635"},{n:"645"},{n:"649"},{n:"655"},{n:"667"}
+        {n:"10",c:4},{n:"10 (Town House)",c:1},{n:"16",c:1},{n:"19",c:3},
+        {n:"91",c:1,note:"104 (Money Invested)"},{n:"100 (Town House)",c:1},{n:"116",c:1},{n:"160",c:1},
+        {n:"169",c:1,note:"177 (Items in Town House)"},{n:"175",c:1},{n:"199",c:1},{n:"207",c:1},
+        {n:"232",c:1,note:"300 (Items in Town House)"},{n:"233",c:1},{n:"264",c:1},{n:"305",c:1},
+        {n:"310",c:1,note:"327 (Items in Cache)"},{n:"331",c:1},{n:"337",c:1},{n:"361",c:1},
+        {n:"398",c:1,note:"400 (Items in Town House)"},{n:"403",c:1},{n:"409",c:1},{n:"446",c:1},
+        {n:"454",c:1,note:"434 (Items in Town House)"},{n:"473",c:1},{n:"496",c:1},{n:"504",c:1},
+        {n:"542",c:1,note:"605 (Money Banked)"},{n:"610",c:1},{n:"612",c:1},{n:"619",c:1},
+        {n:"635",c:1,note:"Notes"},{n:"645",c:1},{n:"649",c:1},{n:"655",c:1},{n:"667",c:1}
     ],
     book2: [
         {n:"2",d:"(Town House)"},{n:"36",d:"(Money Banked)"},{n:"48",d:"(Town House)"},
@@ -527,6 +527,10 @@ function genererParagraphes(bookId, listId, prefix) {
     if (!list) return;
     var paragraphs = bookData[bookId];
     if (!paragraphs) return;
+    if(bookId === 'book1'){
+        buildBook1Table(paragraphs, listId);
+        return;
+    }
     paragraphs.forEach(function(para, i) {
         var key = prefix + '-para-' + para.n + '-' + i;
         ALL_KEYS.push(key);
@@ -550,6 +554,58 @@ function genererParagraphes(bookId, listId, prefix) {
         item.appendChild(desc);
         list.appendChild(item);
     });
+}
+
+function buildBook1Table(paragraphs, tbodyId){
+    var tbody = document.getElementById(tbodyId);
+    if(!tbody) return;
+    var groupSize = 4;
+    for(var i = 0; i < paragraphs.length; i += groupSize){
+        var group = paragraphs.slice(i, i + groupSize);
+        var noteText = '';
+        for(var g = 0; g < group.length; g++){
+            if(group[g].note){
+                noteText = group[g].note;
+                break;
+            }
+        }
+        for(var g = 0; g < group.length; g++){
+            var para = group[g];
+            var key = 'fl-book1-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + i;
+            var tr = document.createElement('tr');
+            // Checkboxes cell
+            var tdCheck = document.createElement('td');
+            tdCheck.className = 'book-td book-td-check';
+            var cbCount = para.c || 1;
+            for(var c = 0; c < cbCount; c++){
+                var cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.className = 'para-check';
+                var cbKey = key + '-c' + c;
+                cb.dataset.key = cbKey;
+                cb.checked = lirePreference(cbKey) === '1';
+                cb.addEventListener('change', function(){
+                    ecrirePreference(this.dataset.key, this.checked ? '1' : '0');
+                });
+                tdCheck.appendChild(cb);
+            }
+            tr.appendChild(tdCheck);
+            // Paragraph cell
+            var tdPara = document.createElement('td');
+            tdPara.className = 'book-td';
+            tdPara.textContent = para.n;
+            tr.appendChild(tdPara);
+            // Notes cell (only on first row of group, with rowspan)
+            if(g === 0 && noteText){
+                var tdNote = document.createElement('td');
+                tdNote.className = 'book-td book-td-notes';
+                tdNote.rowSpan = group.length;
+                tdNote.textContent = noteText;
+                tr.appendChild(tdNote);
+            }
+            tbody.appendChild(tr);
+        }
+    }
 }
 
 /* Ship table */
@@ -767,7 +823,7 @@ document.querySelectorAll('.map-image').forEach(function(img) {
 async function initialiser() {
     genererCodewords();
     genererShipTable();
-    genererParagraphes('book1', 'book1-list', 'fl-book1');
+    genererParagraphes('book1', 'book1TableBody', 'fl-book1');
     genererParagraphes('book2', 'book2-list', 'fl-book2');
     genererParagraphes('book3', 'book3-list', 'fl-book3');
     genererParagraphes('book4', 'book4-list', 'fl-book4');

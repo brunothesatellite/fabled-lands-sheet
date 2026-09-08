@@ -217,9 +217,18 @@
     <!-- BOOK PARAGRAPHS -->
     <section class="tab-panel" id="panel-book1-paragraphs">
         <h2 class="panel-title">Book 1 - Paragraphs & Notes</h2>
-        <div class="paragraphs-list" id="book1-list"></div>
-        <h3 class="section-title">Notes</h3>
-        <textarea class="form-textarea" data-key="fl-book1-notes" rows="6"></textarea>
+        <div class="book-table-wrapper">
+            <table class="book-table" id="book1Table">
+                <thead>
+                    <tr>
+                        <th class="book-th book-th-check"></th>
+                        <th class="book-th">Paragraph</th>
+                        <th class="book-th book-th-notes">Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="book1TableBody"></tbody>
+            </table>
+        </div>
     </section>
     <section class="tab-panel" id="panel-book2-paragraphs">
         <h2 class="panel-title">Book 2 - Paragraphs & Notes</h2>
