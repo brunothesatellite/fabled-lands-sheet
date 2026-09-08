@@ -136,9 +136,9 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .book-tables-row{ display:flex; gap:0; align-items:stretch; }
 .book-table-left{ flex:1; min-width:0; }
 .book-table-right{ flex:0 0 35%; min-width:0; border-left:3px solid var(--ink); display:flex; flex-direction:column; }
-.book-table-right .note-group{ display:flex; flex-direction:column; background:var(--paper); border-bottom:2px solid var(--ink); padding:.3rem .5rem; }
+.book-table-right .note-group{ display:flex; flex-direction:column; background:var(--paper); border-bottom:2px solid var(--ink); padding:.3rem .5rem; justify-content:flex-start; }
 .book-table-right .note-group .note-label{ font:700 .75rem "Barlow Condensed",sans-serif; color:var(--muted); text-transform:uppercase; letter-spacing:.03em; margin-bottom:.3rem; }
-.book-table-right .note-group .note-textarea{ width:100%; border:1px solid var(--line); background:var(--white); resize:vertical; font:.8rem "Space Grotesk",sans-serif; color:var(--ink); padding:.3rem .4rem; box-sizing:border-box; flex:1; min-height:2rem; }
+.book-table-right .note-group .note-textarea{ width:100%; border:1px solid var(--line); background:var(--white); resize:vertical; font:.8rem "Space Grotesk",sans-serif; color:var(--ink); padding:.3rem .4rem; box-sizing:border-box; min-height:4rem; flex:1; }
 .book-table-right .note-group .note-textarea:focus{ outline:2px solid var(--red); }
 .book-table-wrapper{ overflow-x:auto; }
 .book-table{ width:100%; border-collapse:collapse; font-size:.85rem; }

@@ -871,30 +871,6 @@ document.querySelectorAll('.map-image').forEach(function(img) {
     });
 });
 
-/* Sync table heights */
-function syncBookHeights(){
-    var bookIds = ['book1','book2','book3','book4','book5','book6','book7a','book7b'];
-    for(var i = 0; i < bookIds.length; i++){
-        var id = bookIds[i];
-        var leftTable = document.getElementById(id + 'Table');
-        var rightDiv = document.getElementById(id + 'NotesBody');
-        if(!leftTable || !rightDiv) continue;
-        var leftRows = leftTable.querySelectorAll('tbody tr');
-        var noteGroups = rightDiv.querySelectorAll('.note-group');
-        var rowIdx = 0;
-        for(var gi = 0; gi < noteGroups.length; gi++){
-            var group = noteGroups[gi];
-            var rowCount = parseInt(group.dataset.rows) || 1;
-            var groupHeight = 0;
-            for(var r = 0; r < rowCount && rowIdx < leftRows.length; r++){
-                groupHeight += leftRows[rowIdx].offsetHeight;
-                rowIdx++;
-            }
-            group.style.height = groupHeight + 'px';
-        }
-    }
-}
-
 /* Init */
 async function initialiser() {
     genererCodewords();
@@ -907,7 +883,6 @@ async function initialiser() {
     genererParagraphes('book6', 'book6TableBody', 'fl-book6');
     genererParagraphes('book7a', 'book7aTableBody', 'fl-book7');
     genererParagraphes('book7b', 'book7bTableBody', 'fl-book7');
-    syncBookHeights();
 
     await detecterPhp();
     await chargerFormulaire();
@@ -915,9 +890,6 @@ async function initialiser() {
     await chargerShipTable();
 }
 
-window.addEventListener('resize', function(){
-    clearTimeout(this._resizeTimeout);
-    this._resizeTimeout = setTimeout(syncBookHeights, 200);
-});
+/* Sync table heights via CSS flex align-items:stretch — no JS needed */
 
 initialiser();
