@@ -299,7 +299,8 @@ async function traiterImport(fichier) {
     } else {
         effacerDonnees();
     }
-    await ecrireToutesLesPreferences(sauvegarde.data);
+    var writeOk = await ecrireToutesLesPreferences(sauvegarde.data);
+    if (!writeOk) return;
     afficherToast('Data imported successfully!', 'success');
     setTimeout(function() { location.reload(); }, 1000);
 }
@@ -848,9 +849,12 @@ function creerLigneShip(idx){
 function basculerStrike(tr){
     var idx = tr.dataset.row;
     var key = shipStrikeKey(idx);
+    var wasStruck = tr.classList.contains('ship-row-struck');
     tr.classList.toggle('ship-row-struck');
     var struck = tr.classList.contains('ship-row-struck');
-    ecrirePreference(key, struck ? '1' : '0');
+    ecrirePreference(key, struck ? '1' : '0').then(function(ok){
+        if(!ok) tr.classList.toggle('ship-row-struck', wasStruck);
+    });
 }
 
 async function supprimerLigne(tr){
