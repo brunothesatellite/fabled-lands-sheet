@@ -1086,12 +1086,33 @@ var faceRotations = {
     5: 'rotateX(0deg) rotateY(90deg)',
     6: 'rotateX(180deg) rotateY(0deg)'
 };
+var diceAudioCtx = null;
+function playDiceSound() {
+    if (!diceAudioCtx) diceAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    for (var i = 0; i < 6; i++) {
+        (function(delay) {
+            setTimeout(function() {
+                var osc = diceAudioCtx.createOscillator();
+                var gain = diceAudioCtx.createGain();
+                osc.type = 'square';
+                osc.frequency.value = 800 + Math.random() * 600;
+                gain.gain.setValueAtTime(0.08, diceAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, diceAudioCtx.currentTime + 0.06);
+                osc.connect(gain);
+                gain.connect(diceAudioCtx.destination);
+                osc.start();
+                osc.stop(diceAudioCtx.currentTime + 0.06);
+            }, delay);
+        })(i * 100 + Math.random() * 40);
+    }
+}
 function rollDie(die) {
     if (die.classList.contains('rolling')) return;
     var result = Math.floor(Math.random() * 6) + 1;
     die.classList.remove('stopped');
     die.classList.add('rolling');
     die.dataset.value = result;
+    playDiceSound();
     setTimeout(function() {
         die.classList.remove('rolling');
         die.classList.add('stopped');
