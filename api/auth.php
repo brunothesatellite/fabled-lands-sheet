@@ -2,6 +2,12 @@
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
+session_set_cookie_params([
+    'lifetime' => 30 * 24 * 3600,
+    'path'     => '/',
+    'httponly'  => true,
+    'samesite'  => 'Lax'
+]);
 session_start();
 require_once __DIR__ . '/db.php';
 
@@ -48,6 +54,7 @@ switch ($action) {
         $stmt->execute();
 
         $_SESSION['user_id'] = $db->lastInsertRowID();
+        session_regenerate_id(true);
         jsonResponse(['ok' => true, 'pseudo' => $pseudo]);
 
     case 'login':
@@ -66,6 +73,7 @@ switch ($action) {
             jsonError('Incorrect username or password.');
 
         $_SESSION['user_id'] = $user['id'];
+        session_regenerate_id(true);
         jsonResponse(['ok' => true, 'pseudo' => $pseudo]);
 
     case 'logout':
