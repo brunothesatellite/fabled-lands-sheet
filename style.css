@@ -121,12 +121,12 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .toast-message.toast-error{ background:var(--red); border-color:var(--ink); }
 
 /* Encounter */
-.encounter-container{ display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
-.encounter-box{ border:2px solid var(--ink); background:var(--white); padding:1rem; }
+.encounter-container{ display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto repeat(3,auto); gap:1rem; }
+.encounter-box{ border:2px solid var(--ink); background:var(--white); padding:1rem; display:grid; grid-template-rows:subgrid; grid-row:1/-1; }
 .encounter-box-title{ margin:0 0 .8rem; font:800 1.1rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--red); }
 .encounter-box-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.8rem; }
 .encounter-box-header .encounter-box-title{ margin-bottom:0; }
-.encounter-fields{ display:flex; flex-direction:column; gap:.5rem; }
+.encounter-fields{ display:contents; }
 .encounter-field{ display:flex; flex-direction:column; gap:.2rem; }
 .encounter-field .form-number{ min-height:2.4rem; }
 .encounter-field input[readonly]{ background:var(--paper); color:var(--muted); cursor:default; -moz-appearance:textfield; }
@@ -155,7 +155,9 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     .ship-td textarea{ font-size:.72rem; min-height:2.5rem; }
     .book-tables-row{ flex-direction:column; }
     .book-table-right{ border-left:none; border-top:3px solid var(--ink); flex:none; width:100%; }
-    .encounter-container{ grid-template-columns:1fr; }
+    .encounter-container{ grid-template-columns:1fr; grid-template-rows:auto; }
+    .encounter-box{ display:block; grid-row:auto; }
+    .encounter-fields{ display:flex; flex-direction:column; gap:.5rem; }
 }
 
 /* Book tables */
