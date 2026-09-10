@@ -135,23 +135,32 @@ async function ecrirePreference(cle, valeur) {
 
 async function ecrireToutesLesPreferences(prefs) {
     if (phpDisponible && utilisateurLogue) {
-        await apiFetch('set_all_preferences', {
+        var result = await apiFetch('set_all_preferences', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ preferences: prefs })
         });
+        if (!result || !result.ok) {
+            afficherToast('Batch save failed. Check your connection.', 'error');
+            return false;
+        }
     } else {
         Object.keys(prefs).forEach(function(cle) {
             if (prefs[cle] !== undefined) localStorage.setItem(cle, prefs[cle]);
         });
     }
     showToast('Données importées', 'load');
+    return true;
 }
 
 async function chargerToutesLesPreferences() {
     if (phpDisponible && utilisateurLogue) {
         const data = await apiFetch('get_preferences');
-        var prefs = data && data.preferences && !Array.isArray(data.preferences) ? data.preferences : {};
+        if (!data || !data.preferences) {
+            afficherToast('Failed to load server data.', 'error');
+            return null;
+        }
+        var prefs = !Array.isArray(data.preferences) ? data.preferences : {};
         ALL_KEYS.forEach(function(cle) {
             if (!(cle in prefs)) prefs[cle] = '';
         });
@@ -489,7 +498,7 @@ async function chargerCheckboxes() {
         var cle = ALL_KEYS[i];
         var val = await lirePreference(cle);
         if (val !== null) {
-            var el = document.querySelector('[data-key="' + cle + '"]');
+            var el = elementMap.get(cle);
             if (el && el.type === 'checkbox') {
                 el.checked = val === '1';
             }
@@ -1074,7 +1083,7 @@ async function initialiser() {
 
     if (phpDisponible && utilisateurLogue) {
         var prefs = await chargerToutesLesPreferences();
-        restoreAll(prefs);
+        if (prefs) restoreAll(prefs);
     } else {
         await chargerFormulaire();
         await chargerCheckboxes();
