@@ -16,14 +16,15 @@ function showToast(message, type) {
     }
     var t = document.createElement('div');
     t.className = 'toast toast-' + (type || 'save');
-    t.textContent = message;
+    if (message.indexOf('<') === 0) t.classList.add('toast-icon');
+    t.innerHTML = message;
     toastContainer.appendChild(t);
     setTimeout(function(){ t.classList.add('toast-out'); }, 1500);
     setTimeout(function(){ t.remove(); }, 1700);
 }
 function showToastSave() {
     clearTimeout(toastSaveTimer);
-    toastSaveTimer = setTimeout(function(){ showToast('Sauvegardé', 'save'); }, 600);
+    toastSaveTimer = setTimeout(function(){ showToast('<i class="fa-solid fa-floppy-disk"></i>', 'save'); }, 600);
 }
 
 const anonAvatarContainer = document.getElementById('anonAvatarContainer');
