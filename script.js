@@ -117,15 +117,20 @@ async function lirePreference(cle) {
 
 async function ecrirePreference(cle, valeur) {
     if (phpDisponible && utilisateurLogue) {
-        await apiFetch('set_preferences', {
+        var result = await apiFetch('set_preferences', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ key: cle, value: valeur })
         });
+        if (!result || !result.ok) {
+            afficherToast('Save failed. Check your connection.', 'error');
+            return false;
+        }
     } else {
         localStorage.setItem(cle, valeur);
     }
     showToastSave();
+    return true;
 }
 
 async function ecrireToutesLesPreferences(prefs) {
@@ -234,7 +239,11 @@ clearDataBtn.addEventListener('click', async function() {
     fermerMenuUtilisateur();
     if (!confirm('Delete all your Fabled Lands data? This action is irreversible.')) return;
     if (phpDisponible && utilisateurLogue) {
-        await apiFetch('clear_preferences', { method: 'POST' });
+        var result = await apiFetch('clear_preferences', { method: 'POST' });
+        if (!result || !result.ok) {
+            afficherToast('Failed to clear server data.', 'error');
+            return;
+        }
     }
     effacerDonnees();
     location.reload();
@@ -268,22 +277,30 @@ deleteAccountBtn.addEventListener('click', async function() {
 });
 importPrefsBtn.addEventListener('click', function() { fermerMenuUtilisateur(); importPrefsFile.click(); });
 
+async function traiterImport(fichier) {
+    var sauvegarde = JSON.parse(await fichier.text());
+    if (!formatImportValide(sauvegarde)) throw new Error('Invalid format');
+    if (!confirm('Import this data?\n\nExport date: ' + new Date(sauvegarde.exportedAt).toLocaleString('en-US') + '\n\nAll existing data will be overwritten.')) return;
+    if (phpDisponible && utilisateurLogue) {
+        var clearResult = await apiFetch('clear_preferences', { method: 'POST' });
+        if (!clearResult || !clearResult.ok) {
+            afficherToast('Failed to clear server data. Import aborted.', 'error');
+            return;
+        }
+    } else {
+        effacerDonnees();
+    }
+    await ecrireToutesLesPreferences(sauvegarde.data);
+    afficherToast('Data imported successfully!', 'success');
+    setTimeout(function() { location.reload(); }, 1000);
+}
+
 importPrefsFile.addEventListener('change', async function() {
     var fichier = this.files[0];
     this.value = '';
     if (!fichier) return;
     try {
-        var sauvegarde = JSON.parse(await fichier.text());
-        if (!formatImportValide(sauvegarde)) throw new Error('Invalid format');
-        if (!confirm('Import this data?\n\nExport date: ' + new Date(sauvegarde.exportedAt).toLocaleString('en-US') + '\n\nAll existing data will be overwritten.')) return;
-        if (phpDisponible && utilisateurLogue) {
-            await apiFetch('clear_preferences', { method: 'POST' });
-        } else {
-            effacerDonnees();
-        }
-        await ecrireToutesLesPreferences(sauvegarde.data);
-        afficherToast('Data imported successfully!', 'success');
-        setTimeout(function() { location.reload(); }, 1000);
+        await traiterImport(fichier);
     } catch (error) {
         afficherToast('This file does not contain valid data.', 'error');
     }
@@ -294,17 +311,7 @@ importFile.addEventListener('change', async function() {
     this.value = '';
     if (!fichier) return;
     try {
-        var sauvegarde = JSON.parse(await fichier.text());
-        if (!formatImportValide(sauvegarde)) throw new Error('Invalid format');
-        if (!confirm('Import this data?\n\nExport date: ' + new Date(sauvegarde.exportedAt).toLocaleString('en-US') + '\n\nAll existing data will be overwritten.')) return;
-        if (phpDisponible && utilisateurLogue) {
-            await apiFetch('clear_preferences', { method: 'POST' });
-        } else {
-            effacerDonnees();
-        }
-        await ecrireToutesLesPreferences(sauvegarde.data);
-        afficherToast('Data imported successfully!', 'success');
-        setTimeout(function() { location.reload(); }, 1000);
+        await traiterImport(fichier);
     } catch (error) {
         afficherToast('This file does not contain valid data.', 'error');
     }
@@ -456,7 +463,7 @@ async function chargerFormulaire() {
         var cle = ALL_KEYS[i];
         var val = await lirePreference(cle);
         if (val !== null) {
-            var el = document.querySelector('[data-key="' + cle + '"]');
+            var el = elementMap.get(cle);
             if (el && el.type !== 'checkbox') {
                 if (el.type === 'number' && (val === '' || val === null)) {
                     el.value = el.getAttribute('value') || '0';
@@ -781,6 +788,9 @@ function creerLigneShip(idx){
     var tr = document.createElement('tr');
     tr.dataset.row = idx;
 
+    var strikeKey = shipStrikeKey(idx);
+    if(!ALL_KEYS.includes(strikeKey)) ALL_KEYS.push(strikeKey);
+
     var tdAct = document.createElement('td');
     tdAct.className = 'ship-td ship-actions';
     var btnStrike = document.createElement('button');
@@ -834,19 +844,19 @@ function basculerStrike(tr){
     ecrirePreference(key, struck ? '1' : '0');
 }
 
-function supprimerLigne(tr){
+async function supprimerLigne(tr){
     if(!confirm('Delete this row?')) return;
     var idx = tr.dataset.row;
     for(var c = 0; c < SHIP_COLS.length; c++){
         var k = shipKey(idx, c);
         localStorage.removeItem(k);
-        if(phpDisponible && utilisateurLogue) apiFetch('delete_preference',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});
+        if(phpDisponible && utilisateurLogue) await apiFetch('delete_preference',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:k})});
         var ki = ALL_KEYS.indexOf(k);
         if(ki !== -1) ALL_KEYS.splice(ki, 1);
     }
     var sk = shipStrikeKey(idx);
     localStorage.removeItem(sk);
-    if(phpDisponible && utilisateurLogue) apiFetch('delete_preference',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:sk})});
+    if(phpDisponible && utilisateurLogue) await apiFetch('delete_preference',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:sk})});
     var ski = ALL_KEYS.indexOf(sk);
     if(ski !== -1) ALL_KEYS.splice(ski, 1);
     tr.remove();
@@ -872,7 +882,6 @@ function genererShipTable(){
 async function chargerLigneShip(tr){
     var idx = tr.dataset.row;
     var strikeKey = shipStrikeKey(idx);
-    ALL_KEYS.push(strikeKey);
     var strikeVal = await lirePreference(strikeKey);
     if(strikeVal === '1') tr.classList.add('ship-row-struck');
     var taList = tr.querySelectorAll('textarea');
