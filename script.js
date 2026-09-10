@@ -1089,15 +1089,17 @@ var faceRotations = {
 function rollDie(die) {
     if (die.classList.contains('rolling')) return;
     var result = Math.floor(Math.random() * 6) + 1;
+    die.classList.remove('stopped');
     die.classList.add('rolling');
     die.dataset.value = result;
     setTimeout(function() {
         die.classList.remove('rolling');
-        die.style.transform = faceRotations[result];
+        die.classList.add('stopped');
+        die.querySelector('.face-result').textContent = result;
     }, 800);
 }
 document.querySelectorAll('.die').forEach(function(die) {
-    die.style.transform = faceRotations[1];
+    die.classList.add('stopped');
     die.addEventListener('click', function() { rollDie(this); });
 });
 
