@@ -30,6 +30,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .tab-panel.active{ display:block; }
 .panel-title{ margin:0 0 1rem; font:800 1.4rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--red); border-bottom:2px solid var(--ink); padding-bottom:.5rem; }
 .section-title{ margin:1.5rem 0 .6rem; font:700 1rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--ink); letter-spacing:.04em; }
+.section-title i{ color:var(--red); margin-right:.3rem; }
 
 /* Forms */
 .form-grid{ display:flex; flex-direction:column; gap:.6rem; }
@@ -38,6 +39,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .form-row.triple{ grid-template-columns:1fr 1fr 1fr; }
 .form-field{ display:flex; flex-direction:column; gap:.2rem; }
 .form-label{ font:700 .72rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+.form-label i{ color:var(--red); margin-right:.2rem; font-size:.7rem; }
 .form-input{ width:100%; padding:.5rem .6rem; font:500 .85rem "Space Grotesk",sans-serif; color:var(--ink); background:var(--white); border:2px solid var(--ink); min-height:2.2rem; }
 .form-input:focus{ outline:3px solid var(--yellow); outline-offset:2px; }
 .form-textarea{ width:100%; padding:.5rem .6rem; font:500 .85rem "Space Grotesk",sans-serif; color:var(--ink); background:var(--white); border:2px solid var(--ink); min-height:3rem; resize:vertical; }
