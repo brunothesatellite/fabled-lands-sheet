@@ -129,7 +129,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .encounter-fields{ display:flex; flex-direction:column; gap:.5rem; }
 .encounter-field{ display:flex; flex-direction:column; gap:.2rem; }
 .encounter-field .form-number{ min-height:2.4rem; }
-.encounter-field input[readonly]{ background:var(--paper); color:var(--muted); cursor:default; -moz-appearance:textfield; }
+.encounter-field input[readonly]{ background:var(--paper); color:var(--muted); cursor:default; -moz-appearance:textfield; border:2px solid var(--ink); }
 .encounter-field input[readonly]::-webkit-inner-spin-button,.encounter-field input[readonly]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
 .encounter-reset-btn{ padding:.3rem .7rem; font:700 .7rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); background:var(--white); border:2px solid var(--ink); cursor:pointer; transition:transform .12s,box-shadow .12s; }
 .encounter-reset-btn:hover{ transform:translate(-2px,-2px); box-shadow:3px 3px 0 var(--yellow); }
