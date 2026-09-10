@@ -110,6 +110,24 @@
     <section class="tab-panel active" id="panel-adventure-sheet">
         <h2 class="panel-title">Adventure Sheet</h2>
         <div class="form-grid">
+            <div class="form-row double">
+                <div>
+                    <label class="form-label">Current Book</label>
+                    <select class="form-input" data-key="fl-adventure-book">
+                        <option value="1">Book 1</option>
+                        <option value="2">Book 2</option>
+                        <option value="3">Book 3</option>
+                        <option value="4">Book 4</option>
+                        <option value="5">Book 5</option>
+                        <option value="6">Book 6</option>
+                        <option value="7">Book 7</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="form-label">Current Chapter</label>
+                    <input type="number" class="form-input" data-key="fl-adventure-chapter" min="1" value="1">
+                </div>
+            </div>
             <div class="form-row">
                 <label class="form-label">Name</label>
                 <input type="text" class="form-input" data-key="fl-adventure-name">
