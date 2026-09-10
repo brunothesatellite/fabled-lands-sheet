@@ -199,17 +199,13 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .die{ width:40px; height:40px; position:relative; transform-style:preserve-3d; cursor:pointer; transition:transform .1s; }
 .die:hover{ transform:scale(1.1); }
 .die.rolling{ animation:dice-roll .8s ease-out; }
-.face{ position:absolute; width:40px; height:40px; border:2px solid var(--ink); border-radius:6px; background:var(--white); display:grid; padding:5px; box-sizing:border-box; }
+.face{ position:absolute; width:40px; height:40px; border:2px solid var(--ink); border-radius:6px; background:var(--white); display:flex; align-items:center; justify-content:center; font:700 1.2rem "Barlow Condensed",sans-serif; color:var(--ink); box-sizing:border-box; }
 .face-1{ transform:rotateY(0deg) translateZ(20px); }
 .face-2{ transform:rotateY(90deg) translateZ(20px); }
 .face-3{ transform:rotateX(-90deg) translateZ(20px); }
 .face-4{ transform:rotateX(90deg) translateZ(20px); }
 .face-5{ transform:rotateY(-90deg) translateZ(20px); }
 .face-6{ transform:rotateY(180deg) translateZ(20px); }
-.face-1,.face-6{ grid-template-columns:1fr; grid-template-rows:1fr; place-items:center; }
-.face-2,.face-5{ grid-template-columns:1fr; grid-template-rows:repeat(2,1fr); place-items:center; }
-.face-3,.face-4{ grid-template-columns:1fr; grid-template-rows:repeat(3,1fr); place-items:center; }
-.dot{ width:8px; height:8px; background:var(--ink); border-radius:50%; }
 @keyframes dice-roll{
     0%{ transform:rotateX(0) rotateY(0) rotateZ(0); }
     20%{ transform:rotateX(220deg) rotateY(140deg) rotateZ(60deg); }
