@@ -162,19 +162,22 @@ The JavaScript is organized into functional modules within a single file:
 
 | Module | Responsibility |
 |---|---|
-| **Preference I/O** | `lirePreference()`, `ecrirePreference()`, `chargerToutesLesPreferences()`, `ecrireToutesLesPreferences()` — abstracted read/write that routes to localStorage or PHP API |
+| **Preference I/O** | `lirePreference()`, `ecrirePreference()`, `chargerToutesLesPreferences()`, `ecrireToutesLesPreferences()` — abstracted read/write that routes to localStorage or PHP API with error checking |
 | **User UI** | `mettreAJourUIUtilisateur()`, menu open/close handlers — manages avatar display and dropdown menus |
 | **Form Auto-Save** | Binds `input`/`change` events on all `[data-key]` elements with debounced writes (400–500ms) |
 | **Element Map** | `elementMap` — `Map<key, Element>` built at startup for O(1) element lookup during restoration |
 | **Batch Restore** | `restoreAll(prefs)` — applies all preferences to elements in one pass (used in authenticated mode) |
-| **Toast Notifications** | `showToast()`, `showToastSave()` — non-intrusive feedback for save/load/import actions |
+| **Sequential Restore** | `chargerFormulaire()` + `chargerCheckboxes()` — restores elements one by one via `elementMap.get()` (used in anonymous mode) |
+| **Toast Notifications** | `showToast()`, `showToastSave()`, `afficherToast()` — non-intrusive feedback for save/load/error actions |
 | **Dice Roller** | 3D dice with Web Audio API sound effects, randomized via `Math.random()` |
-| **Codewords** | Dynamically generates 408 codeword checkboxes from a hardcoded array |
+| **Codewords** | `genererCodewords()` dynamically generates 265 codeword checkboxes from a hardcoded array |
 | **Book Paragraphs** | `genererParagraphes()` builds paragraph tables + note panels from `bookData` object; paragraphs are grouped by note boundaries |
-| **Ship Table** | `genererShipTable()`, `creerLigneShip()` — dynamic row creation with strike/delete/add actions; restored in parallel via `Promise.all()` |
+| **Ship Table** | `genererShipTable()`, `creerLigneShip()`, `chargerLigneShip()`, `chargerShipTable()` — dynamic row creation with strike/delete/add actions; restored in parallel via `Promise.all()` |
+| **Ship Actions** | `basculerStrike()` — toggles row strikethrough with rollback on save failure; `supprimerLigne()` — async row deletion with await; `ajouterLigneApres()` — inserts row below |
 | **Map Interaction** | Touch-aware pinch-to-zoom and drag panning for fullscreen maps |
-| **Import/Export** | `exporterDonnees()` creates a timestamped JSON blob (prefixed with username when logged in); import validates format before overwriting |
+| **Import/Export** | `exporterDonnees()` creates a timestamped JSON blob; `traiterImport()` shared handler validates format, clears DB, writes data, and verifies each step |
 | **PHP Detection** | `detecterPhp()` probes `api/auth.php?action=check` on load to determine backend availability |
+| **Session Heartbeat** | Periodic `apiFetch('check')` every 5 minutes to keep PHP session alive and prevent garbage collection |
 
 **Data key convention:** All stored values use the `fl-` prefix (e.g. `fl-adventure-name`, `fl-codeword-42`, `fl-book1-10-c0`). Keys are collected in the `ALL_KEYS` array at page load for bulk operations. Elements are registered in `elementMap` for O(1) lookup.
 
@@ -201,7 +204,9 @@ Two CSS files share the same design system:
 - Body: **Space Grotesk**
 - Icons: **Font Awesome 6.5.2** (CDN)
 
-**Responsive behavior:** Mobile breakpoint at 600px collapses triple/double form grids to single column, reduces font sizes, and stacks book paragraph panels vertically.
+**Responsive behavior:** Mobile breakpoint at 600px collapses triple/double form grids to single column, reduces font sizes, and stacks book paragraph panels vertically. The encounter section reverts from CSS Subgrid to a standard single-column layout on mobile.
+
+**Icon system:** Font Awesome icons are used on all adventure sheet labels and section titles (styled in `--red`). Encounter fields use context-appropriate icons: `fa-hand-fist` (Combat), `fa-shield` (Defence), `fa-heart-pulse` (Stamina).
 
 ### Backend
 
@@ -327,6 +332,28 @@ The database file `api/preferences.db` is gitignored and created automatically o
 7. **Authenticated mode optimization** — Uses a single batch API call (`chargerToutesLesPreferences()`) + `elementMap` for O(1) element lookup + `restoreAll()` to restore ~1,020 preferences in one pass (vs. ~2,180 sequential HTTP requests before). Ship table rows are restored in parallel via `Promise.all()`.
 8. **Anonymous mode stability** — Keeps the original sequential read pattern (`chargerFormulaire()` + `chargerCheckboxes()`) which is fast enough for synchronous localStorage operations.
 
+### Persistence & Data Integrity Fixes (v1.10)
+
+A comprehensive audit identified 17 bugs where data could be silently lost or corrupted in authenticated mode. All have been fixed:
+
+**Critical fixes:**
+- **Import safety**: `traiterImport()` now verifies `clear_preferences` and `set_all_preferences` API returns before confirming success. If either fails, the import is aborted with an error toast instead of silently mixing old and new data.
+- **Session expiry handling**: `ecrirePreference()` checks the API response on every write. If the PHP session has expired (401), the user sees "Save failed. Check your connection." instead of a fake "saved" confirmation.
+- **Batch write safety**: `ecrireToutesLesPreferences()` checks the batch API return and aborts import on failure.
+- **Clear data safety**: `clearDataBtn` verifies the DB clear succeeded before wiping localStorage and reloading.
+- **Strike toggle rollback**: `basculerStrike()` reverts the UI toggle if the save fails, preventing visual desync with the database.
+- **Load failure handling**: `chargerToutesLesPreferences()` returns `null` on API failure; `initialiser()` skips `restoreAll()` instead of wiping all fields with empty defaults.
+
+**Performance fixes:**
+- `chargerFormulaire()` and `chargerCheckboxes()` use `elementMap.get()` (O(1)) instead of `document.querySelector()` (O(n)) for element lookup.
+- `supprimerLigne()` is now `async` with `await` on API calls, preventing orphaned rows in the database on network failures.
+
+**Session persistence (Synology NAS):**
+- PHP session cookie lifetime set to 30 days (was: browser session only via default `cookie_lifetime=0`).
+- `session_regenerate_id(true)` called after login and register to prevent session fixation.
+- `$_SESSION['last_activity']` updated on each request to push back PHP's `gc_maxlifetime` (24 min default).
+- Client-side heartbeat pings `api/auth.php?action=check` every 5 minutes to keep the session file alive when the page is left open.
+
 ---
 
 ## Troubleshooting
@@ -393,3 +420,9 @@ chmod 777 /tmp  # or check PHP session.save_path
 ```
 
 On Synology, sessions are typically managed automatically. If issues persist, check `php.ini` for `session.save_path`.
+
+**Note (v1.10+):** Session persistence has been significantly improved:
+- Session cookie lifetime is now 30 days (was: browser session only).
+- `session_regenerate_id()` is called after login/register.
+- A client-side heartbeat keeps the session alive every 5 minutes.
+- If you still experience session loss, check your PHP `session.gc_maxlifetime` setting (default 1440 seconds = 24 minutes).
