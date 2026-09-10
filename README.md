@@ -4,6 +4,36 @@ A web-based Adventure Sheet application for the **Fabled Lands** gamebook series
 
 ---
 
+## Changelog
+
+### v1.9 — Suivi livre et chapitre courant
+
+**Fonctionnalités**
+- Ajout d'un sélecteur **Livre courant** (Book 1–7) et d'un champ **Chapitre courant** dans l'Adventure Sheet
+- Persistance automatique (localStorage, DB, import/export JSON)
+
+### v1.8 — Dés aléatoires 3D avec son
+
+**Fonctionnalités**
+- Deux dés 6 faces en 3D dans le masthead, cliquables pour lancer un tirage aléatoire
+- Animation 3D pendant le lancer, affichage 2D plat du résultat (chiffres toujours lisibles)
+- Bruit de lancer de dés synthétisé via Web Audio API
+
+### v1.7 — User feedback & local dev server
+
+**Fonctionnalités**
+- Toast de notification au chargement des préférences (`Données restaurées`)
+- Icône floppy-disk à chaque sauvegarde automatique d'un champ
+- Toast `Données importées` lors de l'import JSON
+- Serveur de développement local (`deploy/start.py` + `deploy/start.bat`) avec PHP 8.2 intégré
+
+**Corrections**
+- Persistance des checkboxes des livres corrigée (restauration async via `lirePreference`)
+- Suppression des lignes du Ship's Manifest côté serveur aussi (plus de réapparition au rechargement)
+- Clés des livres enregistrées dans `ALL_KEYS` pour export/import/suppression
+
+---
+
 ## User Manual
 
 ### Getting Started
@@ -14,10 +44,11 @@ If the server runs PHP, you can create an account to sync your data across devic
 
 ### Navigation
 
-The top of the screen features a **tab bar** for quick navigation between sections:
+The top of the screen features a **tab bar** for quick navigation between sections, and **two dice** next to the title for quick random rolls:
 
-| Tab | Description |
+| Element | Description |
 |---|---|
+| **Dice** | Click either die to roll it with a 3D animation. Results are displayed as numbers (1–6). No persistence. |
 | **Adventure Sheet** | Your character's core stats, abilities, possessions, money, titles, and blessings |
 | **Ship's Manifest** | Track your fleet: ship type, name, crew quality, cargo, and docking location |
 | **Codewords** | A checklist of all codewords encountered across the 7 books |
@@ -30,6 +61,7 @@ The top of the screen features a **tab bar** for quick navigation between sectio
 
 ![Adventure Sheet](screenshots/adventurer.png)
 
+- Select your **Current Book** (Book 1–7) and enter your **Current Chapter** number.
 - Fill in your character's **Name**, **Profession**, **God**, **Rank**, and **Defence**.
 - Set your six **Ability Scores** (Charisma, Combat, Magic, Sanctity, Scouting, Thievery) from 1 to 12.
 - Track your **Current** and **Maximum Stamina**.
@@ -115,7 +147,7 @@ The project is a **single-page application (SPA)** with a PHP backend for authen
 ```
 fabled-lands-sheet/
 ├── index.html              # Main SPA entry point
-├── script.js               # All client-side logic (~900 lines)
+├── script.js               # All client-side logic (~1100 lines)
 ├── style.css               # Main stylesheet (UI components)
 ├── style-auth.css           # Auth pages stylesheet
 ├── login.php                # Login page
@@ -126,6 +158,9 @@ fabled-lands-sheet/
 │   ├── auth.php             # REST API (authentication + preferences CRUD)
 │   ├── db.php               # Database layer (SQLite3, helpers)
 │   └── preferences.db       # SQLite database file (gitignored)
+├── deploy/
+│   ├── start.py             # Python launcher (starts PHP server + opens browser)
+│   └── start.bat            # Windows batch file for double-click launch
 ├── maps/                    # Map images
 │   ├── world.png
 │   ├── book1.png … book7.png
@@ -162,6 +197,8 @@ The JavaScript is organized into functional modules within a single file:
 | **Form Auto-Save** | Binds `input`/`change` events on all `[data-key]` elements with debounced writes (400–500ms) |
 | **Element Map** | `elementMap` — `Map<key, Element>` built at startup for O(1) element lookup during restoration |
 | **Batch Restore** | `restoreAll(prefs)` — applies all preferences to elements in one pass (used in authenticated mode) |
+| **Toast Notifications** | `showToast()`, `showToastSave()` — non-intrusive feedback for save/load/import actions |
+| **Dice Roller** | 3D dice with Web Audio API sound effects, randomized via `Math.random()` |
 | **Codewords** | Dynamically generates 408 codeword checkboxes from a hardcoded array |
 | **Book Paragraphs** | `genererParagraphes()` builds paragraph tables + note panels from `bookData` object; paragraphs are grouped by note boundaries |
 | **Ship Table** | `genererShipTable()`, `creerLigneShip()` — dynamic row creation with strike/delete/add actions; restored in parallel via `Promise.all()` |
