@@ -1077,4 +1077,28 @@ async function initialiser() {
 
 /* Sync table heights via CSS flex align-items:stretch — no JS needed */
 
+/* Dice roller */
+var faceRotations = {
+    1: 'rotateX(0deg) rotateY(0deg)',
+    2: 'rotateX(0deg) rotateY(-90deg)',
+    3: 'rotateX(-90deg) rotateY(0deg)',
+    4: 'rotateX(90deg) rotateY(0deg)',
+    5: 'rotateX(0deg) rotateY(90deg)',
+    6: 'rotateX(180deg) rotateY(0deg)'
+};
+function rollDie(die) {
+    if (die.classList.contains('rolling')) return;
+    var result = Math.floor(Math.random() * 6) + 1;
+    die.classList.add('rolling');
+    die.dataset.value = result;
+    setTimeout(function() {
+        die.classList.remove('rolling');
+        die.style.transform = faceRotations[result];
+    }, 800);
+}
+document.querySelectorAll('.die').forEach(function(die) {
+    die.style.transform = faceRotations[1];
+    die.addEventListener('click', function() { rollDie(this); });
+});
+
 initialiser();
