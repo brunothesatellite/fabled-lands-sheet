@@ -5,6 +5,27 @@ const elementMap = new Map();
 let phpDisponible = false;
 let utilisateurLogue = null;
 
+/* Toast notifications */
+var toastContainer = null;
+var toastSaveTimer = null;
+function showToast(message, type) {
+    if (!toastContainer) {
+        toastContainer = document.createElement('div');
+        toastContainer.className = 'toast-container';
+        document.body.appendChild(toastContainer);
+    }
+    var t = document.createElement('div');
+    t.className = 'toast toast-' + (type || 'save');
+    t.textContent = message;
+    toastContainer.appendChild(t);
+    setTimeout(function(){ t.classList.add('toast-out'); }, 1500);
+    setTimeout(function(){ t.remove(); }, 1700);
+}
+function showToastSave() {
+    clearTimeout(toastSaveTimer);
+    toastSaveTimer = setTimeout(function(){ showToast('Sauvegardé', 'save'); }, 600);
+}
+
 const anonAvatarContainer = document.getElementById('anonAvatarContainer');
 const anonAvatarBtn = document.getElementById('anonAvatarBtn');
 const anonMenu = document.getElementById('anonMenu');
@@ -103,6 +124,7 @@ async function ecrirePreference(cle, valeur) {
     } else {
         localStorage.setItem(cle, valeur);
     }
+    showToastSave();
 }
 
 async function ecrireToutesLesPreferences(prefs) {
@@ -117,6 +139,7 @@ async function ecrireToutesLesPreferences(prefs) {
             if (prefs[cle] !== undefined) localStorage.setItem(cle, prefs[cle]);
         });
     }
+    showToast('Données importées', 'load');
 }
 
 async function chargerToutesLesPreferences() {
@@ -1048,6 +1071,7 @@ async function initialiser() {
     }
 
     await chargerShipTable();
+    showToast('Données restaurées', 'load');
 }
 
 /* Sync table heights via CSS flex align-items:stretch — no JS needed */

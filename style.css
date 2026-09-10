@@ -182,3 +182,12 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .book-table tbody tr:nth-child(4n+1) .book-td{ border-top:3px solid var(--ink); }
 .book-table tbody tr:nth-child(4n) .book-td{ border-bottom:3px solid var(--ink); }
 .book-table tbody tr.book-tr-empty .book-td{ border-color:var(--line); }
+
+/* Toast notifications */
+.toast-container{ position:fixed; bottom:1rem; right:1rem; z-index:9999; display:flex; flex-direction:column-reverse; gap:.4rem; pointer-events:none; }
+.toast{ padding:.5rem .9rem; border:2px solid var(--ink); background:var(--white); font:600 .78rem "Space Grotesk",sans-serif; color:var(--ink); box-shadow:3px 3px 0 var(--yellow); opacity:0; transform:translateY(10px); animation:toast-in .2s ease forwards; pointer-events:auto; }
+.toast.toast-out{ animation:toast-out .2s ease forwards; }
+.toast-save{ border-left:4px solid var(--red); }
+.toast-load{ border-left:4px solid var(--yellow); }
+@keyframes toast-in{ to{ opacity:1; transform:translateY(0); } }
+@keyframes toast-out{ to{ opacity:0; transform:translateY(10px); } }
