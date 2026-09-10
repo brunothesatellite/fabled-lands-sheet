@@ -6,31 +6,31 @@ A web-based Adventure Sheet application for the **Fabled Lands** gamebook series
 
 ## Changelog
 
-### v1.9 — Suivi livre et chapitre courant
+### v1.9 — Current Book & Chapter Tracking
 
-**Fonctionnalités**
-- Ajout d'un sélecteur **Livre courant** (Book 1–7) et d'un champ **Chapitre courant** dans l'Adventure Sheet
-- Persistance automatique (localStorage, DB, import/export JSON)
+**Features**
+- Added **Current Book** selector (Book 1–7) and **Current Chapter** input to the Adventure Sheet
+- Automatic persistence (localStorage, DB, import/export JSON)
 
-### v1.8 — Dés aléatoires 3D avec son
+### v1.8 — Random Dice Rolls with 3D Animation & Sound
 
-**Fonctionnalités**
-- Deux dés 6 faces en 3D dans le masthead, cliquables pour lancer un tirage aléatoire
-- Animation 3D pendant le lancer, affichage 2D plat du résultat (chiffres toujours lisibles)
-- Bruit de lancer de dés synthétisé via Web Audio API
+**Features**
+- Two 6-sided dice in the masthead, clickable to trigger random rolls
+- 3D animation during roll, flat 2D display of result (numbers always readable)
+- Dice roll sound synthesized via Web Audio API
 
-### v1.7 — User feedback & local dev server
+### v1.7 — User Feedback & Local Dev Server
 
-**Fonctionnalités**
-- Toast de notification au chargement des préférences (`Données restaurées`)
-- Icône floppy-disk à chaque sauvegarde automatique d'un champ
-- Toast `Données importées` lors de l'import JSON
-- Serveur de développement local (`deploy/start.py` + `deploy/start.bat`) avec PHP 8.2 intégré
+**Features**
+- Toast notification on preference load (`Données restaurées`)
+- Floppy-disk icon on every auto-save
+- Toast `Données importées` on JSON import
+- Local development server (`deploy/start.py` + `deploy/start.bat`) with bundled PHP 8.2
 
-**Corrections**
-- Persistance des checkboxes des livres corrigée (restauration async via `lirePreference`)
-- Suppression des lignes du Ship's Manifest côté serveur aussi (plus de réapparition au rechargement)
-- Clés des livres enregistrées dans `ALL_KEYS` pour export/import/suppression
+**Fixes**
+- Book checkboxes persistence fixed (async restore via `lirePreference`)
+- Ship's Manifest row deletion now also clears server-side data (no more reappearing rows on reload)
+- Book keys registered in `ALL_KEYS` for proper export/import/deletion
 
 ---
 
