@@ -4,36 +4,6 @@ A web-based Adventure Sheet application for the **Fabled Lands** gamebook series
 
 ---
 
-## Changelog
-
-### v1.9 — Current Book & Chapter Tracking
-
-**Features**
-- Added **Current Book** selector (Book 1–7) and **Current Chapter** input to the Adventure Sheet
-- Automatic persistence (localStorage, DB, import/export JSON)
-
-### v1.8 — Random Dice Rolls with 3D Animation & Sound
-
-**Features**
-- Two 6-sided dice in the masthead, clickable to trigger random rolls
-- 3D animation during roll, flat 2D display of result (numbers always readable)
-- Dice roll sound synthesized via Web Audio API
-
-### v1.7 — User Feedback & Local Dev Server
-
-**Features**
-- Toast notification on preference load (`Données restaurées`)
-- Floppy-disk icon on every auto-save
-- Toast `Données importées` on JSON import
-- Local development server (`deploy/start.py` + `deploy/start.bat`) with bundled PHP 8.2
-
-**Fixes**
-- Book checkboxes persistence fixed (async restore via `lirePreference`)
-- Ship's Manifest row deletion now also clears server-side data (no more reappearing rows on reload)
-- Book keys registered in `ALL_KEYS` for proper export/import/deletion
-
----
-
 ## User Manual
 
 ### Getting Started
