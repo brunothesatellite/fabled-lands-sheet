@@ -1095,6 +1095,14 @@ async function initialiser() {
 
     await chargerShipTable();
     showToast('Données restaurées', 'load');
+
+    if (phpDisponible && utilisateurLogue) {
+        setInterval(function() {
+            if (phpDisponible && utilisateurLogue) {
+                apiFetch('check');
+            }
+        }, 300000);
+    }
 }
 
 /* Sync table heights via CSS flex align-items:stretch — no JS needed */
