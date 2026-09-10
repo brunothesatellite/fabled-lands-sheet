@@ -77,6 +77,7 @@ function requireLogin($db) {
 }
 
 function touchLastActivity($db, $userId) {
+    $_SESSION['last_activity'] = time();
     if (isset($_SESSION['last_activity_touched']) && time() - $_SESSION['last_activity_touched'] < 300) return;
 
     $stmt = $db->prepare('SELECT last_activity_at FROM users WHERE id = :id');
