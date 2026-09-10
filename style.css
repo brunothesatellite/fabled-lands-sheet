@@ -195,17 +195,17 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 
 /* Dice roller */
 .masthead > div:first-child{ display:flex; align-items:center; gap:1rem; }
-.dice-roller{ display:flex; gap:.6rem; perspective:250px; }
-.die{ width:42px; height:42px; position:relative; transform-style:preserve-3d; cursor:pointer; transition:transform .15s ease; }
-.die:hover{ filter:brightness(1.05); }
+.dice-roller{ display:flex; gap:.5rem; perspective:200px; }
+.die{ width:40px; height:40px; position:relative; transform-style:preserve-3d; cursor:pointer; transition:transform .1s; }
+.die:hover{ transform:scale(1.1); }
 .die.rolling{ animation:dice-roll .8s ease-out; }
-.face{ position:absolute; width:42px; height:42px; border-radius:8px; background:var(--white); box-shadow:0 0 0 2px var(--ink), inset 0 0 0 1px var(--line); display:flex; align-items:center; justify-content:center; font:700 1.3rem "Barlow Condensed",sans-serif; color:var(--ink); backface-visibility:hidden; }
-.face-1{ transform:rotateY(0deg) translateZ(21px); }
-.face-2{ transform:rotateY(90deg) translateZ(21px); }
-.face-3{ transform:rotateX(-90deg) translateZ(21px); }
-.face-4{ transform:rotateX(90deg) translateZ(21px); }
-.face-5{ transform:rotateY(-90deg) translateZ(21px); }
-.face-6{ transform:rotateY(180deg) translateZ(21px); }
+.face{ position:absolute; width:40px; height:40px; border:2px solid var(--ink); border-radius:6px; background:var(--white); display:flex; align-items:center; justify-content:center; font:700 1.2rem "Barlow Condensed",sans-serif; color:var(--ink); box-sizing:border-box; }
+.face-1{ transform:rotateY(0deg) translateZ(20px); }
+.face-2{ transform:rotateY(90deg) translateZ(20px); }
+.face-3{ transform:rotateX(-90deg) translateZ(20px); }
+.face-4{ transform:rotateX(90deg) translateZ(20px); }
+.face-5{ transform:rotateY(-90deg) translateZ(20px); }
+.face-6{ transform:rotateY(180deg) translateZ(20px); }
 @keyframes dice-roll{
     0%{ transform:rotateX(0) rotateY(0) rotateZ(0); }
     20%{ transform:rotateX(220deg) rotateY(140deg) rotateZ(60deg); }
