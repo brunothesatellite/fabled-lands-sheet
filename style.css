@@ -206,6 +206,12 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .face-4{ transform:rotateX(90deg) translateZ(20px); }
 .face-5{ transform:rotateY(-90deg) translateZ(20px); }
 .face-6{ transform:rotateY(180deg) translateZ(20px); }
+.face-1 .die-num{ }
+.face-2 .die-num{ transform:rotateY(-90deg); }
+.face-3 .die-num{ transform:rotateX(90deg); }
+.face-4 .die-num{ transform:rotateX(-90deg); }
+.face-5 .die-num{ transform:rotateY(90deg); }
+.face-6 .die-num{ transform:rotateY(-180deg); }
 @keyframes dice-roll{
     0%{ transform:rotateX(0) rotateY(0) rotateZ(0); }
     20%{ transform:rotateX(220deg) rotateY(140deg) rotateZ(60deg); }
