@@ -15,6 +15,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .tab{ flex:0 0 auto; padding:.6rem 1rem; font:700 .78rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; transition:background .15s,color .15s; }
 .tab:hover{ background:rgba(0,0,0,.06); }
 .tab.active{ color:var(--white); background:var(--ink); border-bottom-color:var(--red); }
+.tab-dropdown-toggle.active{ color:var(--white); background:var(--ink); border-bottom-color:var(--red); }
 .tab-dropdown-column{ display:flex; align-items:center; gap:.2rem; flex:0 0 auto; min-width:0; }
 .tab-dropdown{ position:relative; flex:0 0 auto; }
 .tab-dropdown-toggle{ display:flex; align-items:center; gap:.3rem; min-width:4.8rem; }

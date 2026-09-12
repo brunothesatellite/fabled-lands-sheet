@@ -365,6 +365,8 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
     document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
     document.querySelectorAll('.tab-subitem').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('#booksDropdown .tab-dropdown-toggle').forEach(function(t) { t.classList.remove('active'); });
+    document.querySelectorAll('#mapsDropdown .tab-dropdown-toggle').forEach(function(t) { t.classList.remove('active'); });
 
     var panel = document.getElementById('panel-' + tabId);
     if (panel) panel.classList.add('active');
@@ -374,6 +376,12 @@ function switchTab(tabId) {
 
     var subBtn = document.querySelector('.tab-subitem[data-tab="' + tabId + '"]');
     if (subBtn) subBtn.classList.add('active');
+
+    if (tabId && tabId.startsWith('book')) {
+        document.getElementById('booksDropdown').querySelector('.tab-dropdown-toggle').classList.add('active');
+    } else if (tabId && tabId.startsWith('map')) {
+        document.getElementById('mapsDropdown').querySelector('.tab-dropdown-toggle').classList.add('active');
+    }
 
     document.getElementById('booksMenu').hidden = true;
     document.getElementById('mapsMenu').hidden = true;
