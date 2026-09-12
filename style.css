@@ -10,12 +10,12 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .utility-controls{ display:flex; align-items:flex-start; gap:.7rem; }
 
 /* Tabs */
-.tab-bar{ display:flex; gap:0; border-bottom:2px solid var(--ink); background:var(--white); position:sticky; top:0; z-index:100; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+.tab-bar{ display:flex; gap:0; border-bottom:2px solid var(--ink); background:var(--white); position:sticky; top:0; z-index:100; overflow-x:hidden; flex-wrap:nowrap; -webkit-overflow-scrolling:touch; }
 .tab-bar::-webkit-scrollbar{ display:none; }
 .tab{ flex:0 0 auto; padding:.6rem 1rem; font:700 .78rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--ink); background:transparent; border:none; border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; transition:background .15s,color .15s; }
 .tab:hover{ background:rgba(0,0,0,.06); }
 .tab.active{ color:var(--white); background:var(--ink); border-bottom-color:var(--red); }
-.tab-dropdown{ position:relative; }
+.tab-dropdown{ position:relative; flex:0 0 auto; }
 .tab-dropdown-toggle{ display:flex; align-items:center; gap:.3rem; }
 .tab-dropdown-toggle i{ font-size:.65rem; }
 .tab-dropdown-menu{ position:absolute; top:100%; left:0; min-width:140px; background:var(--white); border:2px solid var(--ink); box-shadow:4px 4px 0 var(--yellow); z-index:200; }
@@ -23,6 +23,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .tab-subitem:last-child{ border-bottom:none; }
 .tab-subitem:hover{ background:var(--yellow); }
 .tab-subitem.active{ background:var(--ink); color:var(--white); }
+
 
 /* Content */
 .content{ max-width:900px; margin:0 auto; padding:1rem; }
@@ -150,7 +151,12 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     .form-row.double,.form-row.triple{ grid-template-columns:1fr; }
     .codewords-grid{ grid-template-columns:repeat(2,1fr); }
     .user-menu{ right:0; left:auto; min-width:0; max-width:calc(100vw - 1rem); }
-    .tab{ padding:.5rem .7rem; font-size:.72rem; }
+    .tab-bar{ flex-wrap:wrap; overflow-x:hidden; }
+    .tab{ flex:0 0 25%; max-width:25%; white-space:nowrap; font-size:.72rem; padding:.55rem .7rem; }
+    #booksDropdown,#mapsDropdown{ flex:0 0 12.5%; max-width:12.5%; }
+    #booksDropdown .tab,#mapsDropdown .tab{ padding-left:.45rem; padding-right:.45rem; font-size:.72rem; }
+    .tab-dropdown{ position:relative; }
+    .tab-dropdown-menu{ min-width:140px; }
     .ship-table{ min-width:600px; }
     .ship-td textarea{ font-size:.72rem; min-height:2.5rem; }
     .book-tables-row{ flex-direction:column; }
