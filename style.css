@@ -25,9 +25,9 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .tab-subitem:last-child{ border-bottom:none; }
 .tab-subitem:hover{ background:var(--yellow); }
 .tab-subitem.active{ background:var(--ink); color:var(--white); }
-.tab-recall{ flex:0 0 auto; min-width:3.8rem; padding:.6rem .7rem; border:2px solid var(--ink); background:var(--paper); color:var(--red); font:800 .78rem "Barlow Condensed",sans-serif; }
+.tab-recall{ flex:0 0 auto; min-width:3.8rem; padding:.6rem .7rem; border:none; background:var(--paper); color:var(--red); font:800 .78rem "Barlow Condensed",sans-serif; }
 .tab-recall:hover{ background:var(--yellow); }
-.tab-recall{ min-width:3.8rem; padding:.6rem .7rem; border:2px solid var(--ink); background:var(--paper); color:var(--red); font-size:.78rem; font-weight:800; }
+.tab-recall{ min-width:3.8rem; padding:.6rem .7rem; border:none; background:var(--paper); color:var(--red); font-size:.78rem; font-weight:800; }
 .tab-recall:hover{ background:var(--yellow); }
 
 
