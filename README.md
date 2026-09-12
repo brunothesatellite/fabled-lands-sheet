@@ -4,6 +4,10 @@ A web-based Adventure Sheet application for the **Fabled Lands** gamebook series
 
 ---
 
+## Release Notes
+
+The v1.14 release notes are described in [CHANGELOG.md](CHANGELOG.md).
+
 ## User Manual
 
 ### Getting Started
