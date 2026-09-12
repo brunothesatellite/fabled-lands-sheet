@@ -393,7 +393,42 @@ document.querySelectorAll('.tab[data-tab]').forEach(function(btn) {
 });
 
 document.querySelectorAll('.tab-subitem[data-tab]').forEach(function(btn) {
-    btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
+    btn.addEventListener('click', function() {
+        var tab = this.dataset.tab;
+        if (tab && tab.indexOf('book') === 0 && tab.indexOf('book') >= 0) {
+            var match = tab.match(/book(\d+)/);
+            if (match) {
+                document.getElementById('bookRecall').textContent = '↩ ' + match[1];
+                document.getElementById('bookRecall').dataset.recallBook = match[1];
+            }
+        }
+        if (tab === 'map-world') {
+            document.getElementById('mapRecall').textContent = '↩ W';
+            document.getElementById('mapRecall').dataset.recallMap = 'W';
+        }
+        if (tab && tab.indexOf('map-book') === 0) {
+            var m = tab.match(/map-book(\d+)/);
+            if (m) {
+                document.getElementById('mapRecall').textContent = '↩ ' + m[1];
+                document.getElementById('mapRecall').dataset.recallMap = m[1];
+            }
+        }
+        switchTab(tab);
+    });
+});
+
+document.getElementById('bookRecall').addEventListener('click', function(e) {
+    e.stopPropagation();
+    var book = this.dataset.recallBook || '3';
+    var target = 'book' + book + '-paragraphs';
+    switchTab(target);
+});
+
+document.getElementById('mapRecall').addEventListener('click', function(e) {
+    e.stopPropagation();
+    var map = this.dataset.recallMap || 'W';
+    var target = map === 'W' ? 'map-world' : 'map-book' + map;
+    switchTab(target);
 });
 
 document.getElementById('booksDropdown').querySelector('.tab-dropdown-toggle').addEventListener('click', function(e) {

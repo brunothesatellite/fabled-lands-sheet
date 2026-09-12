@@ -87,33 +87,39 @@
 <nav class="tab-bar" id="tabBar">
     <button class="tab active" data-tab="adventure-sheet" type="button">Adventure Sheet</button>
     <button class="tab" data-tab="codewords" type="button">Codewords</button>
-    <div class="tab-dropdown" id="booksDropdown">
-        <button class="tab tab-dropdown-toggle" type="button">Books <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
-        <div class="tab-dropdown-menu" id="booksMenu" hidden>
-            <button class="tab-subitem" data-tab="book1-paragraphs" type="button">Book 1</button>
-            <button class="tab-subitem" data-tab="book2-paragraphs" type="button">Book 2</button>
-            <button class="tab-subitem" data-tab="book3-paragraphs" type="button">Book 3</button>
-            <button class="tab-subitem" data-tab="book4-paragraphs" type="button">Book 4</button>
-            <button class="tab-subitem" data-tab="book5-paragraphs" type="button">Book 5</button>
-            <button class="tab-subitem" data-tab="book6-paragraphs" type="button">Book 6</button>
-            <button class="tab-subitem" data-tab="book7-paragraphs" type="button">Book 7</button>
+    <div class="tab-dropdown-column">
+        <div class="tab-dropdown" id="booksDropdown">
+            <button class="tab tab-dropdown-toggle" type="button">Book <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
+            <div class="tab-dropdown-menu" id="booksMenu" hidden>
+                <button class="tab-subitem" data-tab="book1-paragraphs" type="button">Book 1</button>
+                <button class="tab-subitem" data-tab="book2-paragraphs" type="button">Book 2</button>
+                <button class="tab-subitem" data-tab="book3-paragraphs" type="button">Book 3</button>
+                <button class="tab-subitem" data-tab="book4-paragraphs" type="button">Book 4</button>
+                <button class="tab-subitem" data-tab="book5-paragraphs" type="button">Book 5</button>
+                <button class="tab-subitem" data-tab="book6-paragraphs" type="button">Book 6</button>
+                <button class="tab-subitem" data-tab="book7-paragraphs" type="button">Book 7</button>
+            </div>
         </div>
+        <button class="tab tab-recall" id="bookRecall" type="button" data-recall-book="3">↩ 3</button>
     </div>
-    <button class="tab" data-tab="ships-manifest" type="button">Ship's Manifest</button>
+    <button class="tab" data-tab="ships-manifest" type="button">Ships</button>
     <button class="tab" data-tab="encounter" type="button">Encounter</button>
     <button class="tab" data-tab="notes" type="button">Notes</button>
-    <div class="tab-dropdown" id="mapsDropdown">
-        <button class="tab tab-dropdown-toggle" type="button">Maps <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
-        <div class="tab-dropdown-menu" id="mapsMenu" hidden>
-            <button class="tab-subitem" data-tab="map-world" type="button">World</button>
-            <button class="tab-subitem" data-tab="map-book1" type="button">Book 1</button>
-            <button class="tab-subitem" data-tab="map-book2" type="button">Book 2</button>
-            <button class="tab-subitem" data-tab="map-book3" type="button">Book 3</button>
-            <button class="tab-subitem" data-tab="map-book4" type="button">Book 4</button>
-            <button class="tab-subitem" data-tab="map-book5" type="button">Book 5</button>
-            <button class="tab-subitem" data-tab="map-book6" type="button">Book 6</button>
-            <button class="tab-subitem" data-tab="map-book7" type="button">Book 7</button>
+    <div class="tab-dropdown-column">
+        <div class="tab-dropdown" id="mapsDropdown">
+            <button class="tab tab-dropdown-toggle" type="button">Maps <i class="fa-solid fa-caret-down" aria-hidden="true"></i></button>
+            <div class="tab-dropdown-menu" id="mapsMenu" hidden>
+                <button class="tab-subitem" data-tab="map-world" type="button">World</button>
+                <button class="tab-subitem" data-tab="map-book1" type="button">Book 1</button>
+                <button class="tab-subitem" data-tab="map-book2" type="button">Book 2</button>
+                <button class="tab-subitem" data-tab="map-book3" type="button">Book 3</button>
+                <button class="tab-subitem" data-tab="map-book4" type="button">Book 4</button>
+                <button class="tab-subitem" data-tab="map-book5" type="button">Book 5</button>
+                <button class="tab-subitem" data-tab="map-book6" type="button">Book 6</button>
+                <button class="tab-subitem" data-tab="map-book7" type="button">Book 7</button>
+            </div>
         </div>
+        <button class="tab tab-recall" id="mapRecall" type="button" data-recall-map="1">↩ 1</button>
     </div>
 </nav>
 
