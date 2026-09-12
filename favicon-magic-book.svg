@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Background rounded square -->
+  <rect width="32" height="32" rx="5" fill="#171717"/>
+  <!-- Book cover back -->
+  <path d="M6 7 C6 6 7 5 8 5 L24 5 C25 5 26 6 26 7 L26 25 C26 26 25 27 24 27 L8 27 C7 27 6 26 6 25 Z" fill="#8B0000"/>
+  <!-- Book spine shadow -->
+  <rect x="15" y="5" width="2" height="22" fill="#6B0000"/>
+  <!-- Left page -->
+  <path d="M7 7 L15 7 L15 25 L7 25 C6.5 25 6 24.5 6 24 L6 8 C6 7.5 6.5 7 7 7 Z" fill="#f1eee8"/>
+  <!-- Right page -->
+  <path d="M17 7 L25 7 C25.5 7 26 7.5 26 8 L26 24 C26 24.5 25.5 25 25 25 L17 25 Z" fill="#f1eee8"/>
+  <!-- Left page text lines -->
+  <line x1="8.5" y1="10" x2="13.5" y2="10" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="8.5" y1="12" x2="13" y2="12" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="8.5" y1="14" x2="12.5" y2="14" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="8.5" y1="16" x2="13.5" y2="16" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="8.5" y1="18" x2="13" y2="18" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="8.5" y1="20" x2="12" y2="20" stroke="#d7d1c8" stroke-width="0.5"/>
+  <!-- Right page text lines -->
+  <line x1="18.5" y1="10" x2="23.5" y2="10" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="18.5" y1="12" x2="23" y2="12" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="18.5" y1="14" x2="22.5" y2="14" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="18.5" y1="16" x2="23.5" y2="16" stroke="#d7d1c8" stroke-width="0.5"/>
+  <line x1="18.5" y1="18" x2="23" y2="18" stroke="#d7d1c8" stroke-width="0.5"/>
+  <!-- Magical sparkles -->
+  <g fill="#f2bd3d">
+    <!-- Main star top-right -->
+    <polygon points="22,3 22.6,4.5 24,4.5 22.9,5.3 23.3,6.8 22,5.9 20.7,6.8 21.1,5.3 20,4.5 21.4,4.5" transform="scale(0.7) translate(9, -0.5)"/>
+    <!-- Small star left -->
+    <circle cx="7" cy="4" r="0.7"/>
+    <!-- Tiny star -->
+    <circle cx="25" cy="5.5" r="0.5"/>
+    <!-- Sparkle dots -->
+    <circle cx="5" cy="9" r="0.4" opacity="0.7"/>
+    <circle cx="27" cy="8" r="0.4" opacity="0.7"/>
+    <circle cx="24" cy="2.5" r="0.3" opacity="0.5"/>
+  </g>
+  <!-- Wand crossing the book -->
+  <line x1="4" y1="28" x2="16" y2="6" stroke="#8B4513" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- Wand tip glow -->
+  <circle cx="16" cy="6" r="1.5" fill="#f2bd3d" opacity="0.8"/>
+  <circle cx="16" cy="6" r="0.8" fill="#fffdf8"/>
+</svg>

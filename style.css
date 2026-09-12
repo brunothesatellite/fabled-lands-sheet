@@ -4,7 +4,7 @@ body{ font-family:"Space Grotesk",sans-serif; background:var(--paper); color:var
 body:before{ content:""; position:fixed; inset:0 0 auto; height:7px; background:var(--red); z-index:10; }
 .masthead{ max-width:1400px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:center; gap:1rem; padding:.8rem 1.2rem; border-bottom:2px solid var(--ink); position:relative; z-index:150; }
 .brand-mark{ display:flex; align-items:center; gap:.6rem; color:var(--red); font-size:1.2rem; }
-.brand-mark i{ font-size:1.4rem; transform:rotate(-12deg); }
+.brand-mark svg{ width:28px; height:28px; flex-shrink:0; }
 h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-serif; text-transform:uppercase; white-space:nowrap; }
 .masthead-side{ display:flex; align-items:center; gap:.7rem; }
 .utility-controls{ display:flex; align-items:flex-start; gap:.7rem; }
