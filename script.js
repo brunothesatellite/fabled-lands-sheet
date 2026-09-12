@@ -479,6 +479,48 @@ document.getElementById('mapsDropdown').querySelector('.tab-dropdown-toggle').ad
     }
 });
 
+const adventureSheetPanel = document.getElementById('panel-adventure-sheet');
+const adventureSheetLockToggle = document.getElementById('adventureSheetLockToggle');
+let adventureSheetLocked = true;
+
+function applyAdventureSheetLockMode(locked) {
+    if (!adventureSheetPanel || !adventureSheetLockToggle) return;
+
+    const fields = Array.from(adventureSheetPanel.querySelectorAll('[data-key]'));
+    fields.forEach(function(el) {
+        if (el.tagName === 'SELECT') {
+            el.disabled = locked;
+            return;
+        }
+        if (el.type === 'checkbox' || el.type === 'radio') {
+            el.disabled = locked;
+            return;
+        }
+        if (el.type === 'text' || el.type === 'number' || el.type === 'textarea' || el.tagName === 'TEXTAREA') {
+            el.readOnly = locked;
+            el.disabled = false;
+        }
+    });
+
+    const stepperButtons = Array.from(adventureSheetPanel.querySelectorAll('.encounter-stepper-btn'));
+    stepperButtons.forEach(function(btn) {
+        btn.disabled = locked;
+    });
+
+    adventureSheetLockToggle.textContent = locked ? '✏️' : '🔒';
+    adventureSheetLockToggle.setAttribute('aria-pressed', String(!locked));
+    adventureSheetLockToggle.title = locked ? 'Switch to edit mode' : 'Return to locked mode';
+}
+
+if (adventureSheetLockToggle) {
+    adventureSheetLockToggle.addEventListener('click', function() {
+        adventureSheetLocked = !adventureSheetLocked;
+        applyAdventureSheetLockMode(adventureSheetLocked);
+    });
+}
+
+applyAdventureSheetLockMode(adventureSheetLocked);
+
 /* Auto-save form fields */
 document.querySelectorAll('[data-key]').forEach(function(el) {
     if (!ALL_KEYS.includes(el.dataset.key)) ALL_KEYS.push(el.dataset.key);
