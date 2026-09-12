@@ -128,6 +128,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .encounter-box-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:.8rem; }
 .encounter-box-header .encounter-box-title{ margin-bottom:0; }
 .encounter-fields{ display:contents; }
+.encounter-double-row{ display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:.5rem; }
 .encounter-field{ display:flex; flex-direction:column; gap:.2rem; }
 .encounter-field .form-number{ min-height:2.4rem; }
 .encounter-field input[readonly]{ background:var(--paper); color:var(--muted); cursor:default; -moz-appearance:textfield; }
@@ -148,7 +149,6 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 @media (max-width:600px){
     .masthead{ padding:.6rem .8rem; }
     h1{ font-size:1.2rem; }
-    .form-row.double,.form-row.triple{ grid-template-columns:1fr; }
     .codewords-grid{ grid-template-columns:repeat(2,1fr); }
     .user-menu{ right:0; left:auto; min-width:0; max-width:calc(100vw - 1rem); }
     .tab-bar{ flex-wrap:wrap; overflow-x:hidden; }
@@ -164,6 +164,11 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     .encounter-container{ grid-template-columns:1fr; grid-template-rows:auto; }
     .encounter-box{ display:block; grid-row:auto; }
     .encounter-fields{ display:flex; flex-direction:column; gap:.5rem; }
+
+    #panel-adventure-sheet .form-grid .form-row.double{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+    #panel-adventure-sheet .form-grid .form-row.triple{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+    #panel-adventure-sheet .form-grid .form-row.double > div,
+    #panel-adventure-sheet .form-grid .form-row.triple > div{ min-width:0; }
 }
 
 /* Book tables */

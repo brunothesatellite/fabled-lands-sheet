@@ -141,18 +141,38 @@
                     <input type="number" class="form-input" data-key="fl-adventure-chapter" min="1" value="1">
                 </div>
             </div>
-            <div class="form-row">
-                <label class="form-label"><i class="fa-solid fa-user"></i> Name</label>
-                <input type="text" class="form-input" data-key="fl-adventure-name">
+            <div class="form-row double">
+                <div class="form-field">
+                    <label class="form-label"><i class="fa-solid fa-user"></i> Name</label>
+                    <input type="text" class="form-input" data-key="fl-adventure-name">
+                </div>
+                <div class="form-field">
+                    <label class="form-label"><i class="fa-solid fa-hammer"></i> Profession</label>
+                    <input type="text" class="form-input" data-key="fl-adventure-profession">
+                </div>
             </div>
-            <div class="form-row">
-                <label class="form-label"><i class="fa-solid fa-hammer"></i> Profession</label>
-                <input type="text" class="form-input" data-key="fl-adventure-profession">
-            </div>
-            <div class="form-row triple">
+            <div class="form-row double">
+                <div class="form-field">
+                    <label class="form-label"><i class="fa-solid fa-sack-dollar"></i> Money</label>
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-money" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-money" data-key="fl-adventure-money" value="0" min="0">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-money" data-dir="1">+</button>
+                    </div>
+                </div>
                 <div class="form-field">
                     <label class="form-label"><i class="fa-solid fa-cross"></i> God</label>
                     <input type="text" class="form-input" data-key="fl-adventure-god">
+                </div>
+            </div>
+            <div class="form-row double">
+                <div class="form-field">
+                    <label class="form-label"><i class="fa-solid fa-shield"></i> Defence</label>
+                    <div class="encounter-stepper">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-defence" data-dir="-1">−</button>
+                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-defence" data-key="fl-adventure-defence" value="0" min="0">
+                        <button class="encounter-stepper-btn" type="button" data-target="adventure-defence" data-dir="1">+</button>
+                    </div>
                 </div>
                 <div class="form-field">
                     <label class="form-label"><i class="fa-solid fa-ranking-star"></i> Rank</label>
@@ -160,14 +180,6 @@
                         <button class="encounter-stepper-btn" type="button" data-target="adventure-rank" data-dir="-1">−</button>
                         <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-rank" data-key="fl-adventure-rank" value="1" min="1">
                         <button class="encounter-stepper-btn" type="button" data-target="adventure-rank" data-dir="1">+</button>
-                    </div>
-                </div>
-                <div class="form-field">
-                    <label class="form-label"><i class="fa-solid fa-shield"></i> Defence</label>
-                    <div class="encounter-stepper">
-                        <button class="encounter-stepper-btn" type="button" data-target="adventure-defence" data-dir="-1">−</button>
-                        <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-defence" data-key="fl-adventure-defence" value="0" min="0">
-                        <button class="encounter-stepper-btn" type="button" data-target="adventure-defence" data-dir="1">+</button>
                     </div>
                 </div>
             </div>
@@ -265,15 +277,6 @@
 
         <h3 class="section-title"><i class="fa-solid fa-skull-crossbones"></i> Resurrection Arrangements</h3>
         <textarea class="form-textarea" data-key="fl-adventure-resurrection" rows="3"></textarea>
-
-        <div class="form-row">
-            <label class="form-label"><i class="fa-solid fa-sack-dollar"></i> Money</label>
-            <div class="encounter-stepper">
-                <button class="encounter-stepper-btn" type="button" data-target="adventure-money" data-dir="-1">−</button>
-                <input type="number" class="form-input form-number encounter-stepper-input" id="adventure-money" data-key="fl-adventure-money" value="0" min="0">
-                <button class="encounter-stepper-btn" type="button" data-target="adventure-money" data-dir="1">+</button>
-            </div>
-        </div>
 
         <h3 class="section-title"><i class="fa-solid fa-crown"></i> Titles & Honours</h3>
         <textarea class="form-textarea" data-key="fl-adventure-titles" rows="4"></textarea>
@@ -447,16 +450,18 @@
                     <h3 class="encounter-box-title">Me</h3>
                 </div>
                 <div class="encounter-fields">
-                    <div class="encounter-field">
-                        <label class="form-label"><i class="fa-solid fa-hand-fist"></i> Combat</label>
-                        <div class="encounter-stepper">
-                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-me-combat" readonly>
+                    <div class="encounter-double-row">
+                        <div class="encounter-field">
+                            <label class="form-label"><i class="fa-solid fa-hand-fist"></i> Combat</label>
+                            <div class="encounter-stepper">
+                                <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-me-combat" readonly>
+                            </div>
                         </div>
-                    </div>
-                    <div class="encounter-field">
-                        <label class="form-label"><i class="fa-solid fa-shield"></i> Defence</label>
-                        <div class="encounter-stepper">
-                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-me-defence" readonly>
+                        <div class="encounter-field">
+                            <label class="form-label"><i class="fa-solid fa-shield"></i> Defence</label>
+                            <div class="encounter-stepper">
+                                <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-me-defence" readonly>
+                            </div>
                         </div>
                     </div>
                     <div class="encounter-field">
@@ -475,20 +480,22 @@
                     <button class="encounter-reset-btn" id="encounter-foe-reset" type="button">Reset</button>
                 </div>
                 <div class="encounter-fields">
-                    <div class="encounter-field">
-                        <label class="form-label"><i class="fa-solid fa-hand-fist"></i> Combat</label>
-                        <div class="encounter-stepper">
-                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-combat" data-dir="-1">−</button>
-                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-foe-combat" min="1" value="1">
-                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-combat" data-dir="1">+</button>
+                    <div class="encounter-double-row">
+                        <div class="encounter-field">
+                            <label class="form-label"><i class="fa-solid fa-hand-fist"></i> Combat</label>
+                            <div class="encounter-stepper">
+                                <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-combat" data-dir="-1">−</button>
+                                <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-foe-combat" min="1" value="1">
+                                <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-combat" data-dir="1">+</button>
+                            </div>
                         </div>
-                    </div>
-                    <div class="encounter-field">
-                        <label class="form-label"><i class="fa-solid fa-shield"></i> Defence</label>
-                        <div class="encounter-stepper">
-                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-defence" data-dir="-1">−</button>
-                            <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-foe-defence" min="1" value="1">
-                            <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-defence" data-dir="1">+</button>
+                        <div class="encounter-field">
+                            <label class="form-label"><i class="fa-solid fa-shield"></i> Defence</label>
+                            <div class="encounter-stepper">
+                                <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-defence" data-dir="-1">−</button>
+                                <input type="number" class="form-input form-number encounter-stepper-input" id="encounter-foe-defence" min="1" value="1">
+                                <button class="encounter-stepper-btn" type="button" data-target="encounter-foe-defence" data-dir="1">+</button>
+                            </div>
                         </div>
                     </div>
                     <div class="encounter-field">
