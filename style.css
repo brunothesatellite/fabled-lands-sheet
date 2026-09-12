@@ -157,9 +157,10 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     h1{ font-size:1.2rem; }
     .codewords-grid{ grid-template-columns:repeat(2,1fr); }
     .user-menu{ right:0; left:auto; min-width:0; max-width:calc(100vw - 1rem); }
-    .tab-bar{ flex-wrap:wrap; overflow-x:hidden; row-gap:.25rem; }
+
+    .tab-bar{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); grid-template-rows:auto auto; flex-wrap:nowrap; overflow-x:hidden; row-gap:.25rem; align-items:stretch; }
     .tab{ flex:0 0 auto; max-width:none; white-space:nowrap; font-size:.72rem; padding:.55rem .7rem; }
-    .tab-dropdown-column{ flex:0 0 auto; align-items:center; gap:.2rem; min-width:0; }
+    .tab-dropdown-column{ display:flex; align-items:center; gap:.2rem; min-width:0; }
     .tab-dropdown{ flex:0 0 auto; }
     .tab-dropdown-toggle{ min-width:4.8rem; padding-left:.45rem; padding-right:.45rem; font-size:.72rem; }
     .tab-recall{ min-width:3.2rem; padding:.55rem .65rem; font-size:.75rem; }
@@ -167,6 +168,15 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     #booksDropdown .tab,#mapsDropdown .tab{ padding-left:.45rem; padding-right:.45rem; font-size:.72rem; }
     .tab-dropdown{ position:relative; }
     .tab-dropdown-menu{ min-width:140px; }
+
+    .tab[data-tab="adventure-sheet"]{ grid-column:1; grid-row:1; }
+    .tab[data-tab="codewords"]{ grid-column:2; grid-row:1; }
+    .book-group{ grid-column:3; grid-row:1; }
+    .tab[data-tab="ships-manifest"]{ grid-column:5; grid-row:1; }
+    .tab[data-tab="encounter"]{ grid-column:1; grid-row:2; }
+    .tab[data-tab="notes"]{ grid-column:2; grid-row:2; }
+    .map-group{ grid-column:3; grid-row:2; }
+
     .ship-table{ min-width:600px; }
     .ship-td textarea{ font-size:.72rem; min-height:2.5rem; }
     .book-tables-row{ flex-direction:column; }
