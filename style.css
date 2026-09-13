@@ -57,6 +57,47 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .form-textarea:focus{ outline:3px solid var(--yellow); outline-offset:2px; }
 
 /* Number inputs */
+#panel-adventure-sheet.adventure-sheet-locked .form-input,
+#panel-adventure-sheet.adventure-sheet-locked .form-textarea,
+#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-input,
+#panel-adventure-sheet.adventure-sheet-locked .form-grid input,
+#panel-adventure-sheet.adventure-sheet-locked .form-grid textarea,
+#panel-adventure-sheet.adventure-sheet-locked select{
+    background:var(--paper);
+    color:var(--muted);
+    cursor:default;
+    border-color:var(--ink);
+    box-shadow:inset 0 0 0 1px var(--line);
+    -moz-appearance:textfield;
+}
+#panel-adventure-sheet.adventure-sheet-locked .form-input[readonly],
+#panel-adventure-sheet.adventure-sheet-locked .form-textarea[readonly],
+#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-input[readonly],
+#panel-adventure-sheet.adventure-sheet-locked .form-grid input[readonly],
+#panel-adventure-sheet.adventure-sheet-locked .form-grid textarea[readonly]{
+    background:var(--paper);
+    color:var(--muted);
+    cursor:default;
+    border-color:var(--ink);
+    box-shadow:inset 0 0 0 1px var(--line);
+    -moz-appearance:textfield;
+}
+#panel-adventure-sheet.adventure-sheet-locked select:disabled,
+#panel-adventure-sheet.adventure-sheet-locked input:disabled,
+#panel-adventure-sheet.adventure-sheet-locked textarea:disabled{
+    background:var(--paper);
+    color:var(--muted);
+    cursor:default;
+    border-color:var(--ink);
+    opacity:.88;
+}
+#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-btn:disabled,
+#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-btn[disabled]{
+    background:var(--paper);
+    color:var(--muted);
+    cursor:not-allowed;
+    opacity:.72;
+}
 .form-number{ -moz-appearance:textfield; text-align:center; font-weight:700; font-size:1.1rem; min-height:2.6rem; padding:.4rem .3rem; }
 .form-number::-webkit-inner-spin-button,.form-number::-webkit-outer-spin-button{ opacity:1; height:2.4rem; }
 @media (max-width:600px){ .form-number::-webkit-inner-spin-button,.form-number::-webkit-outer-spin-button{ height:2.2rem; } }

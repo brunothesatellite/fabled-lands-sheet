@@ -490,6 +490,7 @@ function applyAdventureSheetLockMode(locked) {
     fields.forEach(function(el) {
         if (el.tagName === 'SELECT') {
             el.disabled = locked;
+            el.setAttribute('aria-disabled', locked ? 'true' : 'false');
             return;
         }
         if (el.type === 'checkbox' || el.type === 'radio') {
@@ -507,6 +508,8 @@ function applyAdventureSheetLockMode(locked) {
         btn.disabled = locked;
     });
 
+    adventureSheetPanel.classList.toggle('adventure-sheet-locked', locked);
+    adventureSheetPanel.classList.toggle('adventure-sheet-editing', !locked);
     adventureSheetLockToggle.textContent = locked ? '✏️' : '🔒';
     adventureSheetLockToggle.setAttribute('aria-pressed', String(!locked));
     adventureSheetLockToggle.title = locked ? 'Switch to edit mode' : 'Return to locked mode';
