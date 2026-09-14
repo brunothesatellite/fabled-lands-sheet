@@ -2,6 +2,29 @@ const STORAGE_PREFIX = 'fl-';
 const ALL_KEYS = [];
 const elementMap = new Map();
 
+/* Theme toggle */
+const THEME_KEY = 'fl-theme';
+const brandMark = document.querySelector('.brand-mark');
+function appliquerTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+}
+(function initTheme() {
+    var saved = localStorage.getItem(THEME_KEY);
+    if (saved) {
+        appliquerTheme(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        appliquerTheme('dark');
+    } else {
+        appliquerTheme('light');
+    }
+})();
+brandMark.addEventListener('click', function() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    appliquerTheme(next);
+    localStorage.setItem(THEME_KEY, next);
+});
+
 let phpDisponible = false;
 let utilisateurLogue = null;
 
