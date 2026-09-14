@@ -18,10 +18,13 @@ If the server runs PHP, you can create an account to sync your data across devic
 
 ### Navigation
 
+![Adventure Sheet](screenshots/adventurer-dark.png)
+
 The top of the screen features a **tab bar** for quick navigation between sections, and **two dice** next to the title for quick random rolls:
 
 | Element | Description |
 |---|---|
+| ![Toggle](screenshots/toggle-theme.png) **Theme toggle** | Click to toggle between Dark theme avec Light theme. |
 | **Dice** | Click either die to roll it with a 3D animation. Results are displayed as numbers (1–6). No persistence. |
 | **Adventure Sheet** | Your character's core stats, abilities, possessions, money, titles, and blessings |
 | **Ship's Manifest** | Track your fleet: ship type, name, crew quality, cargo, and docking location |
