@@ -1262,6 +1262,7 @@ function rollDie(die) {
 }
 document.querySelectorAll('.die').forEach(function(die) {
     die.classList.add('stopped');
+    die.querySelector('.face-result').textContent = Math.floor(Math.random() * 6) + 1;
     die.addEventListener('click', function() { rollDie(this); });
 });
 
