@@ -42,6 +42,8 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .adventure-sheet-lock-toggle{ width:2.7rem; height:2.7rem; border:2px solid var(--border); border-radius:50%; background:var(--paper); color:var(--ink); font:800 1.1rem/1 "Space Grotesk",sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,color .15s,transform .15s; }
 .adventure-sheet-lock-toggle:hover{ background:var(--yellow); transform:translateY(-1px); }
 .adventure-sheet-lock-toggle:focus-visible{ outline:2px solid var(--red); outline-offset:3px; }
+.log-clear-btn{ width:2.7rem; height:2.7rem; border:2px solid var(--border); border-radius:50%; background:var(--paper); color:var(--ink); font:800 1.1rem/1 "Space Grotesk",sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,color .15s,transform .15s; }
+.log-clear-btn:hover{ background:var(--red); color:var(--white); transform:translateY(-1px); }
 .section-title{ margin:1.5rem 0 .6rem; font:700 1rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--ink); letter-spacing:.04em; }
 .section-title i{ color:var(--red); margin-right:.3rem; }
 

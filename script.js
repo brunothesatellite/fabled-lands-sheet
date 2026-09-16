@@ -1307,6 +1307,11 @@ document.getElementById('encounter-foe-reset').addEventListener('click', functio
 /* Init */
 async function initialiser() {
     logtxt = document.getElementById('logtxt');
+    document.getElementById('logClearBtn').addEventListener('click', function() {
+        if (logtxt.value && confirm('Clear the entire log?')) {
+            logtxt.value = '';
+        }
+    });
 
     document.getElementById('content').addEventListener('change', function(e) {
         var el = e.target;
