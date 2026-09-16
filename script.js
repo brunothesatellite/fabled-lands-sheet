@@ -1,6 +1,120 @@
 const STORAGE_PREFIX = 'fl-';
 const ALL_KEYS = [];
 const elementMap = new Map();
+var previousValues = {};
+var logtxt = null;
+
+function obtenirLabel(element, key) {
+    if (!element) return key;
+
+    var codewordItem = element.closest('.codeword-item');
+    if (codewordItem) {
+        var lbl = codewordItem.querySelector('label');
+        if (lbl) return lbl.textContent.trim();
+    }
+
+    var formField = element.closest('.form-field');
+    if (formField) {
+        var formLabel = formField.querySelector('.form-label');
+        if (formLabel) return formLabel.textContent.trim().replace(/^\S+\s+/, '');
+    }
+
+    var parentDiv = element.parentElement;
+    if (parentDiv) {
+        var label = parentDiv.querySelector('label');
+        if (label) return label.textContent.trim().replace(/^\S+\s+/, '');
+    }
+
+    var shipTd = element.closest('.ship-td');
+    if (shipTd) {
+        var shipTr = shipTd.closest('tr');
+        var shipTbody = shipTr.closest('tbody');
+        var shipTable = shipTbody.closest('table');
+        var headers = shipTable.querySelectorAll('thead .ship-th:not(.ship-th-actions)');
+        var cellIndex = Array.from(shipTr.children).indexOf(shipTd) - 1;
+        var rowIndex = Array.from(shipTbody.children).indexOf(shipTr) + 1;
+        if (cellIndex >= 0 && cellIndex < headers.length) {
+            return 'Ship ' + headers[cellIndex].textContent.trim() + ' (Row ' + rowIndex + ')';
+        }
+    }
+
+    var bookTd = element.closest('.book-td');
+    if (bookTd) {
+        if (element.type === 'checkbox') {
+            var cbMatch = key.match(/^fl-book(\d+)-(.+)-c(\d+)$/);
+            if (cbMatch) {
+                var cbBookNum = cbMatch[1];
+                var cbPara = cbMatch[2].replace(/_/g, ' ');
+                var cbGiMatch = cbMatch[2].match(/^(\d+)[^-]*-(\d+)/);
+                var cbGi = cbGiMatch ? cbGiMatch[2] : '0';
+                var cbIndex = parseInt(cbMatch[3]) + 1;
+                return 'Book ' + cbBookNum + ' §' + cbPara.split('-')[0] + ' - ' + cbPara + '_' + cbIndex;
+            }
+        }
+        if (element.type === 'text') {
+            var inpMatch = key.match(/^fl-book(\d+)-inp-/);
+            if (inpMatch) {
+                var inpBookNum = inpMatch[1];
+                var inpNoteLabel = element.dataset.notelabel || '';
+                if (inpNoteLabel) {
+                    return 'Book ' + inpBookNum + ' - ' + inpNoteLabel;
+                }
+            }
+        }
+    }
+
+    var noteGroup = element.closest('.note-group');
+    if (noteGroup) {
+        var noteBook = noteGroup.dataset.book || '';
+        var notePara = noteGroup.dataset.para || '';
+        var noteLabelEl = noteGroup.querySelector('.note-label');
+        var noteLabelText = noteLabelEl ? noteLabelEl.textContent.trim() : '';
+        if (noteBook && notePara) {
+            var noteBookNum = noteBook.replace('book', '');
+            return 'Book ' + noteBookNum + ' §' + notePara + ' - ' + noteLabelText;
+        }
+        return noteLabelText;
+    }
+
+    var sectionTitle = element.closest('section');
+    if (sectionTitle) {
+        var title = sectionTitle.querySelector('.panel-title');
+        if (title) return title.textContent.trim();
+    }
+
+    var readable = key.replace(/^fl-adventure-/, '').replace(/^fl-notes$/, 'Notes').replace(/^fl-codeword-\d+$/, 'Codeword');
+    readable = readable.replace(/-/g, ' ').replace(/\b\w/g, function(c) { return c.toUpperCase(); });
+    return readable || key;
+}
+
+function ajouterLog(label, oldVal, newVal) {
+    if (!logtxt) return;
+    var now = new Date();
+    var h = String(now.getHours()).padStart(2, '0');
+    var m = String(now.getMinutes()).padStart(2, '0');
+    var s = String(now.getSeconds()).padStart(2, '0');
+    var displayOld = oldVal === '' || oldVal === undefined || oldVal === null ? '(empty)' : oldVal;
+    var displayNew = newVal === '' || newVal === undefined || newVal === null ? '(empty)' : newVal;
+    var line = h + ':' + m + ':' + s + ' ' + label + ' ' + displayOld + ' => ' + displayNew + '\n';
+    logtxt.value = line + logtxt.value;
+    var lines = logtxt.value.split('\n');
+    if (lines.length > 501) {
+        logtxt.value = lines.slice(0, 501).join('\n');
+    }
+}
+
+function logChange(key, newValue) {
+    var oldVal = previousValues[key];
+    if (oldVal === undefined || oldVal === null) {
+        previousValues[key] = newValue;
+        return;
+    }
+    if (oldVal === newValue) return;
+    var el = elementMap.get(key);
+    var label = obtenirLabel(el, key);
+    ajouterLog(label, oldVal, newValue);
+    previousValues[key] = newValue;
+}
 
 /* Theme toggle */
 const THEME_KEY = 'fl-theme';
@@ -852,6 +966,7 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
                 var inp = document.createElement('input');
                 inp.type = 'text';
                 inp.className = 'para-input';
+                inp.dataset.notelabel = firstPara.note || '';
                 var inpKey = 'fl-' + bookId + '-inp-' + para.n.replace(/[^a-zA-Z0-9]/g,'_') + '-' + gi;
                 inp.dataset.key = inpKey;
                 if(!ALL_KEYS.includes(inpKey)) ALL_KEYS.push(inpKey);
@@ -870,6 +985,8 @@ function buildBookTables(paragraphs, leftTbodyId, rightDivId, bookId){
         if(!rightDiv) continue;
         var noteGroup = document.createElement('div');
         noteGroup.className = 'note-group';
+        noteGroup.dataset.para = firstPara.n;
+        noteGroup.dataset.book = bookId;
         if(isNoteOnly){
             noteGroup.classList.add('note-group-label');
         }
@@ -950,7 +1067,11 @@ function creerLigneShip(idx){
             var self = this;
             this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
         });
-        ta.addEventListener('change', function(){ ecrirePreference(this.dataset.key, this.value); });
+        ta.addEventListener('change', function(){
+            ecrirePreference(this.dataset.key, this.value);
+            logChange(this.dataset.key, this.value);
+            e.stopPropagation();
+        });
         td.appendChild(ta);
         tr.appendChild(td);
     }
@@ -1165,6 +1286,7 @@ document.querySelectorAll('.encounter-stepper-btn').forEach(function(btn) {
         if (!isNaN(max)) val = Math.min(max, val);
         target.value = val;
         target.dispatchEvent(new Event('input', { bubbles: true }));
+        target.dispatchEvent(new Event('change', { bubbles: true }));
     });
 });
 
@@ -1184,6 +1306,16 @@ document.getElementById('encounter-foe-reset').addEventListener('click', functio
 
 /* Init */
 async function initialiser() {
+    logtxt = document.getElementById('logtxt');
+
+    document.getElementById('content').addEventListener('change', function(e) {
+        var el = e.target;
+        if (el.dataset && el.dataset.key) {
+            var val = el.type === 'checkbox' ? (el.checked ? 'Checked' : 'Unchecked') : el.value;
+            logChange(el.dataset.key, val);
+        }
+    });
+
     genererCodewords();
     genererShipTable();
     genererParagraphes('book1', 'book1TableBody', 'fl-book1');
@@ -1205,6 +1337,15 @@ async function initialiser() {
     }
 
     await chargerShipTable();
+
+    elementMap.forEach(function(el, key) {
+        if (el.type === 'checkbox') {
+            previousValues[key] = el.checked ? 'Checked' : 'Unchecked';
+        } else {
+            previousValues[key] = el.value;
+        }
+    });
+
     showToast('Données restaurées', 'load');
 
     if (phpDisponible && utilisateurLogue) {
