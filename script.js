@@ -1062,6 +1062,7 @@ function creerLigneShip(idx){
         var key = shipKey(idx, c);
         ta.dataset.key = key;
         if(!ALL_KEYS.includes(key)) ALL_KEYS.push(key);
+        elementMap.set(key, ta);
         ta.addEventListener('input', function(){
             clearTimeout(this._saveTimeout);
             var self = this;
@@ -1092,6 +1093,13 @@ function basculerStrike(tr){
 async function supprimerLigne(tr){
     if(!confirm('Delete this row?')) return;
     var idx = tr.dataset.row;
+    var taList = tr.querySelectorAll('textarea');
+    var parts = [];
+    for(var c = 0; c < taList.length; c++){
+        var val = taList[c].value.trim();
+        if(val) parts.push(SHIP_COLS[c] + '=' + val);
+    }
+    if(parts.length) ajouterLog('Ship deleted', '', parts.join(', '));
     for(var c = 0; c < SHIP_COLS.length; c++){
         var k = shipKey(idx, c);
         localStorage.removeItem(k);
