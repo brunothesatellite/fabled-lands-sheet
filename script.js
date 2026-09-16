@@ -1068,7 +1068,7 @@ function creerLigneShip(idx){
             var self = this;
             this._saveTimeout = setTimeout(function(){ ecrirePreference(self.dataset.key, self.value); }, 400);
         });
-        ta.addEventListener('change', function(){
+        ta.addEventListener('change', function(e){
             ecrirePreference(this.dataset.key, this.value);
             logChange(this.dataset.key, this.value);
             e.stopPropagation();
