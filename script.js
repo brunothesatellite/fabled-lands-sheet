@@ -616,51 +616,6 @@ document.getElementById('mapsDropdown').querySelector('.tab-dropdown-toggle').ad
     }
 });
 
-const adventureSheetPanel = document.getElementById('panel-adventure-sheet');
-const adventureSheetLockToggle = document.getElementById('adventureSheetLockToggle');
-let adventureSheetLocked = true;
-
-function applyAdventureSheetLockMode(locked) {
-    if (!adventureSheetPanel || !adventureSheetLockToggle) return;
-
-    const fields = Array.from(adventureSheetPanel.querySelectorAll('[data-key]'));
-    fields.forEach(function(el) {
-        if (el.tagName === 'SELECT') {
-            el.disabled = locked;
-            el.setAttribute('aria-disabled', locked ? 'true' : 'false');
-            return;
-        }
-        if (el.type === 'checkbox' || el.type === 'radio') {
-            el.disabled = locked;
-            return;
-        }
-        if (el.type === 'text' || el.type === 'number' || el.type === 'textarea' || el.tagName === 'TEXTAREA') {
-            el.readOnly = locked;
-            el.disabled = false;
-        }
-    });
-
-    const stepperButtons = Array.from(adventureSheetPanel.querySelectorAll('.encounter-stepper-btn'));
-    stepperButtons.forEach(function(btn) {
-        btn.disabled = locked;
-    });
-
-    adventureSheetPanel.classList.toggle('adventure-sheet-locked', locked);
-    adventureSheetPanel.classList.toggle('adventure-sheet-editing', !locked);
-    adventureSheetLockToggle.textContent = locked ? '✏️' : '🔒';
-    adventureSheetLockToggle.setAttribute('aria-pressed', String(!locked));
-    adventureSheetLockToggle.title = locked ? 'Switch to edit mode' : 'Return to locked mode';
-}
-
-if (adventureSheetLockToggle) {
-    adventureSheetLockToggle.addEventListener('click', function() {
-        adventureSheetLocked = !adventureSheetLocked;
-        applyAdventureSheetLockMode(adventureSheetLocked);
-    });
-}
-
-applyAdventureSheetLockMode(adventureSheetLocked);
-
 /* Auto-save form fields */
 document.querySelectorAll('[data-key]').forEach(function(el) {
     if (!ALL_KEYS.includes(el.dataset.key)) ALL_KEYS.push(el.dataset.key);
@@ -1280,23 +1235,6 @@ function actualiserFight() {
     if (adventureDefence) meDefence.value = adventureDefence.value;
     if (adventureStamina) meStamina.value = adventureStamina.value;
 }
-
-document.querySelectorAll('.encounter-stepper-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-        var target = document.getElementById(this.dataset.target);
-        if (!target) return;
-        var step = parseInt(this.dataset.dir);
-        var min = parseInt(target.min);
-        var max = parseInt(target.max);
-        var val = parseInt(target.value) || 0;
-        val = val + step;
-        if (!isNaN(min)) val = Math.max(min, val);
-        if (!isNaN(max)) val = Math.min(max, val);
-        target.value = val;
-        target.dispatchEvent(new Event('input', { bubbles: true }));
-        target.dispatchEvent(new Event('change', { bubbles: true }));
-    });
-});
 
 document.getElementById('encounter-me-stamina').addEventListener('input', function() {
     var adventureStamina = document.querySelector('[data-key="fl-adventure-current-stamina"]');

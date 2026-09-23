@@ -39,9 +39,6 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .tab-panel.active{ display:block; }
 .panel-title{ margin:0; font:800 1.4rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--red); }
 .panel-title-row{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; border-bottom:2px solid var(--border); padding-bottom:.5rem; margin-bottom:1rem; }
-.adventure-sheet-lock-toggle{ width:2.7rem; height:2.7rem; border:2px solid var(--border); border-radius:50%; background:var(--paper); color:var(--ink); font:800 1.1rem/1 "Space Grotesk",sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,color .15s,transform .15s; }
-.adventure-sheet-lock-toggle:hover{ background:var(--yellow); transform:translateY(-1px); }
-.adventure-sheet-lock-toggle:focus-visible{ outline:2px solid var(--red); outline-offset:3px; }
 .log-clear-btn{ width:2.7rem; height:2.7rem; border:2px solid var(--border); border-radius:50%; background:var(--paper); color:var(--ink); font:800 1.1rem/1 "Space Grotesk",sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,color .15s,transform .15s; }
 .log-clear-btn:hover{ background:var(--red); color:var(--white); transform:translateY(-1px); }
 .section-title{ margin:1.5rem 0 .6rem; font:700 1rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--ink); letter-spacing:.04em; }
@@ -61,47 +58,6 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .form-textarea:focus{ outline:3px solid var(--yellow); outline-offset:2px; }
 
 /* Number inputs */
-#panel-adventure-sheet.adventure-sheet-locked .form-input,
-#panel-adventure-sheet.adventure-sheet-locked .form-textarea,
-#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-input,
-#panel-adventure-sheet.adventure-sheet-locked .form-grid input,
-#panel-adventure-sheet.adventure-sheet-locked .form-grid textarea,
-#panel-adventure-sheet.adventure-sheet-locked select{
-    background:var(--paper);
-    color:var(--muted);
-    cursor:default;
-    border-color:var(--border);
-    box-shadow:inset 0 0 0 1px var(--line);
-    -moz-appearance:textfield;
-}
-#panel-adventure-sheet.adventure-sheet-locked .form-input[readonly],
-#panel-adventure-sheet.adventure-sheet-locked .form-textarea[readonly],
-#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-input[readonly],
-#panel-adventure-sheet.adventure-sheet-locked .form-grid input[readonly],
-#panel-adventure-sheet.adventure-sheet-locked .form-grid textarea[readonly]{
-    background:var(--paper);
-    color:var(--muted);
-    cursor:default;
-    border-color:var(--border);
-    box-shadow:inset 0 0 0 1px var(--line);
-    -moz-appearance:textfield;
-}
-#panel-adventure-sheet.adventure-sheet-locked select:disabled,
-#panel-adventure-sheet.adventure-sheet-locked input:disabled,
-#panel-adventure-sheet.adventure-sheet-locked textarea:disabled{
-    background:var(--paper);
-    color:var(--muted);
-    cursor:default;
-    border-color:var(--border);
-    opacity:.88;
-}
-#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-btn:disabled,
-#panel-adventure-sheet.adventure-sheet-locked .encounter-stepper-btn[disabled]{
-    background:var(--paper);
-    color:var(--muted);
-    cursor:not-allowed;
-    opacity:.72;
-}
 .form-number{ -moz-appearance:textfield; text-align:center; font-weight:700; font-size:1.1rem; min-height:2.6rem; padding:.4rem .3rem; }
 .form-number::-webkit-inner-spin-button,.form-number::-webkit-outer-spin-button{ opacity:1; height:2.4rem; }
 @media (max-width:600px){ .form-number::-webkit-inner-spin-button,.form-number::-webkit-outer-spin-button{ height:2.2rem; } }
@@ -194,10 +150,6 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .encounter-stepper-input{ flex:1; min-width:0; border:none; border-radius:0; text-align:center; min-height:2.4rem; }
 .encounter-stepper-input::-webkit-inner-spin-button,.encounter-stepper-input::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
 .encounter-stepper-input{ -moz-appearance:textfield; }
-.encounter-stepper-btn{ flex:0 0 2.4rem; font:700 1.2rem/1 "Space Grotesk",sans-serif; color:var(--ink); background:var(--paper); border:none; border-left:1px solid var(--line); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .1s; -webkit-tap-highlight-color:transparent; }
-.encounter-stepper-btn:first-child{ border-left:none; border-right:1px solid var(--line); }
-.encounter-stepper-btn:hover{ background:var(--yellow); }
-.encounter-stepper-btn:active{ background:var(--ink); color:var(--white); }
 .form-field .encounter-stepper{ width:100%; }
 
 /* Dark theme overrides */
@@ -206,9 +158,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 [data-theme="dark"] .ship-actions{ background:rgba(255,255,255,.03); }
 [data-theme="dark"] .tab-subitem:hover{ color:var(--paper); }
 [data-theme="dark"] .tab-recall:hover{ color:var(--paper); }
-[data-theme="dark"] .encounter-stepper-btn:hover{ color:var(--paper); }
 [data-theme="dark"] .ship-action-btn.active{ color:var(--paper); }
-[data-theme="dark"] .adventure-sheet-lock-toggle:hover{ color:var(--paper); }
 [data-theme="dark"] .user-menu button:hover{ background:#2e2d2a; }
 [data-theme="dark"] .tab:hover{ background:rgba(255,255,255,.06); }
 [data-theme="dark"] .map-image{ filter:brightness(0.82) contrast(1.05); }
