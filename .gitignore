@@ -5,3 +5,4 @@ forms_data.json
 api/preferences.db
 api/preferences.db-wal
 api/preferences.db-shm
+mockup-codewords.html

@@ -720,11 +720,17 @@ var codewords = [
 
 function genererCodewords() {
     var grid = document.getElementById('codewordsGrid');
+    var firstLetters = {};
     codewords.forEach(function(word, i) {
         var key = 'fl-codeword-' + i;
         ALL_KEYS.push(key);
         var item = document.createElement('div');
         item.className = 'codeword-item';
+        var letter = word.charAt(0).toUpperCase();
+        if (!firstLetters[letter]) {
+            firstLetters[letter] = true;
+            item.id = 'cw-' + letter;
+        }
         var cb = document.createElement('input');
         cb.type = 'checkbox';
         cb.id = key;
@@ -740,6 +746,45 @@ function genererCodewords() {
         item.appendChild(lbl);
         grid.appendChild(item);
     });
+    genererLetterBar(Object.keys(firstLetters).sort());
+}
+
+function genererLetterBar(letters) {
+    var bar = document.getElementById('letterBar');
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    letters.forEach(function(L) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'letter-btn';
+        b.textContent = L;
+        b.dataset.letter = L;
+        b.setAttribute('aria-label', 'Aller au premier codeword en ' + L);
+        b.setAttribute('aria-pressed', 'false');
+        b.addEventListener('click', function() {
+            var target = document.getElementById('cw-' + L);
+            if (!target) return;
+            target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+            bar.querySelectorAll('.letter-btn').forEach(function(x) {
+                x.classList.remove('active');
+                x.setAttribute('aria-pressed', 'false');
+            });
+            b.classList.add('active');
+            b.setAttribute('aria-pressed', 'true');
+            target.classList.remove('flash');
+            void target.offsetWidth;
+            target.classList.add('flash');
+            setTimeout(function() { target.classList.remove('flash'); }, reduceMotion ? 1600 : 1500);
+        });
+        bar.appendChild(b);
+    });
+
+    var tabBar = document.getElementById('tabBar');
+    function syncTabbarH() {
+        document.documentElement.style.setProperty('--tabbar-h', tabBar.offsetHeight + 'px');
+    }
+    syncTabbarH();
+    if (window.ResizeObserver) new ResizeObserver(syncTabbarH).observe(tabBar);
+    window.addEventListener('resize', syncTabbarH);
 }
 
 /* Book paragraphs */
