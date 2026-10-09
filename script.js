@@ -1,10 +1,17 @@
 const STORAGE_PREFIX = 'fl-';
 const ALL_KEYS = [];
+/* Recall buttons (last visited book / map) — persisted like any other preference */
+const RECALL_BOOK_KEY = 'fl-recall-book';
+const RECALL_MAP_KEY = 'fl-recall-map';
+ALL_KEYS.push(RECALL_BOOK_KEY, RECALL_MAP_KEY);
 const elementMap = new Map();
 var previousValues = {};
 var logtxt = null;
 
 function obtenirLabel(element, key) {
+    if (key === RECALL_BOOK_KEY) return 'Book Recall';
+    if (key === RECALL_MAP_KEY) return 'Map Recall';
+
     if (!element) return key;
 
     var codewordItem = element.closest('.codeword-item');
@@ -537,26 +544,77 @@ document.querySelectorAll('.tab[data-tab]').forEach(function(btn) {
     btn.addEventListener('click', function() { switchTab(this.dataset.tab); });
 });
 
+/* Recall helpers */
+function normaliserRecallBook(valeur) {
+    if (typeof valeur !== 'string') return null;
+    var m = valeur.trim().match(/^([1-9]\d?)$/);
+    return m ? m[1] : null;
+}
+
+function normaliserRecallMap(valeur) {
+    if (typeof valeur !== 'string') return null;
+    if (valeur.trim().toUpperCase() === 'W') return 'W';
+    var m = valeur.trim().match(/^([1-9]\d?)$/);
+    return m ? m[1] : null;
+}
+
+function appliquerRecallBook(valeur) {
+    var v = normaliserRecallBook(valeur);
+    if (!v) return;
+    var btn = document.getElementById('bookRecall');
+    btn.dataset.recallBook = v;
+    btn.textContent = '↩ ' + v;
+}
+
+function appliquerRecallMap(valeur) {
+    var v = normaliserRecallMap(valeur);
+    if (!v) return;
+    var btn = document.getElementById('mapRecall');
+    btn.dataset.recallMap = v;
+    btn.textContent = '↩ ' + v;
+}
+
+function definirRecallBook(valeur) {
+    var v = normaliserRecallBook(valeur);
+    if (!v || document.getElementById('bookRecall').dataset.recallBook === v) return;
+    appliquerRecallBook(v);
+    ecrirePreference(RECALL_BOOK_KEY, v);
+    logChange(RECALL_BOOK_KEY, v);
+}
+
+function definirRecallMap(valeur) {
+    var v = normaliserRecallMap(valeur);
+    if (!v || document.getElementById('mapRecall').dataset.recallMap === v) return;
+    appliquerRecallMap(v);
+    ecrirePreference(RECALL_MAP_KEY, v);
+    logChange(RECALL_MAP_KEY, v);
+}
+
+async function restaurerRecall(prefs) {
+    if (prefs) {
+        appliquerRecallBook(prefs[RECALL_BOOK_KEY]);
+        appliquerRecallMap(prefs[RECALL_MAP_KEY]);
+    } else {
+        appliquerRecallBook(await lirePreference(RECALL_BOOK_KEY));
+        appliquerRecallMap(await lirePreference(RECALL_MAP_KEY));
+    }
+    previousValues[RECALL_BOOK_KEY] = document.getElementById('bookRecall').dataset.recallBook;
+    previousValues[RECALL_MAP_KEY] = document.getElementById('mapRecall').dataset.recallMap;
+}
+
 document.querySelectorAll('.tab-subitem[data-tab]').forEach(function(btn) {
     btn.addEventListener('click', function() {
         var tab = this.dataset.tab;
-        if (tab && tab.indexOf('book') === 0 && tab.indexOf('book') >= 0) {
+        if (tab && tab.indexOf('book') === 0) {
             var match = tab.match(/book(\d+)/);
-            if (match) {
-                document.getElementById('bookRecall').textContent = '↩ ' + match[1];
-                document.getElementById('bookRecall').dataset.recallBook = match[1];
-            }
+            if (match) definirRecallBook(match[1]);
         }
         if (tab === 'map-world') {
-            document.getElementById('mapRecall').textContent = '↩ W';
-            document.getElementById('mapRecall').dataset.recallMap = 'W';
+            definirRecallMap('W');
         }
         if (tab && tab.indexOf('map-book') === 0) {
             var m = tab.match(/map-book(\d+)/);
-            if (m) {
-                document.getElementById('mapRecall').textContent = '↩ ' + m[1];
-                document.getElementById('mapRecall').dataset.recallMap = m[1];
-            }
+            if (m) definirRecallMap(m[1]);
         }
         switchTab(tab);
     });
@@ -1282,9 +1340,11 @@ async function initialiser() {
     if (phpDisponible && utilisateurLogue) {
         var prefs = await chargerToutesLesPreferences();
         if (prefs) restoreAll(prefs);
+        await restaurerRecall(prefs);
     } else {
         await chargerFormulaire();
         await chargerCheckboxes();
+        await restaurerRecall(null);
     }
 
     await chargerShipTable();

@@ -183,10 +183,11 @@ The JavaScript is organized into functional modules within a single file:
 | **Ship Actions** | `basculerStrike()` — toggles row strikethrough with rollback on save failure; `supprimerLigne()` — async row deletion with await; `ajouterLigneApres()` — inserts row below |
 | **Map Interaction** | Touch-aware pinch-to-zoom and drag panning for fullscreen maps |
 | **Import/Export** | `exporterDonnees()` creates a timestamped JSON blob; `traiterImport()` shared handler validates format, clears DB, writes data, and verifies each step |
+| **Recall Persistence** | The book/map recall buttons store their target in `fl-recall-book` / `fl-recall-map` (SQLite or localStorage), are restored at load by `restaurerRecall()`, and travel with export/import |
 | **PHP Detection** | `detecterPhp()` probes `api/auth.php?action=check` on load to determine backend availability |
 | **Session Heartbeat** | Periodic `apiFetch('check')` every 5 minutes to keep PHP session alive and prevent garbage collection |
 
-**Data key convention:** All stored values use the `fl-` prefix (e.g. `fl-adventure-name`, `fl-codeword-42`, `fl-book1-10-c0`). Keys are collected in the `ALL_KEYS` array at page load for bulk operations. Elements are registered in `elementMap` for O(1) lookup.
+**Data key convention:** All stored values use the `fl-` prefix (e.g. `fl-adventure-name`, `fl-codeword-42`, `fl-book1-10-c0`, `fl-recall-book`, `fl-recall-map`). Keys are collected in the `ALL_KEYS` array at page load for bulk operations. Elements are registered in `elementMap` for O(1) lookup. Keys without a bound element (like the recall indicators) are still exported, imported and cleared through `ALL_KEYS`.
 
 #### Styling
 
@@ -323,6 +324,8 @@ The database file `api/preferences.db` is gitignored and created automatically o
     "fl-adventure-name": "Roland",
     "fl-adventure-combat": "8",
     "fl-codeword-42": "1",
+    "fl-recall-book": "3",
+    "fl-recall-map": "W",
     "...": "..."
   }
 }
