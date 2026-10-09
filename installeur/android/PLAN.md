@@ -1,14 +1,14 @@
 # PLAN — APK Android pour Fabled Lands Sheet
 
 **Objectif** : produire `fabled-lands-sheet-<version>-android.apk` en réutilisant **exactement le
-mécanisme** de `D:\VS Code\dcc-sheet\installeur\android` :
+mécanisme** de `D:\VS_Code_Workspaces\dcc-sheet\installeur\android` :
 
 > WebView (origine `https://appassets.androidplatform.net`) + routage native des requêtes
 > (`AssetRouter`) + **PHP exécuté en WASM dans un Service Worker** (`php-cgi-wasm`) avec
 > persistance IDBFS (SQLite + sessions). **Aucune permission** (dont `INTERNET`) : l'app est
 > hors-ligne par construction.
 
-Référence : `D:\VS Code\dcc-sheet\installeur\android\` (ci‑dessous « dcc »).
+Référence : `D:\VS_Code_Workspaces\dcc-sheet\installeur\android\` (ci‑dessous « dcc »).
 
 ---
 
@@ -16,7 +16,7 @@ Référence : `D:\VS Code\dcc-sheet\installeur\android\` (ci‑dessous « dcc »
 
 | Besoin | Élément du projet | Verdict |
 |---|---|---|
-| Statique SPA | `index.html`, `script.js`, `style.css`, `style-auth.css`, `favicon*.svg`, `maps/*.png` | servi par `AssetRouter` depuis `assets/www/` |
+| Statique SPA | `index.html`, `script.js`, `style.css`, `style-auth.css`, `favicon*.svg`, `maps/*.webp` | servi par `AssetRouter` depuis `assets/www/` |
 | PHP (pages) | `login.php`, `register.php`, `change-password.php` | exécutés par le Service Worker |
 | PHP (API) | `api/auth.php`, `api/db.php` | idem |
 | SQLite3 | `new SQLite3(__DIR__.'/preferences.db')`, WAL, FK | **php-wasm-sqlite** (`.so` en IDBFS) |
@@ -123,7 +123,8 @@ fabled-lands-sheet/
    `all.min.css` référence ses fontes en `url(../webfonts/fa-solid-900.woff2?v=6.5.2)` :
    servies à `/ajax/libs/font-awesome/6.5.2/webfonts/…` → **mêmes routes, aucun ajout**.
    (la query `?v=` est ignorée : le routeur ne travaille que sur `getPath()`).
-2. **Onglets/maps** : rien à faire côté routeur (`maps/*.png` sont des statiques sous `/fl-sheet/`).
+2. **Onglets/maps** : rien à faire côté routeur (`maps/*.webp` sont des statiques sous `/fl-sheet/` ;
+   `.webp` est déjà dans `STATIC_EXT` + le MIME `image/webp` côté dcc).
 3. **Thème sombre** : dcc force les barres système claires. Fabled a un toggle dark →
    *amélioration optionnelle* : bridge JS `FlBridge.setDark(bool)` appelé par `script.js`
    (hors périmètre MVP, voir §8).
@@ -282,7 +283,7 @@ Assertions bloquantes :
 const required = [
   'www/index.html', 'www/login.php', 'www/register.php', 'www/change-password.php',
   'www/api/auth.php', 'www/api/db.php',
-  'www/maps/world.png', 'www/maps/book7.png',          // les 8 cartes
+  'www/maps/world.webp', 'www/maps/book7.webp',        // les 8 cartes (WebP lossy q80)
   'www/style.css', 'www/style-auth.css', 'www/script.js', 'www/favicon.svg',
   'poc/boot.html', 'poc/cgi-worker.mjs', 'poc/lib-manifest.mjs', 'poc/manifest.json',
   'vendor/php-cgi-wasm/PhpCgiWorker.mjs', 'vendor/php-cgi-wasm/php8.4-cgi-worker.mjs',
@@ -337,7 +338,7 @@ Gates (adaptées de `run.js`, Fabled‑specific) :
 | **Phase B** (restart navigateur) | G7 session persistante · G8 2ᵉ compte créé · G9 double inscription refusée (BDD vivante) |
 | G10 | import bulk : `set_all_preferences` avec 1 020 clés en < 5 s (valide le patch stdin) |
 | G11 | export : `createObjectURL` + `download=` produit le JSON horodaté |
-| G12 | les 8 `maps/*.png` ont `naturalWidth > 0` (hors-ligne) |
+| G12 | les 8 `maps/*.webp` ont `naturalWidth > 0` (hors-ligne) |
 
 ### 6.2 APK
 ```
@@ -363,9 +364,9 @@ adb install -r "dist\fabled-lands-sheet-1.14-android.apk"
 1. **Font Awesome** : seul vrai écart fonctionnel vs dcc. Si `all.min.css` s'avère piloté par des
    chemins absus (`url(/webfonts/…)`), basculer sur le branchement `css/all.min.css` réécrit.
    *Critère de validation : aucun `404` dans `logcat` sur `/ajax/libs/font-awesome/…`.*
-2. **Poids des 8 cartes PNG** : `aapt2` ne compresse pas les PNG → l'APK pèsera le poids réel de
-   `maps/` + vendor (wasm ≈ 10 Mo) + FA. Mesurer à la 1ʳᵉ compilation ; si > 40 Mo, envisager une
-   recompression des cartes (outil externe, hors sync).
+2. **Poids des 8 cartes** : **résolu** — `maps/` converti de PNG en WebP lossy q80 (`maps/*.webp`),
+   3,8 Mo au lieu de 26,1 Mo. `aapt2` stocke le WebP tel quel ; l'APK pèsera 3,8 Mo (cartes) +
+   vendor (wasm ≈ 10 Mo) + FA, donc ≈ 20 Mo. Plus rien à recompresser.
 3. **SQLite en WAL sur IDBFS** : prouvé par dcc (`data/dcc.db`), mais Fabled crée le fichier
    *directement* dans `api/` → le dossier doit exister **avant** la 1ʳᵉ requête : c'est le rôle du
    `mkdir('/persist/www/api')` de `boot.html` (assertion).
