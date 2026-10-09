@@ -1,0 +1,19 @@
+{
+  "name": "fabled-lands-android-poc",
+  "private": true,
+  "type": "module",
+  "description": "POC webapp PHP (php-cgi-wasm en Service Worker) pour la future application Android",
+  "scripts": {
+    "start": "node server.js",
+    "postinstall": "node _patch-php-wasm.mjs",
+    "test": "node run.js"
+  },
+  "dependencies": {
+    "php-cgi-wasm": "0.2.0",
+    "php-wasm-sqlite": "0.2.0",
+    "quickbus": "1.1.0"
+  },
+  "devDependencies": {
+    "puppeteer-core": "25.13.0"
+  }
+}

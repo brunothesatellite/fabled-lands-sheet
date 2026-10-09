@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>POC fabled-lands-sheet — amorcage</title>
+<style>
+  body { font: 14px/1.55 Consolas, monospace; background: #101418; color: #d7dde4; padding: 24px; max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 17px; color: #7fb4ff; }
+  #log { white-space: pre-wrap; background: #171c22; border: 1px solid #2a323c; border-radius: 6px; padding: 12px; min-height: 6em; }
+  .err { color: #ff8080; }
+</style>
+</head>
+<body>
+<h1>POC fabled-lands-sheet — amorcage PHP/WASM (Service Worker)</h1>
+<pre id="log"></pre>
+<script type="module">
+import { Client } from '/poc/vendor/quickbus/index.mjs';
+import { LIB_DIR, SHARED_LIBS } from '/poc/lib-manifest.mjs';
+
+const logEl = document.getElementById('log');
+const log = (msg, cls) => {
+  logEl.innerHTML += (cls ? `<span class="${cls}">${msg}</span>\n` : msg + '\n');
+  console.log('[boot]', msg);
+};
+
+/* Toute l'API PHP + les pages PHP servies par navigation. */
+const PHP_SOURCES = [
+  'login.php',
+  'register.php',
+  'change-password.php',
+  'api/db.php',
+  'api/auth.php',
+];
+
+try {
+  /* 1. Enregistrer le Service Worker. La page d'amorçage vit dans la
+        portee /fl-sheet/ : indispensable, car navigator.serviceWorker
+        .ready attend une registration couvrant l'URL de la page. */
+  log('Enregistrement du Service Worker…');
+  const reg = await navigator.serviceWorker.register('/fl-sheet/cgi-worker.mjs', {
+    type: 'module',
+    updateViaCache: 'none',
+  });
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const deadline = Date.now() + 90000;
+  while (!reg.active && Date.now() < deadline) {
+    if (reg.redundant) break;
+    await sleep(100);
+  }
+  if (!reg.active) {
+    throw new Error('Service Worker non actif apres 90s (state='
+      + (reg.installing ? reg.installing.state
+        : reg.waiting ? 'waiting'
+        : reg.redundant ? 'redundant' : 'aucune registration') + ')');
+  }
+  log('Service Worker actif.');
+
+  /* 3. Pont page -> SW (protocole quickbus natif php-cgi-wasm).
+        Chaque operation FS = transaction IDBFS : hydrate -> op -> flush,
+        donc les dossiers et sources ecrits ici persistent en IndexedDB. */
+  const bus = Client.forServiceWorkerRegistration(reg);
+
+  const manifest = await (await fetch('/poc/manifest.json')).json();
+
+  /* Stamp de version : ecrit EN DERNIER (marqueur de commit).
+     - serveur du POC : pas de version -> reecriture complete a chaque
+       passage (comportement historique du POC) ;
+     - APK : stamp different a chaque build -> reecriture unique apres
+       mise a jour (pas de code stale dans l'IDB WebView conservee) ;
+     - stamp identique : demarrage rapide, aucun ecrit. */
+  let stampNow = null;
+  try {
+    const r = await bus.readFile('/config/app-version', { encoding: 'utf8' });
+    stampNow = typeof r === 'string' ? r : new TextDecoder().decode(new Uint8Array(r));
+  } catch { stampNow = null; }
+  const fresh = !manifest.version || stampNow !== manifest.version;
+
+  if (!fresh) {
+    log('Stamp identique (' + stampNow + ') : sources et .so deja presents.');
+  } else {
+    log('Amorcage complet (stamp emis=' + (manifest.version || 'sans version')
+      + ', lu=' + stampNow + ').');
+
+    /* Sources PHP brutes : route /poc/php-src/ hors portee du SW. */
+    const sources = await Promise.all(PHP_SOURCES.map(async (name) => {
+      const r = await fetch('/poc/php-src/' + name);
+      if (!r.ok) throw new Error('source ' + name + ' : HTTP ' + r.status);
+      return { name, bytes: new Uint8Array(await r.arrayBuffer()) };
+    }));
+    log(sources.length + ' sources PHP chargees.');
+
+    const dirs = [
+      '/persist/www',
+      '/persist/www/api',
+      '/persist/sessions',
+      '/persist/tmp',
+      LIB_DIR,
+    ];
+    let created = 0;
+    let existing = 0;
+    for (const dir of dirs) {
+      try { await bus.mkdir(dir, 0o777); created++; }
+      catch { existing++; } /* deja cree (execution precedente) : normal */
+    }
+    log(created + '/' + dirs.length + ' dossiers FS crees'
+      + (existing ? ' (' + existing + ' existants)' : '') + '.');
+
+    for (const src of sources) {
+      const slash = src.name.lastIndexOf('/');
+      /* slice(0, slash + 1) conserve le '/' final : 'api/db.php' -> parent
+         '/persist/www/api/' (sinon : '/persist/www/apidb.php' inexistant). */
+      const parent = '/persist/www/' + (slash === -1 ? '' : src.name.slice(0, slash + 1));
+      await bus.writeFile(parent + src.name.slice(slash + 1), src.bytes);
+    }
+    log(sources.length + ' sources PHP ecrites dans /persist/www (IDBFS).');
+
+    /* Script de diagnostic : quelles extensions PHP sont reellement
+       disponibles (statiques dans le wasm vs dynamiques via .so). */
+    const diag = `<?php
+header('Content-Type: text/plain; charset=utf-8');
+echo 'php=' . PHP_VERSION . PHP_EOL;
+foreach (get_loaded_extensions() as $e) { echo 'ext:' . $e . PHP_EOL; }
+foreach (['sqlite3','pdo_sqlite','gd','zip','mbstring','zlib'] as $e) {
+  echo 'chk:' . $e . '=' . (extension_loaded($e) ? 'OUI' : 'non') . PHP_EOL;
+}
+foreach (['SQLite3','password_hash','password_verify','session_start'] as $f) {
+  $ok = function_exists($f) || class_exists($f);
+  echo 'fn:' . $f . '=' . ($ok ? 'OUI' : 'non') . PHP_EOL;
+}
+`;
+    await bus.writeFile('/persist/www/_diag.php', new TextEncoder().encode(diag));
+    log('Script _diag.php ecrit.');
+
+    /* .so des extensions dynamiques dans LIB_DIR (IDBFS) : ecriture
+       FORCEE a chaque amorcage complet (stamp change = nouveau build). */
+    let soWritten = 0;
+    for (const lib of SHARED_LIBS) {
+      const r = await fetch('/poc/vendor/' + lib.pkg + '/' + lib.file);
+      if (!r.ok) throw new Error('.so ' + lib.pkg + '/' + lib.file + ' : HTTP ' + r.status);
+      await bus.writeFile(LIB_DIR + '/' + lib.file, new Uint8Array(await r.arrayBuffer()));
+      soWritten++;
+    }
+    log(soWritten + ' .so ecrits dans ' + LIB_DIR + '.');
+
+    /* Stamp EN DERNIER : en cas d'arret en cours, le prochain passage
+       reprend un amorcage complet. */
+    await bus.writeFile('/config/app-version',
+      new TextEncoder().encode(String(manifest.version)));
+    log('Stamp ecrit (' + manifest.version + ').');
+  }
+
+  /* 7. Rediriger vers l'application (nouvelle navigation :
+        le SW la controlera, sa portee couvre /fl-sheet/). */
+  log('Redirection vers /fl-sheet/ …');
+  location.replace('/fl-sheet/');
+} catch (err) {
+  log('ERREUR : ' + (err && (err.stack || err.message) || err), 'err');
+}
+</script>
+</body>
+</html>
