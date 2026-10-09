@@ -18,6 +18,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO = path.resolve(__dirname, '..', '..', '..');
 const POC_PUBLIC = path.join(__dirname, 'public');
 const NM = path.join(__dirname, 'node_modules');
+const FA_DIR = path.resolve(__dirname, '..', 'fa'); // installeur/android/fa
 
 /* Dossiers/fichiers hors webapp (meme filtre que _sync-assets.mjs) */
 const BLOCK_DIRS = new Set([
@@ -119,6 +120,17 @@ export function startServer(port = 0) {
         if (rel === '' || rel === 'boot.html' || !path.extname(rel)) rel = rel || 'boot.html';
         const file = path.resolve(POC_PUBLIC, rel);
         if (!file.startsWith(POC_PUBLIC)) return send(res, 403, 'refuse');
+        return serveFile(res, file);
+      }
+
+      /* Route Font Awesome locale : meme chemin que AssetRouter
+         (/ajax/libs/font-awesome/* -> fa/*) — index.html reference
+         cdnjs, l'APK n'ayant pas INTERNET le routeur sert assets/fa/. */
+      if (p.startsWith('/ajax/libs/font-awesome/')) {
+        const rel = p.slice('/ajax/libs/font-awesome/'.length);
+        if (!rel || rel.includes('..')) return send(res, 404, 'refuse');
+        const file = path.resolve(FA_DIR, rel);
+        if (!file.startsWith(FA_DIR)) return send(res, 403, 'refuse');
         return serveFile(res, file);
       }
 

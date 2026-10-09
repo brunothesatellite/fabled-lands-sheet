@@ -15,6 +15,8 @@
       G10 import bulk : 1020 cles en < 5 s (patch stdin O(1))
       G11 export : createObjectURL + download= -> JSON horodate
       G12 les 8 maps/*.webp se chargent (naturalWidth > 0)
+      G13 route FA locale (/ajax/libs/font-awesome/*) : CSS servi
+          et url(../webfonts/fa-*.woff2) resolvent (mirror AssetRouter)
    Bloque les polices Google ET cdnjs (simulation hors-ligne totale :
    la webapp doit rester utilisable sans Internet).
    ============================================================ */
@@ -346,6 +348,46 @@ try {
     const broken = maps.filter((m) => !(m.w > 0));
     if (broken.length) throw new Error('non chargees : ' + JSON.stringify(broken));
     return maps.map((m) => `${m.src} ${m.w}x${m.h}`).join(', ');
+  });
+
+  /* G13 — route Font Awesome locale : meme chemin que AssetRouter
+     (/ajax/libs/font-awesome/* -> fa/*). Le CDN est bloque par
+     host-resolver-rules (G1) : on fetch depuis l'origine du POC pour
+     prouver que le CSS est servi et que ses fontes resolvent. */
+  await attempt('G13 route FA locale : all.min.css servi + fontes resolues', async () => {
+    const r = await page.evaluate(async () => {
+      const cssPath = '/ajax/libs/font-awesome/6.5.2/css/all.min.css';
+      const res = await fetch(cssPath, { credentials: 'same-origin' });
+      if (!res.ok) return { err: `CSS HTTP ${res.status}` };
+      const type = res.headers.get('content-type') || '';
+      if (!type.includes('text/css')) return { err: 'content-type=' + type };
+      const css = await res.text();
+      if (!css.includes('.fa-solid')) return { err: 'CSS incomplet' };
+
+      /* url(../webfonts/fa-*.woff2) : memes references que celles
+         extraites par _fetch-fontawesome.mjs, resolues contre l'URL
+         du CSS (comme le ferait le WebView). */
+      const refs = [...new Set([...css.matchAll(/url\((["']?)(\.\.\/webfonts\/fa-[\w-]+\.woff2)\1\)/g)]
+        .map((m) => m[2]))];
+      if (!refs.length) return { err: 'aucun url(../webfonts/fa-*.woff2)' };
+
+      const fonts = [];
+      for (const rel of refs) {
+        const abs = new URL(rel, new URL(cssPath, location.origin));
+        const fr = await fetch(abs);
+        const buf = fr.ok ? await fr.arrayBuffer() : null;
+        fonts.push({
+          rel: rel.split('/').pop(), status: fr.status,
+          type: fr.headers.get('content-type') || '', bytes: buf ? buf.byteLength : 0,
+        });
+      }
+      return { cssBytes: css.length, fonts };
+    });
+    if (r.err) throw new Error(r.err);
+    const bad = r.fonts.filter((f) => f.status !== 200
+      || !(f.bytes > 0) || !f.type.includes('font/woff2'));
+    if (bad.length) throw new Error('fontes en echec : ' + JSON.stringify(bad));
+    return `css=${r.cssBytes}o, ` + r.fonts.map((f) => `${f.rel} ${Math.round(f.bytes / 1024)}Ko`).join(', ');
   });
 
   await new Promise((r) => setTimeout(r, 1500)); // laisse le temps aux syncs IDBFS
