@@ -6,3 +6,5 @@ api/preferences.db
 api/preferences.db-wal
 api/preferences.db-shm
 mockup-codewords.html
+node_modules/
+package-lock.json
