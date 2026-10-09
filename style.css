@@ -74,6 +74,17 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .codeword-item{ display:flex; align-items:center; gap:.4rem; padding:.3rem .4rem; background:var(--white); border:1px solid var(--line); font-size:.75rem; }
 .codeword-item input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--red); cursor:pointer; flex-shrink:0; }
 .codeword-item label{ cursor:pointer; user-select:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.letter-bar{ position:sticky; top:var(--tabbar-h,0px); z-index:99; display:flex; justify-content:center; gap:.3rem; flex-wrap:wrap; padding:.45rem .3rem; margin:.6rem 0 .7rem; background:var(--paper); border-top:2px solid var(--border); border-bottom:2px solid var(--border); }
+.letter-btn{ min-width:2.4rem; min-height:2.4rem; padding:.2rem .5rem; font:700 1rem "Barlow Condensed",sans-serif; letter-spacing:.04em; color:var(--ink); background:var(--white); border:2px solid var(--border); cursor:pointer; transition:background .15s,color .15s,transform .1s; }
+.letter-btn:hover{ background:var(--yellow); transform:translateY(-1px); }
+.letter-btn:focus-visible{ outline:3px solid var(--yellow); outline-offset:2px; }
+.letter-btn.active{ background:var(--red); border-color:var(--red); color:var(--white); }
+.codeword-item.flash{ animation:codewordFlash 1.4s ease; }
+@keyframes codewordFlash{
+    0%{ background:var(--yellow); border-color:var(--red); box-shadow:0 0 0 2px var(--red); }
+    100%{ background:var(--white); border-color:var(--line); box-shadow:none; }
+}
+@media (prefers-reduced-motion:reduce){ .codeword-item.flash{ animation:none; background:var(--yellow); } }
 
 /* Paragraphs */
 .paragraphs-list{ display:flex; flex-direction:column; gap:.3rem; }
@@ -178,6 +189,8 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
     .masthead{ padding:.6rem .8rem; }
     h1{ font-size:1.2rem; }
     .codewords-grid{ grid-template-columns:repeat(2,1fr); }
+    .letter-bar{ gap:.2rem; padding:.4rem .2rem; margin:.5rem 0 .6rem; }
+    .letter-btn{ min-width:40px; min-height:40px; font-size:1.05rem; }
     .user-menu{ right:0; left:auto; min-width:0; max-width:calc(100vw - 1rem); }
 
     .tab-bar{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); grid-template-rows:auto auto; flex-wrap:nowrap; overflow-x:hidden; row-gap:.25rem; align-items:stretch; }
