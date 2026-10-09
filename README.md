@@ -177,7 +177,7 @@ The JavaScript is organized into functional modules within a single file:
 | **Sequential Restore** | `chargerFormulaire()` + `chargerCheckboxes()` — restores elements one by one via `elementMap.get()` (used in anonymous mode) |
 | **Toast Notifications** | `showToast()`, `showToastSave()`, `afficherToast()` — non-intrusive feedback for save/load/error actions |
 | **Dice Roller** | 3D dice with Web Audio API sound effects, randomized via `Math.random()` |
-| **Codewords** | `genererCodewords()` dynamically generates 265 codeword checkboxes from a hardcoded array |
+| **Codewords** | `genererCodewords()` dynamically generates 265 codeword checkboxes from a hardcoded array; a "Display only checked codewords" filter (`appliquerFiltreCodewords()`) hides unchecked items — kept in memory for the session, never persisted |
 | **Book Paragraphs** | `genererParagraphes()` builds paragraph tables + note panels from `bookData` object; paragraphs are grouped by note boundaries |
 | **Ship Table** | `genererShipTable()`, `creerLigneShip()`, `chargerLigneShip()`, `chargerShipTable()` — dynamic row creation with strike/delete/add actions; restored in parallel via `Promise.all()` |
 | **Ship Actions** | `basculerStrike()` — toggles row strikethrough with rollback on save failure; `supprimerLigne()` — async row deletion with await; `ajouterLigneApres()` — inserts row below |

@@ -776,6 +776,37 @@ var codewords = [
     "Grub","Guard","Guilt","Guise","Gulf","Gully","Gush"
 ];
 
+/* Codeword display filter — visual only, never persisted (no data-key, not in ALL_KEYS) */
+var filtreCodewords = document.getElementById('onlyCheckedCodewords');
+
+function appliquerFiltreCodewords() {
+    var seulementCochees = filtreCodewords.checked;
+    document.querySelectorAll('#codewordsGrid .codeword-item').forEach(function(item) {
+        var cb = item.querySelector('input[type="checkbox"]');
+        item.hidden = seulementCochees && !(cb && cb.checked);
+    });
+}
+
+filtreCodewords.addEventListener('change', appliquerFiltreCodewords);
+
+/* Keep the filter in sync when a codeword is checked/unchecked while it is active */
+document.getElementById('codewordsGrid').addEventListener('change', function(e) {
+    if (!filtreCodewords.checked) return;
+    if (e.target && e.target.matches('input[type="checkbox"]')) appliquerFiltreCodewords();
+});
+
+/* First visible codeword whose letter is >= the requested one (used when the filter hides targets) */
+function premierCodewordVisible(lettre) {
+    var items = document.querySelectorAll('#codewordsGrid .codeword-item');
+    for (var i = 0; i < items.length; i++) {
+        if (items[i].hidden) continue;
+        var lbl = items[i].querySelector('label');
+        var L = lbl ? lbl.textContent.charAt(0).toUpperCase() : '';
+        if (L >= lettre) return items[i];
+    }
+    return null;
+}
+
 function genererCodewords() {
     var grid = document.getElementById('codewordsGrid');
     var firstLetters = {};
@@ -820,6 +851,7 @@ function genererLetterBar(letters) {
         b.setAttribute('aria-pressed', 'false');
         b.addEventListener('click', function() {
             var target = document.getElementById('cw-' + L);
+            if (!target || target.hidden) target = premierCodewordVisible(L);
             if (!target) return;
             target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
             bar.querySelectorAll('.letter-btn').forEach(function(x) {

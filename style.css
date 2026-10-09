@@ -38,7 +38,9 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 .tab-panel{ display:none; }
 .tab-panel.active{ display:block; }
 .panel-title{ margin:0; font:800 1.4rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--red); }
-.panel-title-row{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; border-bottom:2px solid var(--border); padding-bottom:.5rem; margin-bottom:1rem; }
+.panel-title-row{ display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; border-bottom:2px solid var(--border); padding-bottom:.5rem; margin-bottom:1rem; }
+.codewords-filter{ display:flex; align-items:center; gap:.45rem; font:700 .78rem "Barlow Condensed",sans-serif; text-transform:uppercase; letter-spacing:.04em; color:var(--ink); cursor:pointer; user-select:none; }
+.codewords-filter input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--red); cursor:pointer; flex-shrink:0; }
 .log-clear-btn{ width:2.7rem; height:2.7rem; border:2px solid var(--border); border-radius:50%; background:var(--paper); color:var(--ink); font:800 1.1rem/1 "Space Grotesk",sans-serif; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .15s,color .15s,transform .15s; }
 .log-clear-btn:hover{ background:var(--red); color:var(--white); transform:translateY(-1px); }
 .section-title{ margin:1.5rem 0 .6rem; font:700 1rem/1 "Barlow Condensed",sans-serif; text-transform:uppercase; color:var(--ink); letter-spacing:.04em; }
@@ -72,6 +74,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 /* Codewords */
 .codewords-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:.3rem; }
 .codeword-item{ display:flex; align-items:center; gap:.4rem; padding:.3rem .4rem; background:var(--white); border:1px solid var(--line); font-size:.75rem; }
+.codeword-item[hidden]{ display:none; }
 .codeword-item input[type="checkbox"]{ width:16px; height:16px; accent-color:var(--red); cursor:pointer; flex-shrink:0; }
 .codeword-item label{ cursor:pointer; user-select:none; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .letter-bar{ position:sticky; top:var(--tabbar-h,0px); z-index:99; display:flex; justify-content:center; gap:.3rem; flex-wrap:wrap; padding:.45rem .3rem; margin:.6rem 0 .7rem; background:var(--paper); border-top:2px solid var(--border); border-bottom:2px solid var(--border); }
