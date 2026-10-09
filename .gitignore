@@ -8,3 +8,12 @@ api/preferences.db-shm
 mockup-codewords.html
 node_modules/
 package-lock.json
+
+# --- installeur Android (artefacts de build, voir installeur/android/_build-android.ps1) ---
+installeur/android/.gradle/
+installeur/android/build/
+installeur/android/app/build/
+installeur/android/app/src/main/assets/
+installeur/android/local.properties
+installeur/android/keystore/
+installeur/android/dist/
