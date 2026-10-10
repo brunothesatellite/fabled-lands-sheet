@@ -312,6 +312,15 @@ env (`JAVA_HOME` = JBR d'Android Studio, `ANDROID_HOME` = `%LOCALAPPDATA%\Androi
 -PappVersionName=…`, création keystore si absent, `apksigner sign` + `verify`, taille en Mo,
 ligne `adb install -r "<apk>"`.
 
+**Durcissement (constaté le 10/10/2026)** : les JVM (conscrypt) avertissent sur stderr, et
+selon le mode d'invocation (`powershell -Command`) PowerShell les transforme en `ErrorRecord`
+terminant sous `$ErrorActionPreference='Stop'` → le script abandonnait **après** `Copy-Item`,
+laissant dans `dist/` un fichier au nom du livrable mais **non signé**. Deux garde-fous :
+`Run-Native` (EAP temporairement `Continue` sur gradlew/keytool/apksigner, code retour lu via
+`$LASTEXITCODE` au point d'appel) et signature **en 2 temps** (sign + verify dans un fichier
+temporaire, `dist/` ne reçoit que l'APK vérifié). Reproductible par :
+`powershell -Command "& '.\_build-android.ps1' -Debug"` → doit ressortir `EXIT=0`.
+
 ### É7 — `make-android-icons.ps1`
 Génère les 5 mipmaps (`ic_launcher.png`, `ic_launcher_foreground.png`),
 `mipmap-anydpi-v26/ic_launcher.xml` et `values/ic_launcher_colors.xml`.

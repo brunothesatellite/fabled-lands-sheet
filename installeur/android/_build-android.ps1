@@ -25,6 +25,22 @@ $ErrorActionPreference = 'Stop'
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $here
 
+# Run-Native <scriptblock> : execute une commande JVM (gradlew / keytool /
+# apksigner) sans interrompre le script.
+# Les JVM (conscrypt) avertissent sur stderr ; selon le mode d'invocation
+# (notamment `powershell -Command`), PowerShell convertit ce stderr en
+# ErrorRecord et $ErrorActionPreference='Stop' interrompt le script EN PLEIN
+# MILIEU de la signature — dist/ contenait alors un APK au nom du livrable
+# mais NON signe (constate le 10/10/2026).
+# La sortie (gradle, apksigner) est laissee intacte : on lit ensuite
+# $LASTEXITCODE au point d'appel (cumuler sortie + code ici formerait un
+# tableau, et `$tab -ne 0` FILTRE au lieu de comparer).
+function Run-Native([scriptblock]$cmd) {
+    $eap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try { & $cmd } finally { $ErrorActionPreference = $eap }
+}
+
 # --- 1. Environnement -------------------------------------------------
 $androidStudio = 'C:\Program Files\Android\Android Studio'
 $javaHome = Join-Path $androidStudio 'jbr'
@@ -60,7 +76,7 @@ if ($Debug) {
 }
 $gradlew = Join-Path $here 'gradlew.bat'
 if (-not (Test-Path $gradlew)) { throw "gradlew.bat absent (wrapper Gradle non installe)" }
-& $gradlew @gradleArgs
+Run-Native { & $gradlew @gradleArgs }
 if ($LASTEXITCODE -ne 0) { throw "gradle build en echec ($LASTEXITCODE)" }
 
 # --- 4. Keystore de signature (sideload) -------------------------------
@@ -74,9 +90,9 @@ $dname = 'CN=Fabled Lands Sheet, OU=Local, O=Local, C=FR'
 if (-not (Test-Path $ks)) {
     New-Item -ItemType Directory -Force -Path $ksDir | Out-Null
     $keytool = Join-Path $javaHome 'bin\keytool.exe'
-    & $keytool -genkeypair -v -keystore $ks -alias $aliasName `
+    Run-Native { & $keytool -genkeypair -v -keystore $ks -alias $aliasName `
         -keyalg RSA -keysize 2048 -validity 10000 `
-        -storepass $storePass -keypass $keyPass -dname $dname
+        -storepass $storePass -keypass $keyPass -dname $dname }
     if ($LASTEXITCODE -ne 0) { throw 'keytool : creation du keystore echouee' }
     Write-Host "Keystore cree : $ks  (A CONSERVER - perte = re-signature + mise a jour impossible)" -ForegroundColor Yellow
 } else {
@@ -105,11 +121,22 @@ if ($Debug) {
 }
 if (-not (Test-Path $built)) { throw "APK construit introuvable : $built" }
 
-Copy-Item $built $out -Force
-& $apksigner sign --ks $ks --ks-key-alias $aliasName `
-    --ks-pass "pass:$storePass" --key-pass "pass:$keyPass" $out
-if ($LASTEXITCODE -ne 0) { throw 'apksigner en echec' }
-& $apksigner verify --print-certs $out | Out-Null
+# Signature en 2 temps : on ne recopie dans dist/ qu'un APK signe ET verifie.
+# Sinon, une interruption (cf. Run-Native) laisse dist/ avec un fichier qui a
+# le nom du livrable mais aucune signature — installable = plantage.
+$stage = Join-Path $env:TEMP ('fl-sign-' + [guid]::NewGuid().ToString('N') + '.apk')
+Copy-Item $built $stage -Force
+
+Run-Native { & $apksigner sign --ks $ks --ks-key-alias $aliasName `
+    --ks-pass "pass:$storePass" --key-pass "pass:$keyPass" $stage }
+if ($LASTEXITCODE -ne 0) { throw "apksigner sign en echec ($LASTEXITCODE)" }
+Run-Native { & $apksigner verify --print-certs $stage | Out-Null }
+if ($LASTEXITCODE -ne 0) { throw "apksigner verify en echec ($LASTEXITCODE)" }
+
+Copy-Item $stage $out -Force
+$idsig = "$stage.idsig"
+if (Test-Path $idsig) { Copy-Item $idsig "$out.idsig" -Force }
+Remove-Item $stage, $idsig -Force -ErrorAction SilentlyContinue
 
 $size = [math]::Round((Get-Item $out).Length / 1MB, 1)
 Write-Host ''
