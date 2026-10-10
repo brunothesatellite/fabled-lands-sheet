@@ -78,6 +78,8 @@ fabled-lands-sheet/
         │   ├── package.json             php-cgi-wasm, php-wasm-sqlite, quickbus, puppeteer-core
         │   ├── server.js                serveur statique /fl-sheet/ + /poc/
         │   ├── run.js                   gates automatisées
+        │   ├── _check-masthead.mjs      non-regression geometrie masthead (5 largeurs)
+        │   ├── _test-device.mjs         recette §6.2 sur appareil (APK debug + CDP)
         │   └── public/
         │       ├── boot.html            page d'amorçage (SW + écriture IDBFS)
         │       ├── cgi-worker.mjs       Service Worker PHP
@@ -356,8 +358,13 @@ Gates (adaptées de `run.js`, Fabled‑specific) :
 .\_build-android.ps1 -Version 1.14 -Debug    # adb install rapide
 adb install -r "dist\fabled-lands-sheet-1.14-android.apk"
 ```
+**Recette automatisée** (D0–D9, installe l'APK debug — indispensable car le release n'autorise
+pas l'inspection de la WebView — puis pilote tout en CDP) :
+```
+cd poc && node _test-device.mjs              # SERIAL=xxx pour cibler un appareil
+```
 - Première ouverture : log jaune d'amorçage (`[boot] …`), redirection, app utilisable.
-- `adb logcat -s DCC` → renommer le tag en `FL` (constante `Log.d("FL", …)`).
+- `adb logcat -s FL` (tag déjà renommé dans `MainActivity`, constante `Log.d("FL", …)`).
 - Mode avion **activé avant le lancement** : la page se charge intégralement (aucune requête
   externe ne doit apparaître en `ERR_FAILED`).
 - Vérifs manuelles : register/login, reprise de session après redémarrage de l'app,
@@ -377,7 +384,7 @@ adb install -r "dist\fabled-lands-sheet-1.14-android.apk"
 | Icônes FA (risque #1) | ✅ après fix CORS — voir risque 1 |
 | 404 résiduels | 2 bénins : `/favicon.ico` (auto, `boot.html` n'a pas de `<link rel=icon>`) et `/poc/vendor/…/libxml2.so` (sondage optionnel de php-cgi-wasm, PHP fonctionne sans) |
 | Bug UI rapporté : bouton recouvrant le 2ᵉ dé | ✅ **corrigé** — voir ci-dessous |
-| register/login, session après redémarrage, `preferences.db` en IDB, export/import JSON, toggle dark, pinch-zoom | ⏳ à faire (téléphone indisponible) |
+| register/login, session après redémarrage, `preferences.db` en IDB, export/import JSON, toggle dark, pinch-zoom | ⏳ à faire (téléphone indisponible) — D4–D9 automatisés par `poc/_test-device.mjs`, reste manuel : import JSON (sélecteur de fichiers), pinch-zoom, mise à jour `versionCode` |
 
 **Bug UI corrigé (webapp, pas Android)** : en dessous de ~412 px, la rangée
 `logo + h1 + dés` déborde de la colonne `minmax(0,1fr)` de `.masthead` (le `h1` est
