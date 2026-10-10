@@ -569,6 +569,15 @@
 
 </main>
 
+<!-- Visionneuse de cartes : overlay unique (fond fixe immobile + croix),
+     see script.js - ouverte par clic sur une miniature .map-image -->
+<div id="mapViewer" class="map-viewer" hidden role="dialog" aria-modal="true" aria-label="Map viewer">
+    <img id="mapViewerImg" class="map-viewer-img" alt="" draggable="false">
+    <button id="mapViewerClose" class="map-viewer-close" type="button" aria-label="Close map">
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+    </button>
+</div>
+
 <script src="script.js"></script>
 </body>
 </html>

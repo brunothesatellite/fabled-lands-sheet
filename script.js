@@ -1252,111 +1252,193 @@ document.getElementById('shipAddTopBtn').addEventListener('click', function(){
     newRow.scrollIntoView({behavior:'smooth', block:'center'});
 });
 
-/* Map zoom */
-document.querySelectorAll('.map-image').forEach(function(img) {
-    img.addEventListener('click', function() {
-        if(this.classList.contains('fullscreen')){
-            this.classList.remove('fullscreen');
-            this.style.transform = '';
-            this._mapScale = 1;
-            this._mapX = 0;
-            this._mapY = 0;
-        } else {
-            this.classList.add('fullscreen');
-            this._mapScale = 1;
-            this._mapX = 0;
-            this._mapY = 0;
+/* Visionneuse de cartes : overlay plein ecran (fond fixe + croix), zoom et
+   deplacement unifies PC (molette + souris) et mobile (pinch + glisser).
+   Model repris de dcc-sheet (map-draw.js) : Pointer Events + capture,
+   pinch ancre au milieu des doigts, panning BORNE - et surtout le fond
+   n'EST PAS l'image : contrairement a l'ancien .map-image.fullscreen (ou
+   un glissement hors ecart emportait fond + carte et bloquait l'ecran),
+   ici la carte ne peut plus jamais sortir de l'ecran (bornes + marge).
+   Le pinch navigateur est neutralise pendant l'ouverture (gesturestart)
+   pour qu'un doigt arrive hors image sans zoomer la page entiere. */
+(function() {
+    'use strict';
+    var viewer = document.getElementById('mapViewer');
+    var img = document.getElementById('mapViewerImg');
+    var croix = document.getElementById('mapViewerClose');
+    if (!viewer || !img || !croix) return;
+
+    var ZOOM_MIN = 1, ZOOM_MAX = 12;  /* bornes relatives a la vue "fit" */
+    var MARGE = 48;                   /* px de carte minimum visibles */
+    var etat = { ouvert: false, fit: 1, scale: 1, tx: 0, ty: 0 };
+    var pts = new Map();              /* pointerId -> {x,y} en cours */
+    var actif = null;                 /* {id, sx, sy, tx, ty} : glisser 1 pointeur */
+    var pinch = null;                 /* {d0, z0, mid:[x,y}] : pincement 2 doigts */
+    var gesteBloque = false;
+    var dernierDrag = null;           /* garde anti-fermeture apres glissement */
+
+    /* Borne de translation : l'image reste centree si elle est plus petite
+       que l'ecran, sinon elle croise toujours le viewport (MARGE px). */
+    function bornes() {
+        var vw = viewer.clientWidth, vh = viewer.clientHeight;
+        var w = img.offsetWidth * etat.scale, h = img.offsetHeight * etat.scale;
+        var bx = (w <= vw || vw <= 2 * MARGE) ? (vw - w) / 2 : null;
+        var by = (h <= vh || vh <= 2 * MARGE) ? (vh - h) / 2 : null;
+        return {
+            minX: bx !== null ? bx : MARGE - w, maxX: bx !== null ? bx : vw - MARGE,
+            minY: by !== null ? by : MARGE - h, maxY: by !== null ? by : vh - MARGE
+        };
+    }
+
+    function appliquer() {
+        var b = bornes();
+        etat.tx = Math.min(b.maxX, Math.max(b.minX, etat.tx));
+        etat.ty = Math.min(b.maxY, Math.max(b.minY, etat.ty));
+        img.style.transform = 'translate(' + etat.tx + 'px,' + etat.ty
+            + 'px) scale(' + etat.scale + ')';
+    }
+
+    /* Zoom ancre sur un point ecran (curseur ou milieu des doigts) :
+       le point de la carte sous (ax,ay) ne bouge pas. */
+    function zoomAncre(prochaine, ax, ay) {
+        var s = Math.min(etat.fit * ZOOM_MAX, Math.max(etat.fit * ZOOM_MIN, prochaine));
+        if (s === etat.scale) return;
+        var wx = (ax - etat.tx) / etat.scale, wy = (ay - etat.ty) / etat.scale;
+        etat.scale = s;
+        etat.tx = ax - wx * s;
+        etat.ty = ay - wy * s;
+    }
+
+    function ajusterFit() {
+        var vw = viewer.clientWidth, vh = viewer.clientHeight;
+        if (!img.naturalWidth || !vw || !vh) return false;
+        etat.fit = Math.min(vw / img.naturalWidth, vh / img.naturalHeight);
+        etat.scale = etat.fit;
+        etat.tx = (vw - img.naturalWidth * etat.scale) / 2;
+        etat.ty = (vh - img.naturalHeight * etat.scale) / 2;
+        appliquer();
+        return true;
+    }
+
+    function ouvrir(src, alt) {
+        img.src = src;
+        img.alt = alt || '';
+        viewer.hidden = false;
+        etat.ouvert = true;
+        document.body.classList.add('viewer-open');
+        if (!gesteBloque) {
+            document.addEventListener('gesturestart', bloquerGeste);
+            gesteBloque = true;
         }
+        if (!ajusterFit()) img.addEventListener('load', ajusterFit, { once: true });
+        img.addEventListener('error', fermer, { once: true });
+        croix.focus({ preventScroll: true });
+    }
+
+    function fermer() {
+        if (!etat.ouvert) return;
+        viewer.hidden = true;
+        etat.ouvert = false;
+        pts.clear(); pinch = null; actif = null; dernierDrag = null;
+        img.classList.remove('dragging');
+        img.style.transform = '';
+        document.body.classList.remove('viewer-open');
+        if (gesteBloque) {
+            document.removeEventListener('gesturestart', bloquerGeste);
+            gesteBloque = false;
+        }
+    }
+
+    function bloquerGeste(e) { e.preventDefault(); }
+
+    /* --- ouverture depuis les miniatures des onglets --- */
+    document.querySelectorAll('.map-image').forEach(function(m) {
+        m.addEventListener('click', function() { ouvrir(m.src, m.alt); });
     });
 
-    var lastDist = 0;
-    var lastMid = {x:0, y:0};
-    var dragging = false;
-    var dragStart = {x:0, y:0};
-    var touchStartTime = 0;
-    var touchStartX = 0;
-    var touchStartY = 0;
-
-    img.addEventListener('touchstart', function(e){
-        if(!this.classList.contains('fullscreen')) return;
-        if(e.touches.length === 2){
-            e.preventDefault();
-            var dx = e.touches[0].clientX - e.touches[1].clientX;
-            var dy = e.touches[0].clientY - e.touches[1].clientY;
-            lastDist = Math.sqrt(dx*dx + dy*dy);
-            lastMid = {
-                x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-                y: (e.touches[0].clientY + e.touches[1].clientY) / 2
+    /* --- entrees unifiees : souris, doigt, stylet (Pointer Events) --- */
+    viewer.addEventListener('pointerdown', function(e) {
+        if (e.target === croix) return;          /* la croix gere son clic */
+        if (viewer.setPointerCapture) {
+            try { viewer.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        }
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        dernierDrag = { bouge: false };
+        if (pts.size === 2) {                    /* 2 doigts -> pincement */
+            var v = Array.from(pts.values());
+            pinch = {
+                d0: Math.hypot(v[0].x - v[1].x, v[0].y - v[1].y) || 1,
+                z0: etat.scale,
+                mid: [(v[0].x + v[1].x) / 2, (v[0].y + v[1].y) / 2]
             };
-        } else if(e.touches.length === 1){
-            e.preventDefault();
-            touchStartTime = Date.now();
-            touchStartX = e.touches[0].clientX;
-            touchStartY = e.touches[0].clientY;
-            if(this._mapScale > 1){
-                dragging = true;
-                dragStart.x = e.touches[0].clientX - this._mapX;
-                dragStart.y = e.touches[0].clientY - this._mapY;
-            }
+            actif = null;
+            return;
         }
-    }, {passive:false});
-
-    img.addEventListener('touchmove', function(e){
-        if(!this.classList.contains('fullscreen')) return;
-        if(e.touches.length === 2){
-            e.preventDefault();
-            var dx = e.touches[0].clientX - e.touches[1].clientX;
-            var dy = e.touches[0].clientY - e.touches[1].clientY;
-            var dist = Math.sqrt(dx*dx + dy*dy);
-            var mid = {
-                x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-                y: (e.touches[0].clientY + e.touches[1].clientY) / 2
-            };
-            if(lastDist > 0){
-                var ratio = dist / lastDist;
-                var newScale = Math.min(Math.max(this._mapScale * ratio, 1), 5);
-                this._mapX = mid.x - (mid.x - this._mapX) * (newScale / this._mapScale);
-                this._mapY = mid.y - (mid.y - this._mapY) * (newScale / this._mapScale);
-                this._mapScale = newScale;
-                this.style.transform = 'translate('+this._mapX+'px,'+this._mapY+'px) scale('+this._mapScale+')';
-                this.style.transformOrigin = '0 0';
-            }
-            lastDist = dist;
-            lastMid = mid;
-        } else if(e.touches.length === 1 && dragging){
-            e.preventDefault();
-            this._mapX = e.touches[0].clientX - dragStart.x;
-            this._mapY = e.touches[0].clientY - dragStart.y;
-            this.style.transform = 'translate('+this._mapX+'px,'+this._mapY+'px) scale('+this._mapScale+')';
-            this.style.transformOrigin = '0 0';
-        }
-    }, {passive:false});
-
-    img.addEventListener('touchend', function(e){
-        if(!this.classList.contains('fullscreen')) return;
-        if(e.touches.length < 2) lastDist = 0;
-        if(e.touches.length === 0){
-            var dt = Date.now() - touchStartTime;
-            var dx = (e.changedTouches[0] ? e.changedTouches[0].clientX : 0) - touchStartX;
-            var dy = (e.changedTouches[0] ? e.changedTouches[0].clientY : 0) - touchStartY;
-            var moved = Math.sqrt(dx*dx + dy*dy);
-            if(dt < 300 && moved < 10){
-                this.classList.remove('fullscreen');
-                this.style.transform = '';
-                this._mapScale = 1;
-                this._mapX = 0;
-                this._mapY = 0;
-            }
-            dragging = false;
-        }
-        if(this._mapScale <= 1){
-            this._mapScale = 1;
-            this._mapX = 0;
-            this._mapY = 0;
-            this.style.transform = '';
-        }
+        if (pts.size > 2) return;
+        actif = { id: e.pointerId, sx: e.clientX, sy: e.clientY, tx: etat.tx, ty: etat.ty };
+        img.classList.add('dragging');
+        e.preventDefault();
     });
-});
+
+    viewer.addEventListener('pointermove', function(e) {
+        if (!pts.has(e.pointerId)) return;
+        pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (pinch && pts.size >= 2) {
+            var v = Array.from(pts.values());
+            var d = Math.hypot(v[0].x - v[1].x, v[0].y - v[1].y) || 1;
+            var mid = [(v[0].x + v[1].x) / 2, (v[0].y + v[1].y) / 2];
+            var r = viewer.getBoundingClientRect();
+            zoomAncre(pinch.z0 * (d / pinch.d0), pinch.mid[0] - r.left, pinch.mid[1] - r.top);
+            etat.tx += mid[0] - pinch.mid[0];    /* le milieu des doigts deplace aussi */
+            etat.ty += mid[1] - pinch.mid[1];
+            pinch.mid = mid;
+            appliquer();
+            return;
+        }
+        if (!actif || e.pointerId !== actif.id) return;
+        var dx = e.clientX - actif.sx, dy = e.clientY - actif.sy;
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) dernierDrag.bouge = true;
+        etat.tx = actif.tx + dx;
+        etat.ty = actif.ty + dy;
+        appliquer();
+        e.preventDefault();
+    });
+
+    function finPointeur(e) {
+        pts.delete(e.pointerId);
+        if (pts.size < 2) pinch = null;
+        if (pts.size === 0) { actif = null; img.classList.remove('dragging'); }
+    }
+    viewer.addEventListener('pointerup', finPointeur);
+    viewer.addEventListener('pointercancel', finPointeur);
+
+    /* --- molette / trackpad (PC) : zoom ancre sur le curseur --- */
+    viewer.addEventListener('wheel', function(e) {
+        if (!etat.ouvert) return;
+        e.preventDefault();
+        var dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;  /* mode "ligne" */
+        var r = viewer.getBoundingClientRect();
+        zoomAncre(etat.scale * Math.exp(-dy * 0.0015), e.clientX - r.left, e.clientY - r.top);
+        appliquer();
+    }, { passive: false });
+
+    /* pas de menu long-press ni de glisser-doser natif sur la carte */
+    viewer.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    viewer.addEventListener('dragstart', function(e) { e.preventDefault(); });
+    viewer.addEventListener('selectstart', function(e) { e.preventDefault(); });
+
+    /* --- fermeture : croix, clic sur le fond (si pas de glissement), Echap --- */
+    croix.addEventListener('click', fermer);
+    viewer.addEventListener('click', function(e) {
+        if (e.target === viewer && dernierDrag && !dernierDrag.bouge) fermer();
+    });
+    document.addEventListener('keydown', function(e) {
+        if (!etat.ouvert || e.key !== 'Escape') return;
+        e.preventDefault();
+        fermer();
+    });
+})();
 
 /* Encounter */
 function actualiserFight() {

@@ -380,7 +380,7 @@ public class MainActivity extends Activity {
                     + "Math.min(bb.length,(k+1)*CH));var bin='';"
                     + "for(var j=0;j<s.length;j+=8192){bin+=String.fromCharCode"
                     + ".apply(null,s.subarray(j,Math.min(s.length,j+8192)));}"
-                    + "FlBridge.blobChunk(T,k,N,window.btoa(bin),k===N-1);}}"
+                    + "FlBridge.blobChunk(T,k,N,window.btoa(bin),k===N-1);}})"
                     + ".catch(function(e){try{FlBridge.blobFailed(T,String(e));}"
                     + "catch(e2){}});})()";
             webView.evaluateJavascript(js,

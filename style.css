@@ -120,8 +120,32 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 
 /* Maps */
 .map-container{ width:100%; overflow:hidden; border:2px solid var(--border); background:var(--ink); }
-.map-image{ width:100%; height:auto; display:block; cursor:zoom-in; transition:transform .2s; }
-.map-image.fullscreen{ cursor:zoom-out; position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:contain; z-index:9999; background:rgba(0,0,0,.95); }
+.map-image{ width:100%; height:auto; display:block; cursor:zoom-in; }
+
+/* Visionneuse de cartes (plein ecran). Le fond et la croix sont FIXES et
+   immobiles, seule l'image est transformee (translate/scale, bornes en
+   script.js) : impossible de "perdre" la carte en la glissant hors ecran,
+   contrairement a l'ancien .map-image.fullscreen ou le fond partait avec
+   l'image. touch-action:none : le pinch navigateur ne zoome jamais la page
+   sous la visionneuse (gesturestart bloque a l'ouverture, cf. script.js). */
+.map-viewer{ position:fixed; inset:0; z-index:9999; background:rgba(0,0,0,.95);
+    overscroll-behavior:contain; touch-action:none; }
+.map-viewer[hidden]{ display:none; }
+/* image ABSOLUE a l'origine : la position est entierement pilotee par la
+   transform (translate/scale, origin 0 0) - pas de centrage flex, qui
+   decale la boite de layout et fausserait les bornes. */
+.map-viewer-img{ position:absolute; top:0; left:0; max-width:none;
+    transform-origin:0 0; will-change:transform;
+    user-select:none; -webkit-user-select:none; -webkit-user-drag:none;
+    cursor:grab; }
+.map-viewer-img.dragging{ cursor:grabbing; }
+.map-viewer-close{ position:fixed; top:0; right:0; z-index:10000;
+    margin:calc(.6rem + env(safe-area-inset-top,0px)) calc(.6rem + env(safe-area-inset-right,0px)) 0 0;
+    width:2.75rem; height:2.75rem; padding:0; border-radius:50%;
+    border:2px solid var(--border); background:var(--ink); color:var(--red);
+    font-size:1.25rem; line-height:1; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; }
+body.viewer-open{ overflow:hidden; }
 
 /* User avatar & menu */
 .user-avatar-container{ position:relative; }
@@ -176,7 +200,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 [data-theme="dark"] .user-menu button:hover{ background:#2e2d2a; }
 [data-theme="dark"] .tab:hover{ background:rgba(255,255,255,.06); }
 [data-theme="dark"] .map-image{ filter:brightness(0.82) contrast(1.05); }
-[data-theme="dark"] .map-image.fullscreen{ filter:brightness(0.72) contrast(1.1); }
+[data-theme="dark"] .map-viewer-img{ filter:brightness(0.72) contrast(1.1); }
 [data-theme="dark"] .brand-mark svg path:nth-child(1){ fill:var(--ink); }
 [data-theme="dark"] .brand-mark svg path:nth-child(3){ fill:var(--white); }
 [data-theme="dark"] .brand-mark svg line{ stroke:var(--ink); }

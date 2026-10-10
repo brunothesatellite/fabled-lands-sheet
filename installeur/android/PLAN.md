@@ -58,6 +58,8 @@ curl (contrairement à dcc qui a `map-image.php`, `maps.php`, imports ZIP).
 ```
 fabled-lands-sheet/
 └── installeur/
+    ├── _www-filter.mjs              filtre « fichiers webapp » partagé (sync APK ↔ zip web)
+    ├── _build-webapp.mjs            artefact zip de déploiement → dist/fabled-lands-sheet-<v>-webapp.zip
     └── android/
         ├── PLAN.md                      ← ce document
         ├── build.gradle                 copié dcc (AGP 9.4.1)
@@ -79,6 +81,9 @@ fabled-lands-sheet/
         │   ├── server.js                serveur statique /fl-sheet/ + /poc/
         │   ├── run.js                   gates automatisées
         │   ├── _check-masthead.mjs      non-regression geometrie masthead (7 largeurs, banc desktop)
+        │   ├── _check-mapviewer.mjs     non-regression visionneuse de cartes (fit, bornes, molette, pinch, fermetures)
+        │   ├── _check-mapviewer-device.mjs  visionneuse sur appareil reel (pinch tactile, borne, croix, theme)
+        │   ├── _mapviewer-shots/         captures screencap recette visionneuse (gitignorées)
         │   ├── _diag-css.mjs            diagnostic sur appareil (zoom texte systeme, CSS servie, 1 ligne)
         │   ├── _test-device.mjs         recette §6.2 sur appareil (APK debug + CDP)
         │   └── public/
@@ -355,9 +360,9 @@ Gates (adaptées de `run.js`, Fabled‑specific) :
 
 ### 6.2 APK
 ```
-.\_build-android.ps1 -Version 1.14           # release signée
-.\_build-android.ps1 -Version 1.14 -Debug    # adb install rapide
-adb install -r "dist\fabled-lands-sheet-1.14-android.apk"
+.\_build-android.ps1 -Version 1.22 -VersionCode 2          # release signée
+.\_build-android.ps1 -Version 1.22 -VersionCode 2 -Debug   # adb install rapide
+adb install -r "dist\fabled-lands-sheet-1.22-android.apk"
 ```
 **Recette automatisée** (D0–D9, installe l'APK debug — indispensable car le release n'autorise
 pas l'inspection de la WebView — puis pilote tout en CDP) :
@@ -385,7 +390,35 @@ cd poc && node _test-device.mjs              # SERIAL=xxx pour cibler un apparei
 | Icônes FA (risque #1) | ✅ après fix CORS — voir risque 1 |
 | 404 résiduels | 2 bénins : `/favicon.ico` (auto, `boot.html` n'a pas de `<link rel=icon>`) et `/poc/vendor/…/libxml2.so` (sondage optionnel de php-cgi-wasm, PHP fonctionne sans) |
 | Bug UI rapportés (webapp) : avatar recouvrant le 2ᵉ dé + titre du masthead sur 2 lignes | ✅ **corrigés** — voir ci-dessous |
-| register/login, session après redémarrage, `preferences.db` en IDB, export/import JSON, toggle dark, pinch-zoom | ⏳ à faire (téléphone indisponible) — D4–D9 automatisés par `poc/_test-device.mjs`, reste manuel : import JSON (sélecteur de fichiers), pinch-zoom, mise à jour `versionCode` |
+| register/login, session après redémarrage, `preferences.db` en IDB, export JSON, toggle dark | ✅ **recette automatisée 12/12** (voir ci-dessous) |
+| mise à jour `versionCode` (v1 → v2) | ✅ session + préférences conservées après `install -r` |
+| import JSON, pinch-zoom | ✅ pinch validé par `_check-mapviewer-device.mjs` ; reste manuel : import JSON (sélecteur de fichiers) |
+
+#### Recette automatisée §6.2 — 10/10/2026 (Pixel 7a, APK 1.15 vCode 2, code identique à l'APK 1.22)
+
+`cd poc && node _test-device.mjs` — **12/12** : D0 install · D1 boot · D2 polices FA woff2
+(0 `.ttf`) · D3 0 requête en échec · D4 inscription · D5 préférence relue depuis le serveur ·
+D6a reprise de session après `force-stop` (**boot ~1 s**) · D6b préférence IDB préservée ·
+D6c thème préservé · D7 export JSON écrit dans `/sdcard/Download` · D8 bascule clair/sombre ·
+D9 les 8 `maps/*.webp` décodées. Le harnais choisit dynamiquement le APK le plus récent de
+`dist/` (`APK=` pour forcer).
+
+**Correctifs apportés au cours de la recette :**
+
+- **D7 (bloquant, applicatif)** — depuis le commit `8d3c76e`, une parenthèse manquante dans
+  le JS assemblé par `MainActivity` (`;}}` → `;}})`) déclenchait `SyntaxError: missing ) after
+  argument list` à **chaque** export : le hook ne s'installait jamais, aucun fichier n'était
+  écrit. Corrigé **en Java** (pas de refonte du pont WebView). Les exports des versions
+  antérieures provenaient d'un binaire plus ancien encore fonctionnel.
+- **D6a (piège du harnais, pas de bug app)** — après `force-stop`, le Service Worker sert le
+  contenu de l'app sur `/fl-sheet/` **sans jamais** transiter par `index.html` : le prédicat
+  d'URL initial ne devenait jamais vrai alors que l'app était prête depuis ~1 s. Prédicat
+  corrigé : `#tabBar` présent + `readyState === 'complete'`, indépendant de l'URL.
+- **D2** — la fonte FA peut résoudre depuis le cache du document d'amorçage : la signature
+  réelle d'une régression CORS est `ttf === 0 && document.fonts.check(…)` (compteur woff2
+  devenu informatif).
+- **D4** — `register.php` redirige quand une session existe déjà : le harnais déconnecte
+  avant d'enregistrer un compte.
 
 **Bugs UI corrigés (webapp, pas Android)** — deux symptômes, trois causes, toutes mesurées
 sur l'appareil réel (Pixel 7a « lynx », `poc/_diag-css.mjs`) :
@@ -426,6 +459,34 @@ captures) — ce banc **ne peut pas simuler `font_scale`** ; la validation avec 
 fait sur appareil via `poc/_diag-css.mjs` (installe l'APK debug, CDP sans override, attend
 l'affichage de l'avatar — l'état le plus serré — puis mesure). Résultat appareil (zoom 1,15,
 avatar affiché) : `h1` ajusté à 192 px = exactement le budget, 1 ligne.
+
+### Cartes : visionneuse plein écran
+
+Ancien mode `.map-image.fullscreen` : l'image **elle-même** devenait son propre fond
+(`position:fixed; width:100vw; height:100vh`) — un glissement hors d'échelle emportait
+fond **et** carte hors écran → écran vide bloqué (seul recours : recharger). Remplacé par
+une visionneuse statique (`#mapViewer` dans `index.html` : fond fixe immobile + `<img>`
++ croix ✕), modèle repris de dcc (`map-draw.js`) :
+
+- **Interactions unifiées** : Pointer Events + `setPointerCapture` (1 pointeur = glisser
+  borné, 2 doigts = pincement ancré au milieu des doigts), molette/trackpad ancrée sur le
+  curseur (`{passive:false}`), `touch-action:none` + `overscroll-behavior:contain`, et
+  `gesturestart` bloqué **uniquement à l'ouverture** (la page redevient zoomable à la
+  fermeture — contrairement au blocage global de dcc, ici l'accessibilité compte).
+  Fermeture : ✕ / Échap / clic sur le fond (avec garde anti-glissement).
+- **Invariant « jamais perdue »** : l'image est en `position:absolute` (la transform est
+  la **seule** source de position — un centrage flex fausserait les bornes, bug réel attrapé
+  par le banc avant correction), bornes de `translate` avec **48 px de carte minimum
+  visibles**, recentrage quand la carte est entièrement visible.
+- Contrôle : `poc/_check-mapviewer.mjs` (banc desktop, 3 largeurs) — fit sur rect **peint**,
+  glissements géants → intersection ≥ 48 px, ancre molette, pincement ×3, les 4 fermetures
+  + nettoyage complet ; `SHOT=1` pour les captures. `G12` (gates POC) vérifie de son côté
+  que les 8 WebP restent chargés.
+- **Recette appareil** (`poc/_check-mapviewer-device.mjs`, WebView réelle,
+  `Input.dispatchTouchEvent`) : ouverture via l'UI réelle (Maps → World → tap), **pincement
+  2 doigts ×2,80**, glissements géants bornés (carte toujours visible), ✕, garde
+  anti-glissement, thème sombre — **6/6** le 10/10/2026 ; captures `SHOT=1` →
+  `_mapviewer-shots/device-*.png`.
 
 ---
 

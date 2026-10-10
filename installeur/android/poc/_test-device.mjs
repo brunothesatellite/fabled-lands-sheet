@@ -39,7 +39,21 @@ import puppeteer from 'puppeteer-core';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const PKG = 'com.fabledlands.sheet';
-const APK = path.resolve(here, '..', 'dist', 'fabled-lands-sheet-1.14-android-debug.apk');
+/* APK debug le plus recent de dist/ (surcharge : APK=/chemin/complet.apk)
+   — un chemin fige a deja cause un downgrade (vieux 1.14 reinstalle,
+   donnees perdues + D7 teste sur l'ancien binaire). */
+function dernierApkDebug() {
+    const dist = path.resolve(here, '..', 'dist');
+    if (fs.existsSync(dist)) {
+        const cands = fs.readdirSync(dist)
+            .filter((f) => /^fabled-lands-sheet-[\d.]+-android-debug\.apk$/.test(f))
+            .map((f) => ({ f, t: fs.statSync(path.join(dist, f)).mtimeMs }))
+            .sort((a, b) => b.t - a.t);
+        if (cands.length) return path.join(dist, cands[0].f);
+    }
+    return path.join(dist, 'fabled-lands-sheet-android-debug.apk');
+}
+const APK = process.env.APK ? path.resolve(process.env.APK) : dernierApkDebug();
 const ORIGIN = 'https://appassets.androidplatform.net';
 const PORT = 9229;
 const adbBin = path.join(process.env.LOCALAPPDATA, 'Android', 'Sdk', 'platform-tools', 'adb.exe');
@@ -192,7 +206,11 @@ try {
         'arrete sur ' + (bootUrl.replace(ORIGIN, '') || '(aucune page)'));
 }
 
-/* D2 : icônes FA (regression fix CORS) */
+/* D2 : icônes FA (regression fix CORS). Le woff2 peut être résolu via le
+   cache du document d'amorçage (même origine, même renderer) : aucune
+   entrée resource dans le document index — le comptage woff2 est donc
+   informatif. La signature réelle de la regression CORS = requête .ttf
+   (repli) + fonte non chargée (check() faux -> icônes en case vide). */
 const fa = await op(() => page.evaluate(async () => {
     try { await document.fonts.ready; } catch (e) { /* ignore */ }
     const res = performance.getEntriesByType('resource').map((e) => e.name);
@@ -203,9 +221,9 @@ const fa = await op(() => page.evaluate(async () => {
         regular: document.fonts.check('400 1em "Font Awesome 6 Free"'),
     };
 }));
-check('D2', 'icônes FA : woff2 chargees, 0 requete .ttf',
-    fa.ttf.length === 0 && fa.woff2.length > 0 && fa.solid,
-    `${fa.woff2.length} woff2, ttf=${fa.ttf.length}, solid=${fa.solid}, regular=${fa.regular}`);
+check('D2', 'icônes FA : fonte woff2 active, 0 requete .ttf',
+    fa.ttf.length === 0 && fa.solid,
+    `${fa.woff2.length} woff2 tracees, ttf=${fa.ttf.length}, solid=${fa.solid}, regular=${fa.regular}`);
 
 /* D3 : rechargement — aucune requete en echec (hors-ligne) */
 failures.length = 0;
@@ -226,7 +244,13 @@ try {
     check('D3', 'rechargement : 0 requete en echec', false, e.message);
 }
 
-/* D4 : inscription (form_ts + honeypot geres par register.php) */
+/* D4 : inscription (form_ts + honeypot geres par register.php).
+   register.php REDIRIGE vers index.html si une session existe deja
+   (etat residuel d'un run precedent) : on deconnecte d'abord. */
+try {
+    await op(() => page.evaluate(() =>
+        fetch('api/auth.php?action=logout', { cache: 'no-store' }).then((r) => r.json())));
+} catch (e) { /* pas de session : logout inoffensif */ }
 try {
     await op(async () => {
         await page.goto(`${ORIGIN}/fl-sheet/register.php`, { waitUntil: 'networkidle2', timeout: 60000 });
@@ -327,15 +351,36 @@ try {
     await sleep(2500);
     browser = await connectCDP(serial);
     page = await pageOf(browser);
-    /* meme piege que D1 : attendre index.html, pas simplement /fl-sheet/
-       (boot-poc.html est lui-meme sous /fl-sheet/) */
-    await op(() => page.waitForFunction(
-        () => location.href.includes('/fl-sheet/index.html') && document.readyState === 'complete',
-        { timeout: 120000 }));
+    /* meme piege que D1 : attendre l'app, pas simplement /fl-sheet/
+       (boot-poc.html est lui-meme sous /fl-sheet/). PIEGE COMPLEMENTAIRE
+       constate sur appareil : apres force-stop, le SW sert deja le
+       contenu app sur /fl-sheet/ SANS jamais passer par index.html —
+       l'URL est donc un critere faux ici. L'invariant reel = l'UI
+       (#tabBar) + document complet. Boucle diagnostiquee (re-acquisition
+       du handle a chaque tour, comme D1) : en cas de timeout, l'etat
+       reel (URL + readyState + app) alimente le message. */
+    let dernierEtat = '(aucune page)';
+    const t0 = Date.now();
+    for (;;) {
+        page = await pageOf(browser);
+        const u = page.url();
+        let pret = '?';
+        let appUp = false;
+        try {
+            pret = await page.evaluate(() => document.readyState);
+            appUp = await page.evaluate(() => !!document.querySelector('#tabBar'));
+        } catch (e) { /* cible detruite */ }
+        dernierEtat = u.replace(ORIGIN, '') + ' ready=' + pret + ' app=' + appUp;
+        if (u.startsWith(`${ORIGIN}/fl-sheet/`) && pret === 'complete' && appUp) break;
+        if (Date.now() - t0 > 180000) {
+            throw new Error('timeout 180s — dernier etat : ' + dernierEtat);
+        }
+        await sleep(2000);
+    }
     const chk = await page.evaluate(() =>
         fetch('api/auth.php?action=check', { cache: 'no-store' }).then((r) => r.json()));
     check('D6a', 'session reprise apres redemarrage app', chk.logged_in === true,
-        `pseudo=${chk.pseudo || '(aucun)'}`);
+        `pseudo=${chk.pseudo || '(aucun)'} [boot ${Math.round((Date.now() - t0) / 1000)}s]`);
     if (val) {
         const srv = await page.evaluate(() =>
             fetch('api/auth.php?action=get_preferences&key=fl-devtest', { cache: 'no-store' })
