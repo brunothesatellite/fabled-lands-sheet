@@ -339,6 +339,7 @@ Gates (adaptées de `run.js`, Fabled‑specific) :
 | G10 | import bulk : `set_all_preferences` avec 1 020 clés en < 5 s (valide le patch stdin) |
 | G11 | export : `createObjectURL` + `download=` produit le JSON horodaté |
 | G12 | les 8 `maps/*.webp` ont `naturalWidth > 0` (hors-ligne) |
+| G13 | route FA locale `/ajax/libs/font-awesome/*` : `all.min.css` servi (200, `text/css`) **et** ses `url(../webfonts/fa-*.woff2)` résolvent (miroir exact d'AssetRouter) |
 
 ### 6.2 APK
 ```
@@ -357,13 +358,44 @@ adb install -r "dist\fabled-lands-sheet-1.14-android.apk"
 - Mise à jour : `adb install -r` avec `versionCode` incrémenté → données IDB conservées,
   stamp différent → réécriture des sources, reconnexion conservée.
 
+#### État des tests appareil — 10/10/2026 (Pixel 7a, `lynx`, Android, APK 1.14)
+
+| Vérification | Résultat |
+|---|---|
+| Install `adb install -r` | ✅ `Success` |
+| Première ouverture (mode avion **avant** lancement) | ✅ amorçage → `/fl-sheet/`, app utilisable |
+| Aucune requête externe / `ERR_FAILED` | ✅ **zéro** URL hors `appassets` |
+| Icônes FA (risque #1) | ✅ après fix CORS — voir risque 1 |
+| 404 résiduels | 2 bénins : `/favicon.ico` (auto, `boot.html` n'a pas de `<link rel=icon>`) et `/poc/vendor/…/libxml2.so` (sondage optionnel de php-cgi-wasm, PHP fonctionne sans) |
+| Bug UI rapporté : bouton recouvrant le 2ᵉ dé | ✅ **corrigé** — voir ci-dessous |
+| register/login, session après redémarrage, `preferences.db` en IDB, export/import JSON, toggle dark, pinch-zoom | ⏳ à faire (téléphone indisponible) |
+
+**Bug UI corrigé (webapp, pas Android)** : en dessous de ~412 px, la rangée
+`logo + h1 + dés` déborde de la colonne `minmax(0,1fr)` de `.masthead` (le `h1` est
+`nowrap` sans `min-width:0`) et l'avatar, peint après dans le DOM, **recouvrait le 2ᵉ dé**
+(12,5 px à 393 px, 39,3 px à 360 px). Correctif : `flex-wrap:wrap` sur la rangée (les dés
+passent sous le titre), `min-width:0 + ellipsis` en dernier recours sur le `h1`, et
+`align-items:start` en mobile (avatar aligné sur le titre). Mesure de non-régression :
+`cd installeur/android/poc && node _check-masthead.mjs` (5 largeurs, 0 px de chevauchement,
+desktop toujours sur **1** rangée) — `SHOT=1` ajoute les captures.
+
 ---
 
 ## 7. Risques & points d'attention
 
-1. **Font Awesome** : seul vrai écart fonctionnel vs dcc. Si `all.min.css` s'avère piloté par des
-   chemins absus (`url(/webfonts/…)`), basculer sur le branchement `css/all.min.css` réécrit.
-   *Critère de validation : aucun `404` dans `logcat` sur `/ajax/libs/font-awesome/…`.*
+1. **Font Awesome** : seul vrai écart fonctionnel vs dcc. **Résolu en test réel (10/10/2026,
+   Pixel 7a)** — mais la cause n'était pas celle anticipée : les chemins `url(../webfonts/…)`
+   sont corrects (la requête woff2 **arrive** au routeur). C'était le **header CORS** :
+   `AssetRouter.asset()` construisait la carte `headers` (`Access-Control-Allow-Origin: *`)
+   puis appelait le **constructeur 3 arguments** `WebResourceResponse(mime, encoding, stream)`
+   qui ne sait pas transmettre d'en-têtes → carte jetée silencieusement. Or un `@font-face` se
+   télécharge en mode `cors` (rejet sans ACAO) alors que le `<link>` de la feuille de style passe
+   en `no-cors` (il chargeait, d'où un diagnostic trompeur) : le navigateur retombait sur le
+   `.ttf` non fourni → 404 → icônes en case vide ☒. **Fix** : constructeur 6 arguments
+   (`200, "OK", headers, stream)`. dcc a le même défaut latent mais ne l'a jamais rencontré
+   (ses polices sont en URL absolue `appassets`, même origine).
+   *Critère de validation : aucun `404` dans `logcat` sur `/ajax/libs/font-awesome/…`* → **OK**
+   (`all.min.css → 200`, `fa-solid-900.woff2 → 200`, **zéro** requête `.ttf`).
 2. **Poids des 8 cartes** : **résolu** — `maps/` converti de PNG en WebP lossy q80 (`maps/*.webp`),
    3,8 Mo au lieu de 26,1 Mo. `aapt2` stocke le WebP tel quel ; l'APK pèsera 3,8 Mo (cartes) +
    vendor (wasm ≈ 10 Mo) + FA, donc ≈ 20 Mo. Plus rien à recompresser.

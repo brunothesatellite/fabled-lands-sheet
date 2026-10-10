@@ -190,11 +190,26 @@ public final class AssetRouter {
             String encoding = TEXT_EXT.get(ext(assetPath)); /* null = binaire */
             Map<String, String> headers = new LinkedHashMap<>();
             headers.put("Cache-Control", "no-store"); /* APK mis a jour = assets nouveaux */
-            /* CORS : les @font-face de fonts.css sont charges depuis une
-               autre origine (fonts.googleapis.com) — sans cet en-tete,
-               le navigateur rejette le telechargement des woff2. */
+            /* CORS OBLIGATOIRE : le woff2 de FA est reference par
+               all.min.css servi a l'URL percue
+               https://cdnjs.cloudflare.com/... (celle du <link>) — un
+               relatif ../webfonts/ se resout donc contre cdnjs, CROSS-
+               origine vs la page appassets. Un @font-face se telecharge
+               en mode "cors" : sans Access-Control-Allow-Origin le
+               navigateur REJETTE le woff2 et retombe sur le .ttf (non
+               fourni) -> icone en case vide (c'est ce qui s'est produit
+               en test reel : -> 0 sur le woff2 puis 404 sur le ttf).
+               Les <link rel=stylesheet> passent en "no-cors" : d'ou le
+               CSS qui, lui, chargeait sans cet en-tete.
+               Les fontes Google sont en URL absolue appassets (meme
+               origine) : l'en-tete y est inutile mais inoffensif.
+               NE PAS utiliser le constructeur 3 args (mime, encoding,
+               stream) : il n'accepte PAS les en-tetes, la carte est
+               alors jetee silencieusement. */
             headers.put("Access-Control-Allow-Origin", "*");
-            return new WebResourceResponse(mime, encoding, stream);
+            /* Constructeur complet : status explicite + en-tetes reels. */
+            return new WebResourceResponse(mime, encoding, 200, "OK",
+                    headers, stream);
         } catch (IOException e) {
             return notFound();
         }

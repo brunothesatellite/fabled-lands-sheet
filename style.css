@@ -7,7 +7,7 @@ body:before{ content:""; position:fixed; inset:0 0 auto; height:7px; background:
 .brand-mark{ display:flex; align-items:center; gap:.6rem; color:var(--red); font-size:1.2rem; cursor:pointer; user-select:none; }
 .brand-mark svg{ width:28px; height:28px; flex-shrink:0; transition:transform .15s,filter .15s; }
 .brand-mark:hover svg{ transform:scale(1.15); filter:brightness(1.2); }
-h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-serif; text-transform:uppercase; white-space:nowrap; }
+h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-serif; text-transform:uppercase; white-space:nowrap; min-width:0; overflow:hidden; text-overflow:ellipsis; }
 .masthead-side{ display:flex; align-items:center; gap:.7rem; }
 .utility-controls{ display:flex; align-items:flex-start; gap:.7rem; }
 
@@ -189,7 +189,7 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 
 /* Mobile */
 @media (max-width:600px){
-    .masthead{ padding:.6rem .8rem; }
+    .masthead{ padding:.6rem .8rem; align-items:start; }
     h1{ font-size:1.2rem; }
     .codewords-grid{ grid-template-columns:repeat(2,1fr); }
     .letter-bar{ gap:.2rem; padding:.4rem .2rem; margin:.5rem 0 .6rem; }
@@ -268,7 +268,12 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 @keyframes toast-out{ to{ opacity:0; transform:translateY(10px); } }
 
 /* Dice roller */
-.masthead > div:first-child{ display:flex; align-items:center; gap:1rem; }
+/* flex-wrap : sur un ecran etroit la rangee (logo + titre + des) ne
+   tient pas dans la colonne minmax(0,1fr) ; les des passent alors sur
+   une 2e ligne plutot que de deborder SOUS l'avatar de la colonne 2
+   (bug reel : le bouton recouvrait le 2e des, mesure par
+   _check-masthead.mjs a 393px et 360px). */
+.masthead > div:first-child{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
 .dice-roller{ display:flex; gap:.5rem; perspective:200px; }
 .die{ width:40px; height:40px; position:relative; transform-style:preserve-3d; cursor:pointer; transition:transform .1s; }
 .die:hover{ transform:scale(1.1); }
