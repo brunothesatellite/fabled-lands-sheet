@@ -6,7 +6,7 @@ A web-based Adventure Sheet application for the **Fabled Lands** gamebook series
 
 ## Release Notes
 
-The v1.14 release notes are described in [CHANGELOG.md](CHANGELOG.md).
+The v1.22 release notes are described in [CHANGELOG.md](CHANGELOG.md).
 
 ## User Manual
 
@@ -65,6 +65,7 @@ All fields auto-save as you type.
 
 - A grid of checkboxes for every codeword in the series.
 - Check a codeword when you learn it during your adventure.
+- Use the **"Display only checked codewords"** filter to hide everything you haven't found yet.
 
 ### Book Paragraphs
 
@@ -88,9 +89,16 @@ A quick-reference combat tracker with two side-by-side boxes:
 
 ![Maps](screenshots/map.png)
 
-- Tap a map to view it **fullscreen**.
-- Tap again to return to the fitted view.
-- In fullscreen mode on mobile, use **pinch-to-zoom** and **drag** to pan around the map.
+- Tap a map to open the **fullscreen viewer**: a fixed backdrop, the map, and a single ✕ button.
+- **Zoom**: pinch with two fingers on mobile, mouse wheel / trackpad on desktop — zoom is anchored on the pinch midpoint or under the cursor.
+- **Pan**: drag with one finger or the mouse. The map is hard-bounded so it can **never leave the screen** — at least 48 px of the map always stays visible.
+- Close with the ✕, the `Esc` key, or a tap on the backdrop (drags never close it by accident).
+- The viewer honours the active theme (light and dark).
+
+### Log
+
+- The **Log** tab records a session history of your changes: label with the old and new value, newest entries first (up to 500 lines).
+- Use the trash button to clear the whole log (confirmation required).
 
 ### User Menu (Avatar Icon)
 
@@ -115,6 +123,54 @@ Click the avatar icon in the top-right corner to open the user menu:
 
 ---
 
+## Android Application
+
+The project ships an **offline Android APK** (package `com.fabledlands.sheet`) that runs the whole companion without any network access:
+
+- **Local runtime** — the webapp is bundled inside the APK and served from local assets under the `https://appassets.androidplatform.net/fl-sheet/` origin. A Service Worker executes PHP (`php-cgi-wasm`) with SQLite, so login sessions and server-style preference sync keep working offline; state lives in the browser's IndexedDB filesystem and survives app restarts and upgrades.
+- **No CDN at runtime** — Barlow Condensed + Space Grotesk (SIL OFL) and Font Awesome 6.5.2 are vendored into the APK assets; the eight maps ship as WebP (lossy q80).
+- **File export** — the JSON export writes a real file to `/sdcard/Download` via MediaStore (no browser download prompt).
+- **Zero permissions** in the manifest.
+
+### Build & install
+
+```powershell
+cd installeur\android
+.\_build-android.ps1 -Version 1.22 -VersionCode 2          # signed release APK
+.\_build-android.ps1 -Version 1.22 -VersionCode 2 -Debug   # debug APK (WebView inspection)
+adb install -r "dist\fabled-lands-sheet-1.22-android.apk"
+```
+
+> **Back up the keystore**: `installeur/android/keystore/fabled-lands.keystore` (gitignored) is required to sign updates. Without it, installed copies can never be upgraded — only uninstalled.
+
+### Tests
+
+| Suite | Command | Scope |
+|---|---|---|
+| Browser POC gates | `cd installeur/android/poc && npm install && npm run test` | 14 gates: offline boot, PHP/SQLite, FA route, maps |
+| Device recette | `node _test-device.mjs` (12 checks D0–D9) | install, boot, fonts, login, prefs, export, force-stop restart |
+| Device viewer | `node _check-mapviewer-device.mjs` | real two-finger pinch, bounded drag, close, dark theme |
+| Desktop benches | `node _check-mapviewer.mjs`, `node _check-masthead.mjs` | viewer geometry, single-line masthead |
+
+Set `SERIAL=<adb-serial>` to target a specific device. The full plan, architecture decisions and test results live in [installeur/android/PLAN.md](installeur/android/PLAN.md).
+
+---
+
+## Release Artifacts
+
+A release carries two artifacts, both produced from this repository:
+
+| Artifact | Script | Output |
+|---|---|---|
+| **Webapp zip** (server deployment) | `node installeur/_build-webapp.mjs` | `dist/fabled-lands-sheet-<version>-webapp.zip` |
+| **Android APK** (signed) | `installeur\android\_build-android.ps1` | `installeur\android\dist\fabled-lands-sheet-<version>-android.apk` (also copied to `dist/` by the webapp script) |
+
+The webapp zip contains **only the files the webapp needs**: `index.html`, `script.js`, both stylesheets, the three auth pages, `api/*.php`, `favicon.svg`, the eight WebP maps and `LICENSE`. Development files, documentation, installer tooling and the runtime SQLite database are excluded by the shared filter [`installeur/_www-filter.mjs`](installeur/_www-filter.mjs) — the same filter used by the APK asset sync, so both artifacts always ship the same code. Fonts and icons stay on CDN (Google Fonts, Font Awesome) and are not bundled.
+
+**Deploying the zip**: unpack it on any PHP 8.2+ host with the `curl` and `sqlite3` extensions, ensure `api/` is writable (SQLite database is created on first request) — see [Server Requirements](#server-requirements).
+
+---
+
 ## Architecture
 
 ### Overview
@@ -124,7 +180,7 @@ The project is a **single-page application (SPA)** with a PHP backend for authen
 ```
 fabled-lands-sheet/
 ├── index.html              # Main SPA entry point
-├── script.js               # All client-side logic (~1100 lines)
+├── script.js               # All client-side logic (~1510 lines)
 ├── style.css               # Main stylesheet (UI components)
 ├── style-auth.css           # Auth pages stylesheet
 ├── login.php                # Login page
@@ -135,12 +191,18 @@ fabled-lands-sheet/
 │   ├── auth.php             # REST API (authentication + preferences CRUD)
 │   ├── db.php               # Database layer (SQLite3, helpers)
 │   └── preferences.db       # SQLite database file (gitignored)
+├── CHANGELOG.md             # Release notes (English)
 ├── deploy/
 │   ├── start.py             # Python launcher (starts PHP server + opens browser)
 │   └── start.bat            # Windows batch file for double-click launch
-├── maps/                    # Map images
-│   ├── world.png
-│   ├── book1.png … book7.png
+├── maps/                    # Map images (WebP, lossy q80)
+│   ├── world.webp
+│   ├── book1.webp … book7.webp
+├── dist/                    # Release artifacts: webapp zip + APK (gitignored)
+├── installeur/
+│   ├── _www-filter.mjs      # Shared webapp file filter (APK sync ↔ web zip)
+│   ├── _build-webapp.mjs    # Builds dist/fabled-lands-sheet-<v>-webapp.zip
+│   └── android/             # Android APK project (PLAN.md, build scripts, POC gates, recettes)
 ├── screenshots/             # Documentation screenshots
 │   ├── adventurer.png       # Adventure sheet example
 │   ├── book.png             # Book paragraph tracker
@@ -181,7 +243,7 @@ The JavaScript is organized into functional modules within a single file:
 | **Book Paragraphs** | `genererParagraphes()` builds paragraph tables + note panels from `bookData` object; paragraphs are grouped by note boundaries |
 | **Ship Table** | `genererShipTable()`, `creerLigneShip()`, `chargerLigneShip()`, `chargerShipTable()` — dynamic row creation with strike/delete/add actions; restored in parallel via `Promise.all()` |
 | **Ship Actions** | `basculerStrike()` — toggles row strikethrough with rollback on save failure; `supprimerLigne()` — async row deletion with await; `ajouterLigneApres()` — inserts row below |
-| **Map Interaction** | Touch-aware pinch-to-zoom and drag panning for fullscreen maps |
+| **Map Viewer** | Fullscreen overlay viewer (`#mapViewer`): bounded pan/zoom so the map can never leave the screen, pinch (2 pointers) and wheel zoom anchored on the gesture, drag-guarded close paths (✕, Escape, backdrop) |
 | **Import/Export** | `exporterDonnees()` creates a timestamped JSON blob; `traiterImport()` shared handler validates format, clears DB, writes data, and verifies each step |
 | **Recall Persistence** | The book/map recall buttons store their target in `fl-recall-book` / `fl-recall-map` (SQLite or localStorage), are restored at load by `restaurerRecall()`, and travel with export/import |
 | **PHP Detection** | `detecterPhp()` probes `api/auth.php?action=check` on load to determine backend availability |
