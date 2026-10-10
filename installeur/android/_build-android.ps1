@@ -9,13 +9,13 @@
     5. apksigner -> dist/fabled-lands-sheet-<version>-android.apk
 
   Exemples :
-    .\_build-android.ps1 -Version 1.14
-    .\_build-android.ps1 -Version 1.15 -VersionCode 2
-    .\_build-android.ps1 -Version 1.14 -SkipSync
+    .\_build-android.ps1 -Version 1.22
+    .\_build-android.ps1 -Version 1.22 -VersionCode 2
+    .\_build-android.ps1 -Version 1.22 -SkipSync
     .\_build-android.ps1 -Debug   (assembleDebug, signe avec la cle debug)
 #>
 param(
-    [string]$Version = '1.14',
+    [string]$Version = '1.22',
     [string]$VersionCode = '1',
     [switch]$SkipSync,
     [switch]$Debug   # pas de CmdletBinding : -Debug serait reserve au parametre commun

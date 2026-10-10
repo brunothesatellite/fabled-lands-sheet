@@ -4,7 +4,8 @@
    ------------------------------------------------------------
    Quatre copiers + assertions bloquantes :
       1. webapp  : racine du repo filtree  -> assets/www/
-         (route AssetRouter /fl-sheet/* ; memes exclusions que
+         (route AssetRouter /fl-sheet/* ; filtre partage
+         installeur/_www-filter.mjs — memes exclusions que
          server.js, php compris pour la route /poc/php-src/) ;
       2. POC     : installeur/android/poc/public/ -> assets/poc/
          + manifest.json genere (stamp de build) ;
@@ -30,25 +31,8 @@ const POC = path.join(HERE, 'poc');
 const NM = path.join(POC, 'node_modules');
 const ASSETS = path.join(HERE, 'app', 'src', 'main', 'assets');
 
-/* --- filtre webapp --- */
-const BLOCK_DIRS = new Set(['node_modules', '.git', '.opencode', '.vscode',
-  'deploy', 'installeur', 'screenshots', 'test', 'tests', 'dist']);
-const BLOCK_FILES = [
-  /^\.[a-z]/i,                       // dotfiles (.gitignore, .git…)
-  /(^|\/)[^/]*\.md$/i,               // README, CHANGELOG, TODO, PLAN
-  /^package(-lock)?\.json$/i,
-  /\.pdf$/i,                         // Fabled-Lands-Play-Sheets-Ultimate.pdf
-  /\.py$/i, /\.log$/i, /\.bat$/i,
-  /^test-import/i,                   // test-import*.json
-  /^forms_data\.json$/i, /^mockup-/i,
-  /^spec\.txt$/i,
-];
-
-/* Meme liste que server.js STATIC_EXT + .php (source brute deliberatee) */
-const WWW_EXT = new Set([
-  '.html', '.css', '.js', '.mjs', '.svg', '.png', '.webp', '.jpg', '.jpeg',
-  '.gif', '.ico', '.woff', '.woff2', '.ttf', '.avif', '.php', '.json', '.txt',
-]);
+/* --- filtre webapp : module partage avec _build-webapp.mjs --- */
+import { estFichierWebapp, walk } from '../_www-filter.mjs';
 
 function fail(msg) {
   console.error('ERREUR : ' + msg);
@@ -62,16 +46,6 @@ function copyFile(src, dest) {
   fs.copyFileSync(src, dest);
 }
 
-function walk(dir, base, out = []) {
-  for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, e.name);
-    const rel = path.join(base, e.name);
-    if (e.isDirectory()) walk(full, rel, out);
-    else if (e.isFile()) out.push(rel);
-  }
-  return out;
-}
-
 /* ============================================================
   1. WEBAPP -> assets/www
    ============================================================ */
@@ -80,12 +54,7 @@ function syncWebapp() {
   const dest = path.join(ASSETS, 'www');
   let n = 0, bytes = 0;
   for (const rel of walk(src, '')) {
-    const posix = rel.split(path.sep).join('/');
-    const segs = posix.split('/');
-    const base = segs[segs.length - 1];
-    if (segs.some((s) => BLOCK_DIRS.has(s))) continue;
-    if (BLOCK_FILES.some((re) => re.test(base))) continue;
-    if (!WWW_EXT.has(path.extname(base).toLowerCase())) continue;
+    if (!estFichierWebapp(rel)) continue;
     copyFile(path.join(src, rel), path.join(dest, rel));
     bytes += fs.statSync(path.join(dest, rel)).size;
     n++;

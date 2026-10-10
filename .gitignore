@@ -17,3 +17,9 @@ installeur/android/app/src/main/assets/
 installeur/android/local.properties
 installeur/android/keystore/
 installeur/android/dist/
+
+# --- artefacts de release (voir installeur/_build-webapp.mjs) ---
+dist/
+
+# --- captures des bancs de test (regenerables avec SHOT=1) ---
+installeur/android/poc/*-shots/
