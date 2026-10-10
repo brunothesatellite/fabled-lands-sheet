@@ -1,15 +1,20 @@
 /* ============================================================
-   _check-masthead.mjs — mesure le chevauchement avatar / dés
-   ------------------------------------------------------------
-   Bug rapporte en test reel (Pixel 7a, 393px) : le bouton rond
-   de l'avatar recouvre la moitie du 2e dé. Cause candidate :
-   .masthead = grille minmax(0,1fr) | auto, h1 en nowrap sans
-   min-width:0 -> contenu de la colonne 1 qui deborde sous la
-   colonne 2 (l'avatar, peint apres dans le DOM).
+   _check-masthead.mjs — geometrie du masthead (1 ligne, sans recouvrement)
+   ----------------------------------------------------------------------------
+   Bugs constates en test reel (Pixel 7a : 1080px physiques / 2.625 = 411px
+   logiques, font_scale systeme 1.15) :
+     1) le bouton rond de l'avatar recouvrait la moitie du 2e de ;
+     2) le titre du masthead passait sur 2 lignes des que la place manquait.
+   Correctifs : min-width:0 + ellipsis sur le h1, gap .5rem de la rangee, et
+   surtout ajusterTitreMasthead() (script.js) qui mesure la place reelle et
+   reduit la fonte du h1 — SEULE facon de garantir une ligne, le zoom texte
+   systeme (x1.15 sur l'appareil de test) n'etant pas anticipable en CSS.
 
-   Ce script mesure la geometrie reelle (rectangles du DOM) a la
-   largeur d'un telephone, AVANT/APRES correction CSS.
-   Sortie non nulle => bug present.
+   NOTE : ce banc (Chrome desktop) ne peut PAS simuler font_scale ; la
+   validation avec zoom se fait sur appareil via poc/_diag-css.mjs.
+
+   Mesure les rectangles DOM reels (avatar, des, wrap, debordement).
+   Sortie non nulle => regression.
    ============================================================ */
 
 import fs from 'node:fs';
@@ -28,10 +33,10 @@ const CANDIDATES = [
 const exe = CANDIDATES.find((p) => fs.existsSync(p));
 if (!exe) throw new Error('Chrome/Edge introuvable (CHROME_PATH)');
 
-/* Largeur logique d'un telephone (Pixel 7a = 1080px / ~2.75 dppx)
-   + tablette et desktop pour verifier que le retour a la ligne ne
-   se declenche QUE quand c'est necessaire. */
-const WIDTHS = [393, 360, 412, 768, 1280];
+/* Largeurs logiques d'ecrans reels : 411 = Pixel 7a (1080 / 2.625, l'appareil
+   de test), 393 = Pixel 5/6a, 412 = Pixel 7/8, 360 = standard Android,
+   320 = petit ecran (filet), 768/1280 = tablette/desktop. */
+const WIDTHS = [411, 393, 412, 360, 320, 768, 1280];
 
 const { server, url } = await startServer(0);
 const browser = await puppeteer.launch({
@@ -52,7 +57,7 @@ const shots = [];
 
 for (const width of WIDTHS) {
   const page = await browser.newPage();
-  await page.setViewport({ width, height: 900, deviceScaleFactor: 2.75 });
+  await page.setViewport({ width, height: 900, deviceScaleFactor: 2.625 });
   await page.goto(url + '/fl-sheet/', { waitUntil: 'domcontentloaded', timeout: 60000 });
   /* Attendre les fontes AVANT mesure : le wrapping de la rangee du
      masthead depend de la largeur reelle du h1. */
@@ -81,14 +86,30 @@ for (const width of WIDTHS) {
     const ov = (a) => +(Math.max(0, Math.min(a.r, av.r) - Math.max(a.x, av.x))).toFixed(1);
     const line = document.querySelector('.masthead > div:first-child');
     const mh = document.querySelector('.masthead');
+    /* Retour a la ligne : sur une meme rangee, les gauches sont
+       STRICTEMENT croissantes. (offsetTop ne marche pas : avec
+       align-items:center, des enfants de hauteurs differentes ont des
+       tops differents meme cote a cote.) */
+    const kids = [...line.children].filter((k) => k.getClientRects().length);
+    const kr = kids.map((k) => k.getBoundingClientRect());
+    const wrapped = kr.some((r, i) => i > 0 && r.left < kr[i - 1].left);
+    const gapPx = parseFloat(getComputedStyle(line).gap) || 0;
+    const kidsW = kr.reduce((s, r) => s + r.width, 0) + gapPx * Math.max(0, kr.length - 1);
+    const h1El = document.querySelector('.masthead h1');
     return {
       avatar: av, die1: d[0], die2: d[1],
       ov1: ov(d[0]), ov2: ov(d[1]),
       leftCol: line ? +line.getBoundingClientRect().width.toFixed(1) : null,
-      /* hauteur du masthead : > ~70px => la rangee s'est retournee */
+      /* hauteur du masthead : > ~90px => la rangee s'est retournee */
       mastH: mh ? +mh.getBoundingClientRect().height.toFixed(1) : null,
       /* contenu reel de la rangee (peut deborder de la colonne) */
       lineScroll: line ? line.scrollWidth : null,
+      wrapped,
+      contentW: +kidsW.toFixed(1),
+      avail: line ? +line.getBoundingClientRect().width.toFixed(1) : null,
+      slack: line ? +(line.getBoundingClientRect().width - kidsW).toFixed(1) : null,
+      h1Font: h1El ? getComputedStyle(h1El).fontSize : null,
+      h1W: h1El ? +h1El.getBoundingClientRect().width.toFixed(1) : null,
       scrollW: document.documentElement.scrollWidth,
     };
   });
@@ -105,11 +126,15 @@ for (const width of WIDTHS) {
 
   const overlap = Math.max(m.ov1, m.ov2);
   const overflowX = m.scrollW > width;
-  const ko = overlap > 0 || overflowX;
+  /* Telephones (>=360px) : le header doit tenir sur UNE ligne. Le wrap
+     flex n'est qu'un filet de securite pour les ecrans tres etroits. */
+  const wantSingle = width >= 360;
+  const ko = overlap > 0 || overflowX || (wantSingle && m.wrapped);
   if (ko) bad++;
   rows.push({
     width, overlapPx: overlap, die1: m.ov1, die2: m.ov2,
-    leftCol: m.leftCol, mastH: m.mastH, lineScroll: m.lineScroll,
+    mastH: m.mastH, wrapped: m.wrapped, contentW: m.contentW,
+    avail: m.avail, slack: m.slack, h1Font: m.h1Font, h1W: m.h1W,
     scrollW: m.scrollW, overflowX, ...(ko ? { KO: true } : {}),
   });
 }
@@ -117,12 +142,16 @@ for (const width of WIDTHS) {
 await browser.close();
 server.close();
 
-console.log('\nlargeur | chevauchement avatar/dé | hauteur masthead | contenu rangee | scrollWidth');
+console.log('\nlargeur | recouvrement | lignes | fonte h1 | contenu rangee | marge | scrollWidth');
 for (const r of rows) {
   if (r.err) { console.log(`${r.width}px | ERREUR : ${r.err}`); continue; }
-  const wrapped = r.mastH > 90 ? ' (rangee retournee)' : ' (1 rangee)';
-  console.log(`${r.width}px | ${r.overlapPx}px (dé1=${r.die1}, dé2=${r.die2}) | ${r.mastH}px${wrapped} | ${r.lineScroll}px | ${r.scrollW}px${r.overflowX ? ' (DEBORDE)' : ''}${r.KO ? '  <-- BUG' : ''}`);
+  console.log(`${r.width}px | ${r.overlapPx}px (dé1=${r.die1}, dé2=${r.die2}) | `
+    + `${r.wrapped ? '2 LIGNES' : '1 ligne '} (h=${r.mastH}px) | ${r.h1Font} -> ${r.h1W}px | `
+    + `${r.contentW}/${r.avail}px (marge ${r.slack}px) | ${r.scrollW}px`
+    + `${r.overflowX ? ' (DEBORDE)' : ''}${r.KO ? '  <-- BUG' : ''}`);
 }
-console.log(bad ? `\n${bad} largeur(s) en echec` : '\nOK : aucun chevauchement');
+console.log(bad
+  ? `\n${bad} largeur(s) en echec (recouvrement, debordement, ou 2 lignes sur telephone)`
+  : '\nOK : une ligne sur telephone, aucun recouvrement');
 for (const s of shots) console.log('capture : ' + s);
 process.exit(bad ? 1 : 0);

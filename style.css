@@ -190,7 +190,18 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 /* Mobile */
 @media (max-width:600px){
     .masthead{ padding:.6rem .8rem; align-items:start; }
-    h1{ font-size:1.2rem; }
+    /* Un seul ligne : logo + titre + 2 des (40px chacun) + avatar (2.8rem)
+       doivent tenir dans la largeur du telephone.
+       Mesure (poc/_check-masthead.mjs) : h1 = 9.745px de large par px de
+       fonte ; marge disponible = W - 202.4px (padding, avatar, logo, des)
+       d'ou F <= 0.1026W - 22.4px.
+       Le clamp borne : mini pour les petits ecrans (le flex-wrap de la
+       rangee reste le filet < 360px), maxi = 1.4rem comme en desktop
+       (pas de saut visuel a la frontiere 600/601px).
+       NOTE : le gap .5rem est place plus bas dans le fichier, apres la
+       regle de base (a egalite de specificite, c'est l'ordre qui
+       decide — place dans le media query seul, il ne s'appliquait pas). */
+    h1{ font-size:clamp(.78rem, calc(10.26vw - 24px), 1.4rem); }
     .codewords-grid{ grid-template-columns:repeat(2,1fr); }
     .letter-bar{ gap:.2rem; padding:.4rem .2rem; margin:.5rem 0 .6rem; }
     .letter-btn{ min-width:40px; min-height:40px; font-size:1.05rem; }
@@ -268,12 +279,19 @@ h1{ margin:0; font:800 clamp(1.4rem,3vw,2.2rem)/.86 "Barlow Condensed",sans-seri
 @keyframes toast-out{ to{ opacity:0; transform:translateY(10px); } }
 
 /* Dice roller */
-/* flex-wrap : sur un ecran etroit la rangee (logo + titre + des) ne
-   tient pas dans la colonne minmax(0,1fr) ; les des passent alors sur
-   une 2e ligne plutot que de deborder SOUS l'avatar de la colonne 2
+/* flex-wrap : filet de securite. Le cas nominal (téléphone 360-412px)
+   tient sur UNE ligne grace a la fonte de titre reduite (voir @media
+   ci-dessus) ; le wrap ne se declenche que sous ~360px. Sans quoi la
+   rangee (logo + titre + des) deborde sous l'avatar de la colonne 2
    (bug reel : le bouton recouvrait le 2e des, mesure par
    _check-masthead.mjs a 393px et 360px). */
 .masthead > div:first-child{ display:flex; align-items:center; gap:1rem; flex-wrap:wrap; }
+/* Mobile : gaps resserres pour laisser la place au titre sur une ligne
+   (voir @media ci-dessus — ici, apres la regle de base, pour que
+   l'ordre du fichier tranche a egalite de specificite). */
+@media (max-width:600px){
+    .masthead > div:first-child{ gap:.5rem; }
+}
 .dice-roller{ display:flex; gap:.5rem; perspective:200px; }
 .die{ width:40px; height:40px; position:relative; transform-style:preserve-3d; cursor:pointer; transition:transform .1s; }
 .die:hover{ transform:scale(1.1); }

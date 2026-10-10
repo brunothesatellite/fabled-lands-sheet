@@ -1495,4 +1495,57 @@ document.querySelectorAll('.die').forEach(function(die) {
     die.addEventListener('click', function() { rollDie(this); });
 });
 
+/* Masthead : le titre doit tenir sur UNE ligne en mobile, quel que soit le
+   zoom texte systeme et quelle que soit la largeur reelle de l'ecran.
+   La WebView d'Android applique le font_scale systeme a TOUTES les fontes
+   (x1.15 sur le Pixel 7a de test : settings get system font_scale = 1.15) -
+   aucun calcul CSS ne peut anticiper ce multiplicateur. Sans correctif :
+   h1 = 18,21px x 1,15 = 20,94px -> 336px dans 325px de place -> 2 lignes.
+   On remet la valeur CSS, on mesure la place reelle de la rangee (hors
+   avatar, gaps compris) et on ne reduit la fonte que si le titre deborde.
+   En desktop, ou si la place suffit deja, la CSS s'applique seule.
+   ATTENTION : getComputedStyle renvoie la valeur DEJA zoomee - on ne peut
+   donc pas s'en servir comme valeur declaree (le zoom s'appliquerait deux
+   fois) ; on etalonne sur une fonte declaree de reference (100px). */
+function ajusterTitreMasthead() {
+    var rangee = document.querySelector('.masthead > div:first-child');
+    var titre = rangee && rangee.querySelector('h1');
+    if (!rangee || !titre) return;
+    if (!window.matchMedia('(max-width:600px)').matches) {
+        if (titre.style.fontSize) titre.style.fontSize = '';   // desktop : CSS seule
+        return;
+    }
+    titre.style.fontSize = '';                                 // valeur CSS de reference
+    titre.style.flexShrink = '0';                             // mesures en largeur naturelle
+    var enfants = rangee.children;
+    var autres = 0;
+    for (var i = 0; i < enfants.length; i++) {
+        if (enfants[i] !== titre) autres += enfants[i].getBoundingClientRect().width;
+    }
+    var ecart = parseFloat(getComputedStyle(rangee).gap) || 0;
+    /* -1 : marge d'arrondi pour ne jamais declencher l'ellipsis du h1 */
+    var budget = rangee.clientWidth - autres - ecart * (enfants.length - 1) - 1;
+    var largeur = titre.getBoundingClientRect().width;
+    if (budget <= 0 || largeur <= 0 || largeur <= budget) {
+        titre.style.flexShrink = '';                          // la CSS suffit
+        return;
+    }
+    /* Etalonnage : largeur obtenue pour 100px de fonte DECLAREE. Le zoom
+       texte systeme s'applique aussi aux valeurs en px, il est donc deja
+       inclus dans cette mesure - le rapport budget/ref le neutralise. */
+    titre.style.fontSize = '100px';
+    var ref = titre.getBoundingClientRect().width;
+    titre.style.flexShrink = '';
+    titre.style.fontSize = ref > 0 ? (100 * budget / ref) + 'px' : '';
+}
+ajusterTitreMasthead();
+if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(ajusterTitreMasthead);   // re-calibre avec Barlow charge
+}
+if (window.ResizeObserver) {
+    var mastheadRangee = document.querySelector('.masthead > div:first-child');
+    if (mastheadRangee) new ResizeObserver(ajusterTitreMasthead).observe(mastheadRangee);
+}
+window.addEventListener('resize', ajusterTitreMasthead);
+
 initialiser();

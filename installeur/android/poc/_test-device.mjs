@@ -60,16 +60,19 @@ function info(msg) { console.log(`     · ${msg}`); }
 function adb(serial, ...args) {
     try {
         return execFileSync(adbBin, serial ? ['-s', serial, ...args] : args,
-            { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+            { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] })
+            /* CRLF : sans quoi un etat vaut 'device\r' et jamais 'device',
+               et un nom 'export.json\r' ne finit pas par '.json'. */
+            .replace(/\r/g, '').trim();
     } catch (e) {
-        return (e.stdout || '') + (e.stderr || '');
+        return ((e.stdout || '') + (e.stderr || '')).replace(/\r/g, '');
     }
 }
 
 function findDevice() {
     if (process.env.SERIAL) return process.env.SERIAL;
     const out = adb(null, 'devices').split('\n').slice(1);
-    const devs = out.map((l) => l.split('\t')).filter((p) => p[1] === 'device').map((p) => p[0]);
+    const devs = out.map((l) => l.trim().split(/\s+/)).filter((p) => p[1] === 'device').map((p) => p[0]);
     if (!devs.length) throw new Error('Aucun telephone en etat "device" (branchez-le et autorisez le debogage).');
     const real = devs.filter((d) => !d.startsWith('emulator-'));
     if (real.length === 1) return real[0];
@@ -101,7 +104,12 @@ async function connectCDP(serial) {
             try { adb(serial, 'forward', '--remove', `tcp:${PORT}`); } catch (e) { /* pas encore en place */ }
             adb(serial, 'forward', `tcp:${PORT}`, `localabstract:webview_devtools_remote_${pid}`);
             try {
-                return await puppeteer.connect({ browserURL: `http://127.0.0.1:${PORT}` });
+                /* defaultViewport: NULL obligatoire : sinon puppeteer
+                   applique Emulation.setDeviceMetricsOverride(800x600) a la
+                   WebView du TELEPHONE — la webapp se layout en desktop,
+                   coupée a droite ET en bas, et l'override persiste si le
+                   processus de test est tue (constate le 10/10/2026). */
+                return await puppeteer.connect({ browserURL: `http://127.0.0.1:${PORT}`, defaultViewport: null });
             } catch (e) { /* socket pas pret */ }
         }
         await sleep(1000);
@@ -138,23 +146,54 @@ await sleep(1500);
 
 let browser = await connectCDP(serial);
 let page = await pageOf(browser);
-const failures = [];
-page.on('requestfailed', (r) => failures.push(`${r.url()} -> ${r.failure()?.errorText}`));
+let failures = [];
+const attachFail = () => {
+    failures = [];
+    page.on('requestfailed', (r) => failures.push(`${r.url()} -> ${r.failure()?.errorText}`));
+};
+attachFail();
 
-/* D1 : boot + redirection */
+/* Reprise apres « detached Frame » : boot -> index (ou un reload)
+   detachent la frame CDP ; on re-acquiert un handle propre et on
+   rejoue l'etape. Sans quoi une seule navigation casse toute la suite. */
+async function op(fn) {
+    for (let i = 0; i < 2; i++) {
+        try { return await fn(); }
+        catch (e) {
+            if (i === 1 || !/detached|Target closed|Session closed|frame/i.test(e.message)) throw e;
+            info('frame detachee, reconnexion CDP : ' + e.message.split('\n')[0]);
+            await sleep(500);
+            try { await browser.disconnect(); } catch (e2) { /* deja ferme */ }
+            browser = await connectCDP(serial);
+            page = await pageOf(browser);
+            attachFail();
+        }
+    }
+}
+
+/* D1 : attendre la fin de l'amorçage. ATTENTION : boot-poc.html est
+   lui-meme en /fl-sheet/ — attendre « /fl-sheet/ » ne suffit pas, la
+   suite s'executerait sur la page d'amorçage (0 woff2, reload qui
+   detachait la frame...). On poll l'URL de la cible depuis
+   l'exterieur, en re-acquerant le handle a chaque tour. */
+let bootUrl = '';
+for (let i = 0; i < 120; i++) {
+    page = await pageOf(browser);
+    bootUrl = page.url();
+    if (bootUrl.includes('/fl-sheet/index.html')) break;
+    await sleep(1000);
+}
+attachFail();
 try {
-    await page.waitForFunction(
-        () => location.href.includes('/fl-sheet/') && document.readyState === 'complete',
-        { timeout: 60000 });
-    const url = page.url();
-    const tabBar = await page.$('#tabBar');
-    check('D1', 'boot + page /fl-sheet/ chargee', !!tabBar, url.replace(ORIGIN, ''));
+    await page.waitForSelector('#tabBar', { timeout: 20000 });
+    check('D1', 'boot + redirection vers index.html', true, bootUrl.replace(ORIGIN, ''));
 } catch (e) {
-    check('D1', 'boot + page /fl-sheet/ chargee', false, e.message);
+    check('D1', 'boot + redirection vers index.html', false,
+        'arrete sur ' + (bootUrl.replace(ORIGIN, '') || '(aucune page)'));
 }
 
 /* D2 : icônes FA (regression fix CORS) */
-const fa = await page.evaluate(async () => {
+const fa = await op(() => page.evaluate(async () => {
     try { await document.fonts.ready; } catch (e) { /* ignore */ }
     const res = performance.getEntriesByType('resource').map((e) => e.name);
     return {
@@ -163,7 +202,7 @@ const fa = await page.evaluate(async () => {
         solid: document.fonts.check('900 1em "Font Awesome 6 Free"'),
         regular: document.fonts.check('400 1em "Font Awesome 6 Free"'),
     };
-});
+}));
 check('D2', 'icônes FA : woff2 chargees, 0 requete .ttf',
     fa.ttf.length === 0 && fa.woff2.length > 0 && fa.solid,
     `${fa.woff2.length} woff2, ttf=${fa.ttf.length}, solid=${fa.solid}, regular=${fa.regular}`);
@@ -172,7 +211,7 @@ check('D2', 'icônes FA : woff2 chargees, 0 requete .ttf',
 failures.length = 0;
 let reloadNote = '';
 try {
-    await page.reload({ waitUntil: 'networkidle2', timeout: 45000 });
+    await op(() => page.reload({ waitUntil: 'networkidle2', timeout: 45000 }));
 } catch (e) {
     /* Un timeout networkidle2 n'est pas un echec en soi (SW actif) :
        on juge sur les requetes reellement en echec. */
@@ -180,7 +219,7 @@ try {
 }
 try {
     await sleep(1500);
-    const fontFail = await page.evaluate(() => document.fonts.status);
+    const fontFail = await op(() => page.evaluate(() => document.fonts.status));
     check('D3', 'rechargement : 0 requete en echec', failures.length === 0 && fontFail === 'loaded',
         (failures.length ? failures.slice(0, 3).join(' | ') : 'aucune') + ` (fonts=${fontFail})` + (reloadNote ? ' [' + reloadNote + ']' : ''));
 } catch (e) {
@@ -189,51 +228,53 @@ try {
 
 /* D4 : inscription (form_ts + honeypot geres par register.php) */
 try {
-    await page.goto(`${ORIGIN}/fl-sheet/register.php`, { waitUntil: 'networkidle2', timeout: 60000 });
-    await page.waitForSelector('#registerForm', { timeout: 15000 });
-    const pseudo = 'devtest' + String(Date.now()).slice(-5);
-    const pw = 'Fl-Test-2026';
-    await page.type('#pseudo', pseudo);
-    await page.type('#password', pw);
-    await page.type('#passwordConfirm', pw);
-    /* form_ts impose >= 3s au moment du POST (anti-rejeu) */
-    await sleep(3500);
-    await page.click('#registerForm button[type=submit]');
-    /* Succes = redirection vers index.html ; echec = #errorMsg affiche
-       (on capture le texte, sinon le diagnostic se limiterait a un timeout). */
-    const outcome = await Promise.race([
-        page.waitForFunction(() => location.href.includes('index.html'), { timeout: 30000 })
-            .then(() => 'redirect'),
-        page.waitForFunction(() => {
-            const e = document.querySelector('#errorMsg');
-            return e && e.classList.contains('visible') && e.textContent.trim();
-        }, { timeout: 30000 }).then(() => 'error'),
-    ]);
-    if (outcome === 'error') {
-        const msg = await page.evaluate(() => document.querySelector('#errorMsg').textContent);
-        check('D4', 'inscription + session active', false, 'register.php: ' + msg);
-    } else {
-        const chk = await page.evaluate(() =>
-            fetch('api/auth.php?action=check', { cache: 'no-store' }).then((r) => r.json()));
-        check('D4', 'inscription + session active', chk.logged_in === true,
-            `pseudo=${chk.pseudo || '(aucun)'} [attendu ${pseudo}]`);
-        globalThis.__pseudo = pseudo;
-    }
+    await op(async () => {
+        await page.goto(`${ORIGIN}/fl-sheet/register.php`, { waitUntil: 'networkidle2', timeout: 60000 });
+        await page.waitForSelector('#registerForm', { timeout: 15000 });
+        const pseudo = 'devtest' + String(Date.now()).slice(-5);
+        const pw = 'Fl-Test-2026';
+        await page.type('#pseudo', pseudo);
+        await page.type('#password', pw);
+        await page.type('#passwordConfirm', pw);
+        /* form_ts impose >= 3s au moment du POST (anti-rejeu) */
+        await sleep(3500);
+        await page.click('#registerForm button[type=submit]');
+        /* Succes = redirection vers index.html ; echec = #errorMsg affiche
+           (on capture le texte, sinon le diagnostic se limiterait a un timeout). */
+        const outcome = await Promise.race([
+            page.waitForFunction(() => location.href.includes('index.html'), { timeout: 30000 })
+                .then(() => 'redirect'),
+            page.waitForFunction(() => {
+                const e = document.querySelector('#errorMsg');
+                return e && e.classList.contains('visible') && e.textContent.trim();
+            }, { timeout: 30000 }).then(() => 'error'),
+        ]);
+        if (outcome === 'error') {
+            const msg = await page.evaluate(() => document.querySelector('#errorMsg').textContent);
+            check('D4', 'inscription + session active', false, 'register.php: ' + msg);
+        } else {
+            const chk = await page.evaluate(() =>
+                fetch('api/auth.php?action=check', { cache: 'no-store' }).then((r) => r.json()));
+            check('D4', 'inscription + session active', chk.logged_in === true,
+                `pseudo=${chk.pseudo || '(aucun)'} [attendu ${pseudo}]`);
+            globalThis.__pseudo = pseudo;
+        }
+    });
 } catch (e) {
     check('D4', 'inscription + session active', false, e.message);
 }
 
 /* D5 : preference ecrite puis lue COTE SERIEUR (preferences.db) */
 try {
-    await page.waitForFunction(() => typeof ecrirePreference === 'function', { timeout: 15000 });
+    await op(() => page.waitForFunction(() => typeof ecrirePreference === 'function', { timeout: 15000 }));
     const val = 'd5-' + Date.now();
-    const wrote = await page.evaluate(async (v) => {
+    const wrote = await op(() => page.evaluate(async (v) => {
         const ok = await ecrirePreference('fl-devtest', v);
         return { ok, logue: !!utilisateurLogue, php: phpDisponible };
-    }, val);
-    const srv = await page.evaluate(() =>
+    }, val));
+    const srv = await op(() => page.evaluate(() =>
         fetch('api/auth.php?action=get_preferences&key=fl-devtest', { cache: 'no-store' })
-            .then((r) => r.json()));
+            .then((r) => r.json())));
     check('D5', 'preference ecrite -> relue depuis le serveur',
         wrote.ok && wrote.logue && srv.value === val,
         `logge=${wrote.logue}, php=${wrote.php}, serveur=${JSON.stringify(srv.value)}`);
@@ -245,10 +286,10 @@ try {
 /* D8a : bascule de theme (avant force-stop pour tester la persistence) */
 let themeAvant = null;
 try {
-    themeAvant = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-    await page.click('.brand-mark');
-    const themeApres = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-    const stored = await page.evaluate(() => localStorage.getItem('fl-theme'));
+    themeAvant = await op(() => page.evaluate(() => document.documentElement.getAttribute('data-theme')));
+    await op(() => page.click('.brand-mark'));
+    const themeApres = await op(() => page.evaluate(() => document.documentElement.getAttribute('data-theme')));
+    const stored = await op(() => page.evaluate(() => localStorage.getItem('fl-theme')));
     check('D8', 'bascule clair/sombre (clic .brand-mark)',
         themeApres && themeApres !== themeAvant && stored === themeApres,
         `${themeAvant} -> ${themeApres} (localStorage=${stored})`);
@@ -260,15 +301,15 @@ try {
 /* D7 : export JSON -> /sdcard/Download (DownloadListener -> MediaStore) */
 try {
     const before = new Set((adb(serial, 'shell', 'ls', '/sdcard/Download') || '').split('\n'));
-    await page.waitForFunction(() => typeof exporterDonnees === 'function', { timeout: 15000 });
-    await page.evaluate(() => { try { exporterDonnees(); } catch (e) { window.__expErr = String(e); } });
+    await op(() => page.waitForFunction(() => typeof exporterDonnees === 'function', { timeout: 15000 }));
+    await op(() => page.evaluate(() => { try { exporterDonnees(); } catch (e) { window.__expErr = String(e); } }));
     let nouveau = null;
     for (let i = 0; i < 20 && !nouveau; i++) {
         await sleep(1000);
         const now = (adb(serial, 'shell', 'ls', '/sdcard/Download') || '').split('\n');
         nouveau = now.find((f) => f.endsWith('.json') && !before.has(f)) || null;
     }
-    const expErr = await page.evaluate(() => window.__expErr || null);
+    const expErr = await op(() => page.evaluate(() => window.__expErr || null));
     check('D7', 'export JSON -> /sdcard/Download', !!nouveau,
         nouveau || expErr || 'aucun nouveau .json apres 20s');
 } catch (e) {
@@ -286,9 +327,11 @@ try {
     await sleep(2500);
     browser = await connectCDP(serial);
     page = await pageOf(browser);
-    await page.waitForFunction(
-        () => location.href.includes('/fl-sheet/') && document.readyState === 'complete',
-        { timeout: 60000 });
+    /* meme piege que D1 : attendre index.html, pas simplement /fl-sheet/
+       (boot-poc.html est lui-meme sous /fl-sheet/) */
+    await op(() => page.waitForFunction(
+        () => location.href.includes('/fl-sheet/index.html') && document.readyState === 'complete',
+        { timeout: 120000 }));
     const chk = await page.evaluate(() =>
         fetch('api/auth.php?action=check', { cache: 'no-store' }).then((r) => r.json()));
     check('D6a', 'session reprise apres redemarrage app', chk.logged_in === true,
@@ -312,8 +355,8 @@ try {
 
 /* D9 : cartes webp chargees sur l'appareil */
 try {
-    const maps = await page.evaluate(() =>
-        [...document.querySelectorAll('img[src*="maps/"]')].map((i) => ({ s: i.getAttribute('src'), w: i.naturalWidth })));
+    const maps = await op(() => page.evaluate(() =>
+        [...document.querySelectorAll('img[src*="maps/"]')].map((i) => ({ s: i.getAttribute('src'), w: i.naturalWidth }))));
     check('D9', 'cartes maps/*.webp decodees',
         maps.length > 0 && maps.every((m) => m.w > 0),
         maps.length ? `${maps.length} images, min w=${Math.min(...maps.map((m) => m.w))}` : 'aucune img maps/ sur la page');

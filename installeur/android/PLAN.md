@@ -78,7 +78,8 @@ fabled-lands-sheet/
         │   ├── package.json             php-cgi-wasm, php-wasm-sqlite, quickbus, puppeteer-core
         │   ├── server.js                serveur statique /fl-sheet/ + /poc/
         │   ├── run.js                   gates automatisées
-        │   ├── _check-masthead.mjs      non-regression geometrie masthead (5 largeurs)
+        │   ├── _check-masthead.mjs      non-regression geometrie masthead (7 largeurs, banc desktop)
+        │   ├── _diag-css.mjs            diagnostic sur appareil (zoom texte systeme, CSS servie, 1 ligne)
         │   ├── _test-device.mjs         recette §6.2 sur appareil (APK debug + CDP)
         │   └── public/
         │       ├── boot.html            page d'amorçage (SW + écriture IDBFS)
@@ -383,17 +384,48 @@ cd poc && node _test-device.mjs              # SERIAL=xxx pour cibler un apparei
 | Aucune requête externe / `ERR_FAILED` | ✅ **zéro** URL hors `appassets` |
 | Icônes FA (risque #1) | ✅ après fix CORS — voir risque 1 |
 | 404 résiduels | 2 bénins : `/favicon.ico` (auto, `boot.html` n'a pas de `<link rel=icon>`) et `/poc/vendor/…/libxml2.so` (sondage optionnel de php-cgi-wasm, PHP fonctionne sans) |
-| Bug UI rapporté : bouton recouvrant le 2ᵉ dé | ✅ **corrigé** — voir ci-dessous |
+| Bug UI rapportés (webapp) : avatar recouvrant le 2ᵉ dé + titre du masthead sur 2 lignes | ✅ **corrigés** — voir ci-dessous |
 | register/login, session après redémarrage, `preferences.db` en IDB, export/import JSON, toggle dark, pinch-zoom | ⏳ à faire (téléphone indisponible) — D4–D9 automatisés par `poc/_test-device.mjs`, reste manuel : import JSON (sélecteur de fichiers), pinch-zoom, mise à jour `versionCode` |
 
-**Bug UI corrigé (webapp, pas Android)** : en dessous de ~412 px, la rangée
-`logo + h1 + dés` déborde de la colonne `minmax(0,1fr)` de `.masthead` (le `h1` est
-`nowrap` sans `min-width:0`) et l'avatar, peint après dans le DOM, **recouvrait le 2ᵉ dé**
-(12,5 px à 393 px, 39,3 px à 360 px). Correctif : `flex-wrap:wrap` sur la rangée (les dés
-passent sous le titre), `min-width:0 + ellipsis` en dernier recours sur le `h1`, et
-`align-items:start` en mobile (avatar aligné sur le titre). Mesure de non-régression :
-`cd installeur/android/poc && node _check-masthead.mjs` (5 largeurs, 0 px de chevauchement,
-desktop toujours sur **1** rangée) — `SHOT=1` ajoute les captures.
+**Bugs UI corrigés (webapp, pas Android)** — deux symptômes, trois causes, toutes mesurées
+sur l'appareil réel (Pixel 7a « lynx », `poc/_diag-css.mjs`) :
+
+1. *Avatar recouvrant le 2ᵉ dé* : en dessous de ~412 px, la rangée `logo + h1 + dés`
+   déborde de la colonne `minmax(0,1fr)` de `.masthead` (le `h1` est `nowrap` sans
+   `min-width:0`) et l'avatar, peint après dans le DOM, passe par-dessus.
+2. *Titre sur 2 lignes (constaté appareil, invisible en simulation)* : **`font_scale`
+   système = 1,15** (`adb shell settings get system font_scale`). La WebView multiplie
+   **toutes** les fontes par ce facteur — mesuré par sondes : `font-size:100px` déclaré
+   → 115 px calculé, `100vw` → 473,143 px (= 411,43 × 1,15). La CSS donne donc
+   `h1 = 18,21 × 1,15 = 20,94 px` → 336 px de contenu dans 325 px de place → 2 lignes.
+   La simulation Chrome desktop ne le voit pas (zoom ×1) **et** calibrait sur 393 px au
+   lieu des **411 px réels** (1080 / 2,625) : d'où l'écart « parfait en test, cassé
+   sur le téléphone ».
+3. *« coupé à droite **et en bas** »* n'était **pas** un bug CSS : le banc de test CDP
+   laissait `Emulation.setDeviceMetricsOverride(800×600)` sur la WebView quand le
+   processus de test était tué (`puppeteer.connect()` l'applique par défaut) → layout
+   desktop de 800 px affiché plein écran. Fix : `defaultViewport: null` dans `connect()`.
+
+Correctifs retenus :
+- **CSS** (valeur de référence, valide à zoom système ×1) : fonte fluide
+  `clamp(.78rem, calc(10.26vw - 24px), 1.4rem)` calibrée sur la mesure
+  (`h1 = 9,745 px de large par px de fonte`), gaps de la rangée en `.5rem`,
+  `min-width:0 + ellipsis` sur le `h1`, `align-items:start` en mobile.
+  Piège CSS rencontré : le override `gap:.5rem` du media query ne s'appliquait pas tant
+  qu'il restait **avant** la règle de base de même spécificité — l'ordre du fichier tranche.
+- **JS** `ajusterTitreMasthead()` (`script.js`) : garantit **1 ligne à tout `font_scale`
+  et toute largeur** — impossible en CSS, le multiplicateur système n'étant pas
+  anticipable. Il mesure la place réelle de la rangée (hors avatar, gaps) et étalonne sur
+  une fonte déclarée **de référence (100 px)**, ce qui neutralise exactement le zoom.
+  Piège évité : `getComputedStyle` renvoie la valeur **déjà zoomée** — s'en servir comme
+  valeur déclarée applique le zoom **une seconde fois** (constaté puis corrigé).
+
+Contrôles : `poc/_check-masthead.mjs` (banc desktop, 7 largeurs 411/393/412/360/320/
+768/1280, **1 ligne** ≥ 360 px, 0 px de recouvrement, desktop inchangé, `SHOT=1` pour les
+captures) — ce banc **ne peut pas simuler `font_scale`** ; la validation avec zoom réel se
+fait sur appareil via `poc/_diag-css.mjs` (installe l'APK debug, CDP sans override, attend
+l'affichage de l'avatar — l'état le plus serré — puis mesure). Résultat appareil (zoom 1,15,
+avatar affiché) : `h1` ajusté à 192 px = exactement le budget, 1 ligne.
 
 ---
 
