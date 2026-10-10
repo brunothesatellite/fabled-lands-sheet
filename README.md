@@ -67,6 +67,8 @@ All fields auto-save as you type.
 - Check a codeword when you learn it during your adventure.
 - Use the **"Display only checked codewords"** filter to hide everything you haven't found yet.
 
+![Display only checked codewords](screenshots/codewordscheck.png)
+
 ### Book Paragraphs
 
 ![Book Paragraphs](screenshots/book.png)
@@ -90,6 +92,9 @@ A quick-reference combat tracker with two side-by-side boxes:
 ![Maps](screenshots/map.png)
 
 - Tap a map to open the **fullscreen viewer**: a fixed backdrop, the map, and a single ✕ button.
+
+![Fullscreen map viewer](screenshots/mapfull.png)
+
 - **Zoom**: pinch with two fingers on mobile, mouse wheel / trackpad on desktop — zoom is anchored on the pinch midpoint or under the cursor.
 - **Pan**: drag with one finger or the mouse. The map is hard-bounded so it can **never leave the screen** — at least 48 px of the map always stays visible.
 - Close with the ✕, the `Esc` key, or a tap on the backdrop (drags never close it by accident).
