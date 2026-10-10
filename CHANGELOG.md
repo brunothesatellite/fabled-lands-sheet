@@ -33,6 +33,10 @@ This release delivers the first offline Android application for the project (the
 
 With v1.22 the project can now be played two ways: hosted on any PHP 8.2+ web server (webapp zip artifact) or fully offline on a phone (signed APK artifact) — both from the same codebase, with the same data format (`fl-local-storage` v1) travelling between them through export/import.
 
+---
+
+## v1.14
+
 This release continues the evolution of the project from the v1.13 baseline, focusing on visual identity, screen-size usability, compact interface polish, and stronger consistency between the adventure sheet, encounter panels, and the book/map navigation flow.
 
 ### New brand and visual identity
